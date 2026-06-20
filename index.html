@@ -1365,8 +1365,38 @@ function dT(){return[
   {id:'t12',stage:'Idea',status:'Todo',projectId:'p3',parentId:null,title:'Set up SUMMER20 discount code',desc:'20% off all textiles 20–30 June',priority:'Medium',due:'2026-06-20',assignee:'u1',comments:[],createdAt:'2026-06-04'}
 ];}
 function dH(){return {};}
-function save(){const d=JSON.stringify({rows,brands,calItems,ideas,tasks,notes,ctypes,hours,users,projects,taskTypes,usd:USD_R,eur:EUR_R,anth:ANTH_KEY,oai:OPENAI_KEY,supa_url:SUPA_URL,supa_key:SUPA_KEY,sess:currentUser?currentUser.id:null,v:4});try{localStorage.setItem('st_v17',d);}catch(e){}try{window.name='st_v17:'+d;}catch(e){}debounceSupa();}
-function load(){let d=null;try{d=localStorage.getItem('st_v17');}catch(e){}if(!d)try{const n=window.name;if(n&&n.startsWith('st_v17:'))d=n.slice(6);}catch(e){}if(d){try{const p=JSON.parse(d);rows=p.rows||dR();brands=p.brands||dB();calItems=p.calItems||dCal();ideas=p.ideas||dI();tasks=p.tasks||dT();notes=p.notes||dN();ctypes=p.ctypes||dCT();const rh=p.hours||{};hours=Array.isArray(rh)?{}:rh;users=p.users&&p.users.length?p.users:dUsers();projects=p.projects&&p.projects.length?p.projects:dProjects();taskTypes=p.taskTypes&&p.taskTypes.length?p.taskTypes:dTaskTypes();if(p.usd){USD_R=p.usd;document.getElementById('usdR').value=p.usd;}if(p.eur){EUR_R=p.eur;document.getElementById('eurR').value=p.eur;}if(p.anth){ANTH_KEY=p.anth;document.getElementById('anthKey').value=p.anth;}if(p.oai){OPENAI_KEY=p.oai;document.getElementById('oaiKey').value=p.oai;}if(p.supa_url){SUPA_URL=p.supa_url;const su=document.getElementById('supaUrl');if(su)su.value=p.supa_url;}if(p.supa_key){SUPA_KEY=p.supa_key;const sk=document.getElementById('supaKey');if(sk)sk.value=p.supa_key;}if(p.sess)window._savedSess=p.sess;return;}catch(e){}}rows=dR();brands=dB();calItems=dCal();ideas=dI();tasks=dT();notes=dN();ctypes=dCT();hours=dH();users=dUsers();projects=dProjects();taskTypes=dTaskTypes();}
+function save(){const d=JSON.stringify({rows,brands,calItems,ideas,tasks,notes,ctypes,hours,users,projects,taskTypes,usd:USD_R,eur:EUR_R,anth:ANTH_KEY,oai:OPENAI_KEY,supa_url:SUPA_URL,supa_key:SUPA_KEY,sess:currentUser?currentUser.id:null,v:4});try{localStorage.setItem('st_v18',d);}catch(e){}try{window.name='st_v18:'+d;}catch(e){}debounceSupa();}
+function load(){
+  let d=null;
+  try{d=localStorage.getItem('st_v18');}catch(e){}
+  if(!d)try{const n=window.name;if(n&&n.startsWith('st_v18:'))d=n.slice(6);}catch(e){}
+  if(d){
+    try{
+      const p=JSON.parse(d);
+      rows=p.rows&&p.rows.length?p.rows:dR();
+      brands=p.brands&&p.brands.length?p.brands:dB();
+      calItems=p.calItems&&p.calItems.length?p.calItems:dCal();
+      ideas=p.ideas&&p.ideas.length?p.ideas:dI();
+      tasks=p.tasks&&p.tasks.length?p.tasks:dT();
+      notes=p.notes&&p.notes.length?p.notes:dN();
+      ctypes=p.ctypes&&p.ctypes.length?p.ctypes:dCT();
+      const rh=p.hours||{};hours=Array.isArray(rh)?{}:rh;
+      users=p.users&&p.users.length?p.users:dUsers();
+      projects=p.projects&&p.projects.length?p.projects:dProjects();
+      taskTypes=p.taskTypes&&p.taskTypes.length?p.taskTypes:dTaskTypes();
+      if(p.usd){USD_R=p.usd;const el=document.getElementById('usdR');if(el)el.value=p.usd;}
+      if(p.eur){EUR_R=p.eur;const el=document.getElementById('eurR');if(el)el.value=p.eur;}
+      if(p.anth){ANTH_KEY=p.anth;const el=document.getElementById('anthKey');if(el)el.value=p.anth;}
+      if(p.oai){OPENAI_KEY=p.oai;const el=document.getElementById('oaiKey');if(el)el.value=p.oai;}
+      if(p.supa_url){SUPA_URL=p.supa_url;const su=document.getElementById('supaUrl');if(su)su.value=p.supa_url;}
+      if(p.supa_key){SUPA_KEY=p.supa_key;const sk=document.getElementById('supaKey');if(sk)sk.value=p.supa_key;}
+      if(p.sess)window._savedSess=p.sess;
+      return;
+    }catch(e){console.warn('Load error:',e);}
+  }
+  rows=dR();brands=dB();calItems=dCal();ideas=dI();tasks=dT();notes=dN();
+  ctypes=dCT();hours=dH();users=dUsers();projects=dProjects();taskTypes=dTaskTypes();
+}
 function sv(v){document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));document.getElementById(v+'View').classList.add('active');document.querySelectorAll('.np').forEach(el=>el.classList.remove('active'));const nb=document.getElementById('nb-'+v);if(nb)nb.classList.add('active');document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));const sb2=document.getElementById('sb-'+v);if(sb2)sb2.classList.add('active');if(v==='income'){buildMrow();renderInc();}else if(v==='analytics')renderAn();else if(v==='crm')renderCrm();else if(v==='cal')renderCal();else if(v==='notes')renderNotes();else if(v==='tasks')renderTasks();else if(v==='hours'){if(!tsWeekStart)tsWeekStart=getMon(new Date());renderTS();}}
 function typeTag(n){const t=ctypes.find(x=>x.name===n)||{color:'#E0E0DC',tc:'#505050',name:n||'?'};return`<span class="type-tag" style="background:${t.color};color:${t.tc}">${esc(t.name)}</span>`;}
 function buildMrow(){document.getElementById('mrow').innerHTML=MONTHS.map(m=>`<button class="mb${m===aM?' active':''}" onclick="setM('${m}')">${m}</button>`).join('');}
