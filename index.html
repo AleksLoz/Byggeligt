@@ -766,6 +766,8 @@ select.sp-pending{background:#FFF0D4;color:#8B5E00}
 .td-file-item a{color:#1A5A8A;text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 @media(max-width:768px){
+  .mobile-hide{display:none!important}
+
   .nav .np{display:none!important}
   .nav-gap{display:none}
   .nav{height:48px;padding:0 14px;padding-top:env(safe-area-inset-top)}
@@ -773,85 +775,90 @@ select.sp-pending{background:#FFF0D4;color:#8B5E00}
   .rates-drop{min-width:240px;right:-4px}
 }
 /* ── MOBILE LAYOUT IMPROVEMENTS ── */
+
 @media(max-width:768px){
-  /* Stats */
-  .stats-row{grid-template-columns:1fr 1fr}
-  .stat-card:last-child{grid-column:1 / -1}
-  .stat-val{font-size:22px}
-  /* Tables with smooth scroll */
-  .table-card,.ts-wrap,.crm-table{-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
-  /* Income table */
-  .tbl{min-width:460px}
-  .tbl thead th,.tbl tbody td{padding:8px 10px}
-  /* CRM rows */
-  .crm-thead{display:none}
-  .crm-row{display:flex;flex-wrap:wrap;gap:6px 8px;padding:11px 13px;align-items:center}
-  .crm-row>div:nth-child(1){order:1;flex-shrink:0}
-  .crm-row>div:nth-child(2){order:2;flex:1;min-width:0}
-  .crm-row>div:nth-child(7){order:3}
-  .crm-row>div:nth-child(4){order:4}
-  .crm-row>div:nth-child(6){order:5}
-  .crm-row>div:nth-child(3){order:6;flex-basis:100%;font-size:11px;color:var(--mu)}
-  .crm-row>div:nth-child(5){order:7;font-size:11px;color:var(--mu)}
-  .cd-grid{grid-template-columns:1fr 1fr}
-  /* Modals */
-  .overlay{padding:0;align-items:flex-end}
-  .modal{width:100%;max-width:100%;border-radius:20px 20px 0 0;padding:20px 16px calc(24px + env(safe-area-inset-bottom));max-height:90vh}
-  .ne-overlay{padding:0;align-items:flex-end}
-  .note-editor{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:90vh}
-  .profile-panel{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:90vh}
-  .profile-ov{padding:0;align-items:flex-end}
-  /* Import modal */
-  .imp-panel{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:92vh}
-  .imp-ov{padding:0;align-items:flex-end}
-  /* Task panel */
-  .task-panel{width:100%;right:-100%}
-  /* Kanban */
-  .kanban{padding-bottom:6px}
-  .k-col{flex:0 0 82vw;max-width:340px}
+  /* Nav */
+  .np{display:none!important}
+  #userNavBtn span{display:none}
+  
+  /* Views full width */
+  .view{padding:16px 12px!important}
+  .bigt{font-size:28px!important}
+  
+  /* Task list mobile */
+  .as-hdr{display:none}
+  .as-row{flex-wrap:wrap;gap:6px;padding:10px 10px}
+  .as-cell{width:auto!important;flex-shrink:1}
+  .as-name-cell{flex:1;min-width:0}
+  .as-name-inp{font-size:13px!important}
+  /* Hide due and priority on mobile to save space */
+  .as-row .as-cell:nth-child(4),
+  .as-row .as-cell:nth-child(5){display:none}
+  .as-sect-hdr{flex-wrap:wrap;gap:6px;padding:8px 8px}
+  .as-sect-name{font-size:13px!important}
+  .as-prog-bar{width:40px}
+  
+  /* Income table mobile */
+  .tbl th:nth-child(2),
+  .tbl td:nth-child(2),
+  .tbl th:nth-child(4),
+  .tbl td:nth-child(4),
+  .tbl th:nth-child(6),
+  .tbl td:nth-child(6){display:none}
+  .inc-row td:nth-child(2){display:none}
+  .dkk-cell{display:none}
+  
+  /* CRM table mobile */
+  .crm-tbl th:nth-child(3),
+  .crm-tbl td:nth-child(3),
+  .crm-tbl th:nth-child(6),
+  .crm-tbl td:nth-child(6){display:none}
+  .crm-tabs{overflow-x:auto;gap:2px}
+  .crm-tab{padding:6px 10px;font-size:10px}
+  
+  /* Modals full width */
+  .modal{width:95vw!important;max-width:95vw!important;padding:16px!important}
+  .mfrow{flex-direction:column}
+  .mf{min-width:0}
+  
+  /* Task detail panel full screen */
+  #taskDetailPanel{width:100%!important;right:-100%!important}
+  #taskDetailPanel[style*="right: 0"]{right:0!important}
+  
+  /* Income summary cards */
+  .inc-summary{flex-direction:column;gap:10px}
+  .sum-card{min-width:0!important}
+  
+  /* Hours table */
+  #tsTable th:nth-child(3),
+  #tsTable td:nth-child(3){display:none}
+  
+  /* Pipeline/stats */
+  .pipe-bar{flex-wrap:wrap}
+  .pipe-cell{min-width:80px}
+  
+  /* Forms */
+  input,select,textarea{font-size:16px!important}/* Prevents iOS zoom */
+  
   /* Calendar */
-  .cal-card-hdr{flex-direction:column;align-items:flex-start;gap:10px}
-  .cal-day{min-height:58px;padding:4px 3px}
-  .cal-sidebar{max-height:260px}
-  .cal-grid{grid-template-columns:1fr}
-  /* Hours */
-  .ts-table th:first-child{width:140px}
-  .ts-row-task{font-size:11px}
-  .ts-summary{grid-template-columns:repeat(2,1fr)}
-  .ts-sum-val{font-size:18px}
-  /* Task list */
-  .tl2-head{display:none}
-  .tl2-row,.tl2-row.is-sub{grid-template-columns:24px 1fr 28px;padding-right:10px}
-  .tl2-row .tl2-cell:not(:last-child){display:none}
-  .tl2-row .tl2-cell:last-child{display:flex}
-  .tl2-row.is-sub{padding-left:34px}
-  /* Auth */
-  .auth-box{border-radius:0;padding:28px 20px calc(28px + env(safe-area-inset-bottom));width:100%;box-shadow:none;margin-top:auto}
-  .auth-screen{align-items:flex-end}
-  /* Buttons */
-  .abtn,.bcl,.bdel{min-height:40px;padding:9px 16px}
-  .bigt{font-size:30px;margin-bottom:16px}
-  /* Notes grid */
-  .notes-grid{grid-template-columns:1fr}
-  .an-grid{grid-template-columns:1fr}
-  /* Pipe bar */
-  .pipe-bar{grid-template-columns:repeat(5,1fr)}
-  .pipe-n{font-size:18px}
-  .pipe-l{font-size:8px}
+  .tcal-wrap{flex-direction:column}
+  .tcal-side{width:100%!important}
+  
+  /* CRM detail expand */
+  .crm-detail{padding:12px!important}
+  .cd-grid{grid-template-columns:1fr!important}
+  
+  /* Bulk bar */
+  .bulk-bar{flex-wrap:wrap;gap:6px;padding:10px}
+  .bulk-pick{font-size:11px}
 }
-@media(max-width:400px){
-  .stats-row{grid-template-columns:1fr}
-  .stat-card:last-child{grid-column:auto}
-  .k-col{flex:0 0 88vw}
-}
-@media(max-width:600px){.page{padding:62px 13px calc(26px + env(safe-area-inset-bottom))}.bigt{font-size:28px;margin-bottom:16px}.stats-row{grid-template-columns:1fr}.table-card{overflow-x:auto}.tbl{min-width:480px}.mf input,.mf select,.mf textarea,.tbl td input,.tbl td select,.tp-s,.tp-d,.imp-field-inp,.imp-field-sel,.imp-textarea{font-size:16px!important}.an-grid{grid-template-columns:1fr}.pipe-cell{padding:9px 4px}.pipe-n{font-size:18px}.pipe-l{font-size:8px}.crm-thead{display:none}.crm-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px 8px;padding:10px}.crm-row>div:nth-child(1){order:1}.crm-row>div:nth-child(2){order:2;flex:1;min-width:0}.crm-row>div:nth-child(7){order:3}.crm-row>div:nth-child(3){order:5;flex-basis:100%}.crm-row>div:nth-child(4){order:6}.crm-row>div:nth-child(5){order:7}.crm-row>div:nth-child(6){order:8}.cd-grid{grid-template-columns:1fr}.cal-grid{grid-template-columns:1fr}.cal-day{min-height:54px;padding:4px 3px}.day-n{width:21px;height:21px;font-size:11px}.hol-lbl{display:none}.notes-grid{grid-template-columns:1fr}.kanban .k-col{flex:0 0 230px}.task-panel{width:100%;right:-100%}.overlay{padding:0;align-items:flex-end}.modal{width:100%;max-width:100%;border-radius:20px 20px 0 0;padding:18px 14px calc(18px + env(safe-area-inset-bottom));max-height:90vh}.mfrow{grid-template-columns:1fr}.ne-overlay{padding:0;align-items:flex-end}.note-editor{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:90vh}.ts-summary{grid-template-columns:1fr 1fr}}
+
 </style>
 </head><body>
 <nav class="nav">
   <button class="burger-btn" onclick="openSidebar()" aria-label="Menu">☰</button>
   <div class="nav-brand" style="display:flex;align-items:center;gap:5px">Byggeligt<span class="sync-dot" id="syncDot" title="Supabase sync"></span></div>
   <button class="np" id="nb-income" onclick="sv('income')">Income</button>
-  <button class="np" id="nb-analytics" onclick="sv('analytics')">Analytics</button>
   <button class="np" id="nb-crm" onclick="sv('crm')">Collabs</button>
   <button class="np" id="nb-notes" onclick="sv('notes')">Notes</button>
   <button class="np" id="nb-tasks" onclick="sv('tasks')">Tasks</button>
@@ -877,9 +884,9 @@ select.sp-pending{background:#FFF0D4;color:#8B5E00}
   <div class="eye">Financial Overview</div><div class="bigt">Income Streams</div>
   <div class="month-row" id="mrow"></div>
   <div class="stats-row">
-    <div class="stat-card" id="sc-all" onclick="setSF('all')"><div class="stat-lbl">Total Potential</div><div class="stat-val" id="sPot">—</div><div class="stat-sub" id="sPotS">streams</div></div>
-    <div class="stat-card" id="sc-inv" onclick="setSF('inv')"><div class="stat-lbl">Invoiced</div><div class="stat-val" id="sInv">—</div><div class="stat-sub" id="sInvS">sent</div></div>
-    <div class="stat-card" id="sc-paid" onclick="setSF('paid')"><div class="stat-lbl">Paid</div><div class="stat-val" id="sPaid">—</div><div class="stat-sub" id="sPaidS">received</div></div>
+    <div class="inc-summary-wrap" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap"><div class="stat-card" id="sc-all" onclick="setSF('all')" style="flex:1;min-width:140px"><div class="stat-lbl">Total Potential</div><div class="stat-val" id="sPot">—</div><div class="stat-sub" id="sPotS">streams</div></div>
+    <div class="stat-card" id="sc-inv" onclick="setSF('inv')" style="flex:1;min-width:140px"><div class="stat-lbl">Invoiced</div><div class="stat-val" id="sInv">—</div><div class="stat-sub" id="sInvS">sent</div></div>
+    <div class="stat-card" id="sc-paid" onclick="setSF('paid')" style="flex:1;min-width:140px"><div class="stat-lbl">Paid</div><div class="stat-val" id="sPaid">—</div><div class="stat-sub" id="sPaidS">received</div></div>
   </div>
   <div class="table-card">
     <table class="tbl"><thead><tr><th style="width:200px">Stream</th><th style="width:160px">Type</th><th style="width:105px">Amount</th><th style="width:68px">CCY</th><th style="width:108px">Status</th><th>in DKK</th><th style="width:38px"></th></tr></thead>
@@ -887,14 +894,9 @@ select.sp-pending{background:#FFF0D4;color:#8B5E00}
     <div id="incFooter"><button class="add-row-btn" onclick="addR()">+ Add stream</button></div>
   </div>
 </div>
-<div id="analyticsView" class="view">
-  <div class="eye">Financial Overview</div><div class="bigt">Analytics</div>
-  <div class="ac" style="margin-bottom:14px"><div class="ac-title">Monthly overview — potential vs. confirmed</div><div id="mBars"></div></div>
-  <div class="an-grid"><div class="ac"><div class="ac-title">Income by type</div><div id="byType"></div></div><div class="ac"><div class="ac-title">Month-over-month</div><div class="cmp-grid" id="cmpCards"></div></div></div>
-</div>
 <div id="crmView" class="view">
   <div class="eye">Brand Pipeline</div><div class="bigt">Collabs</div>
-  <div class="crm-tabs" id="crmTabBar"></div>
+  <div class="crm-tabs" id="crmTabBar" style="overflow-x:auto;-webkit-overflow-scrolling:touch"></div>
   <div class="crm-header">
     <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
       <button class="abtn" onclick="openCrmM()">+ New brand</button>
@@ -1393,11 +1395,11 @@ function dT(){return[
   {id:'t12',from:'',stage:'Idea',status:'Todo',projectId:'p3',parentId:null,title:'Set up SUMMER20 discount code',desc:'20% off all textiles 20-30 June',priority:'Medium',due:'2026-06-20',assignee:'u1',comments:[],createdAt:'2026-06-04'}
 ];}
 function dH(){return {};}
-function save(){const d=JSON.stringify({rows,brands,calItems,ideas,tasks,notes,ctypes,hours,users,projects,taskTypes,usd:USD_R,eur:EUR_R,anth:ANTH_KEY,oai:OPENAI_KEY,supa_url:SUPA_URL,supa_key:SUPA_KEY,sess:currentUser?currentUser.id:null,v:4});try{localStorage.setItem('st_v18',d);}catch(e){}try{window.name='st_v18:'+d;}catch(e){}debounceSupa();}
+function save(){const d=JSON.stringify({rows,brands,calItems,ideas,tasks,notes,ctypes,hours,users,projects,taskTypes,usd:USD_R,eur:EUR_R,anth:ANTH_KEY,oai:OPENAI_KEY,supa_url:SUPA_URL,supa_key:SUPA_KEY,sess:currentUser?currentUser.id:null,v:4});try{localStorage.setItem('st_v19',d);}catch(e){}try{window.name='st_v19:'+d;}catch(e){}debounceSupa();}
 function load(){
   let d=null;
-  try{d=localStorage.getItem('st_v18');}catch(e){}
-  if(!d)try{const n=window.name;if(n&&n.startsWith('st_v18:'))d=n.slice(6);}catch(e){}
+  try{d=localStorage.getItem('st_v19');}catch(e){}
+  if(!d)try{const n=window.name;if(n&&n.startsWith('st_v19:'))d=n.slice(6);}catch(e){}
   if(d){
     try{
       const p=JSON.parse(d);
@@ -1425,7 +1427,7 @@ function load(){
   rows=dR();brands=dB();calItems=dCal();ideas=dI();tasks=dT();notes=dN();
   ctypes=dCT();hours=dH();users=dUsers();projects=dProjects();taskTypes=dTaskTypes();
 }
-function sv(v){document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));document.getElementById(v+'View').classList.add('active');document.querySelectorAll('.np').forEach(el=>el.classList.remove('active'));const nb=document.getElementById('nb-'+v);if(nb)nb.classList.add('active');document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));const sb2=document.getElementById('sb-'+v);if(sb2)sb2.classList.add('active');if(v==='income'){buildMrow();renderInc();}else if(v==='analytics')renderAn();else if(v==='crm')renderCrm();else if(v==='cal')renderCal();else if(v==='notes')renderNotes();else if(v==='tasks')renderTasks();else if(v==='hours'){if(!tsWeekStart)tsWeekStart=getMon(new Date());renderTS();}}
+function sv(v){document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));document.getElementById(v+'View').classList.add('active');document.querySelectorAll('.np').forEach(el=>el.classList.remove('active'));const nb=document.getElementById('nb-'+v);if(nb)nb.classList.add('active');document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));const sb2=document.getElementById('sb-'+v);if(sb2)sb2.classList.add('active');if(v==='income'){buildMrow();renderInc();}else if(v==='crm')renderCrm();else if(v==='cal')renderCal();else if(v==='notes')renderNotes();else if(v==='tasks')renderTasks();else if(v==='hours'){if(!tsWeekStart)tsWeekStart=getMon(new Date());renderTS();}}
 function typeTag(n){const t=ctypes.find(x=>x.name===n)||{color:'#E0E0DC',tc:'#505050',name:n||'?'};return`<span class="type-tag" style="background:${t.color};color:${t.tc}">${esc(t.name)}</span>`;}
 function buildMrow(){document.getElementById('mrow').innerHTML=MONTHS.map(m=>`<button class="mb${m===aM?' active':''}" onclick="setM('${m}')">${m}</button>`).join('');}
 function setM(m){aM=m;buildMrow();renderInc();}
@@ -2606,6 +2608,8 @@ function openTaskDetail(taskId){
   tdRenderSubs(t);tdRenderFiles(t);tdRenderComments(t);
   // Show panel
   document.getElementById('taskDetailOverlay').style.display='block';
+  var w=window.innerWidth;
+  document.getElementById('taskDetailPanel').style.width=w<=768?'100%':'500px';
   document.getElementById('taskDetailPanel').style.right='0';
 }
 
@@ -2724,7 +2728,7 @@ function tdAddComment(){
 
 function closeTaskDetail(){
   document.getElementById('taskDetailOverlay').style.display='none';
-  document.getElementById('taskDetailPanel').style.right='-520px';
+  document.getElementById('taskDetailPanel').style.right=window.innerWidth<=768?'-100%':'-520px';
   _tdTaskId=null;
 }
 
