@@ -991,7 +991,7 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
       <div class="login-field"><label>Password</label><input class="login-input" id="su-password" type="password" placeholder="Min. 6 characters" autocomplete="new-password"></div>
       <div class="login-field"><label>Confirm password</label><input class="login-input" id="su-confirm" type="password" placeholder="Repeat password" autocomplete="new-password"></div>
       <div class="login-error" id="su-error"></div>
-      <button class="btn btn-primary login-cta" id="su-btn">Create Account</button>
+      <button class="btn btn-primary login-cta" id="su-btn" onclick="document.getElementById('su-error').textContent='Click registered at '+Date.now()">Create Account</button>
     </div>
   </div>
 </div>
