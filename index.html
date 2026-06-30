@@ -991,7 +991,7 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
       <div class="login-field"><label>Password</label><input class="login-input" id="su-password" type="password" placeholder="Min. 6 characters" autocomplete="new-password"></div>
       <div class="login-field"><label>Confirm password</label><input class="login-input" id="su-confirm" type="password" placeholder="Repeat password" autocomplete="new-password"></div>
       <div class="login-error" id="su-error"></div>
-      <button class="btn btn-primary login-cta" id="su-btn" onclick="document.getElementById('su-error').textContent=window._suListenerReady?'LISTENER READY':'LISTENER MISSING - JS error blocked setup'">Create Account</button>
+      <button class="btn btn-primary login-cta" id="su-btn">Create Account</button>
     </div>
   </div>
 </div>
@@ -4417,15 +4417,15 @@ function closeCreateCampaignModal() {
   document.getElementById('create-campaign-overlay').style.display = 'none';
 }
 
-document.getElementById('btn-add-campaign').addEventListener('click', openCreateCampaignModal);
-document.getElementById('btn-add-campaign-topbar').addEventListener('click', openCreateCampaignModal);
-document.getElementById('create-camp-close').addEventListener('click', closeCreateCampaignModal);
-document.getElementById('create-camp-cancel').addEventListener('click', closeCreateCampaignModal);
-document.getElementById('create-campaign-overlay').addEventListener('click', e => {
+document.getElementById('btn-add-campaign')?.addEventListener('click', openCreateCampaignModal);
+document.getElementById('btn-add-campaign-topbar')?.addEventListener('click', openCreateCampaignModal);
+document.getElementById('create-camp-close')?.addEventListener('click', closeCreateCampaignModal);
+document.getElementById('create-camp-cancel')?.addEventListener('click', closeCreateCampaignModal);
+document.getElementById('create-campaign-overlay')?.addEventListener('click', e => {
   if (e.target === document.getElementById('create-campaign-overlay')) closeCreateCampaignModal();
 });
 
-document.getElementById('create-camp-save').addEventListener('click', () => {
+document.getElementById('create-camp-save')?.addEventListener('click', () => {
   const name = document.getElementById('cc-name').value.trim();
   const errEl = document.getElementById('cc-error');
   if (!name) { errEl.textContent = 'Campaign name is required.'; return; }
@@ -5469,7 +5469,6 @@ document.getElementById('si-btn')?.addEventListener('click', async ()=>{
 });
 
 // ─── Sign Up ──────────────────────────────────────────────
-window._suListenerReady = true;
 document.getElementById('su-btn')?.addEventListener('click', async ()=>{
   const name     = document.getElementById('su-name').value.trim();
   const email    = document.getElementById('su-email').value.trim().toLowerCase();
