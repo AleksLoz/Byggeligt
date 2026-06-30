@@ -5453,14 +5453,16 @@ document.getElementById('si-btn')?.addEventListener('click', async ()=>{
   const email    = document.getElementById('si-email').value.trim().toLowerCase();
   const password = document.getElementById('si-password').value;
   const errEl    = document.getElementById('si-error');
-  errEl.textContent = '';
-  if (!email||!password){ errEl.textContent='Please fill in all fields'; return; }
-  const users = getAuthUsers();
-  const user  = users.find(u=>u.email===email);
-  if (!user){ errEl.textContent='No account found with that email'; return; }
-  const hash = await hashPassword(password);
-  if (hash !== user.passwordHash){ errEl.textContent='Incorrect password'; return; }
-  finishLogin(user.id);
+  try {
+    errEl.textContent = '';
+    if (!email||!password){ errEl.textContent='Please fill in all fields'; return; }
+    const users = getAuthUsers();
+    const user  = users.find(u=>u.email===email);
+    if (!user){ errEl.textContent='No account found with that email. Please create an account first.'; return; }
+    const hash = await hashPassword(password);
+    if (hash !== user.passwordHash){ errEl.textContent='Incorrect password'; return; }
+    finishLogin(user.id);
+  } catch(e) { errEl.textContent = 'Error: ' + e.message; }
 });
 ['si-email','si-password'].forEach(id=>{
   document.getElementById(id)?.addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('si-btn').click(); });
@@ -5473,6 +5475,7 @@ document.getElementById('su-btn')?.addEventListener('click', async ()=>{
   const password = document.getElementById('su-password').value;
   const confirm  = document.getElementById('su-confirm').value;
   const errEl    = document.getElementById('su-error');
+  try {
   errEl.textContent = '';
   if (!name||!email||!password||!confirm){ errEl.textContent='Please fill in all fields'; return; }
   if (password.length < 6){ errEl.textContent='Password must be at least 6 characters'; return; }
@@ -5515,6 +5518,7 @@ document.getElementById('su-btn')?.addEventListener('click', async ()=>{
     const aw=document.getElementById('prof-admin-wrap');
     if(aw) aw.style.display='flex';
   }
+  } catch(e) { document.getElementById('su-error').textContent = 'Error: ' + e.message; }
 });
 
 // ─── Forgot password ──────────────────────────────────────
