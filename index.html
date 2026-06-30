@@ -10,8 +10,8 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f7f6f2;--card:#ffffff;--accent:#5a4fcf;--accent-light:#ede9ff;--accent-mid:#7c6ee0;
-  --border:#e5e3dc;--border2:#d0cdc4;--text:#1a1917;--text2:#6b6862;--text3:#9c9893;
+  --bg:#f2ede6;--card:#faf7f3;--accent:#3a1a0e;--accent-light:#ecddd5;--accent-mid:#5c2b18;
+  --border:#ddd5c8;--border2:#c9bfb3;--text:#2a1208;--text2:#7a6558;--text3:#a8968a;
   --radius:8px;--radius-lg:12px;--shadow:0 2px 8px rgba(0,0,0,0.08);
   --status-idea:#8b5cf6;--status-in_process:#f59e0b;--status-ready:#10b981;--status-done:#6b7280;
   --font:Inter,sans-serif;
@@ -444,7 +444,7 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 .team-user-info{flex:1;min-width:0}
 .team-user-name{font-weight:600}
 .team-user-email{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.team-admin-badge{font-size:10px;background:#ede9ff;color:var(--accent);padding:1px 7px;border-radius:10px;font-weight:700;margin-left:4px}
+.team-admin-badge{font-size:10px;background:var(--accent-light);color:var(--accent);padding:1px 7px;border-radius:10px;font-weight:700;margin-left:4px}
 .invite-link-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:11px;color:var(--text2);word-break:break-all;margin-top:6px;font-family:monospace}
 
 #cal-body{display:flex;gap:0;align-items:flex-start;min-height:0}
@@ -1397,7 +1397,7 @@ const SB_HDRS = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Ty
 
 async function sbGet(key) {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/aankl_store?key=eq.' + encodeURIComponent(key) + '&select=value', { headers: SB_HDRS });
+    const r = await fetch(SB_URL + '/rest/v1/aankl_store?key=eq.' + encodeURIComponent('byggeligt_' + key) + '&select=value', { headers: SB_HDRS });
     if (!r.ok) return null;
     const d = await r.json();
     return d.length ? d[0].value : null;
@@ -1409,7 +1409,7 @@ async function sbSet(key, value) {
     await fetch(SB_URL + '/rest/v1/aankl_store', {
       method: 'POST',
       headers: Object.assign({}, SB_HDRS, { Prefer: 'resolution=merge-duplicates' }),
-      body: JSON.stringify({ key: key, value: value, updated_at: new Date().toISOString() })
+      body: JSON.stringify({ key: 'byggeligt_' + key, value: value, updated_at: new Date().toISOString() })
     });
   } catch(e) {}
 }
@@ -1423,7 +1423,7 @@ function sbStripDataUrls(inspoData) {
 
 async function sbGetUpdatedAt(key) {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/aankl_store?key=eq.' + encodeURIComponent(key) + '&select=updated_at', { headers: SB_HDRS });
+    const r = await fetch(SB_URL + '/rest/v1/aankl_store?key=eq.' + encodeURIComponent('byggeligt_' + key) + '&select=updated_at', { headers: SB_HDRS });
     if (!r.ok) return null;
     const d = await r.json();
     return d.length ? d[0].updated_at : null;
