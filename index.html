@@ -736,6 +736,60 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 .kanban-col-remove{opacity:0;font-size:12px;color:var(--text3);padding:2px 4px;border-radius:4px;cursor:pointer;transition:all .12s;border:none;background:none;line-height:1}
 .kanban-col-header:hover .kanban-col-remove{opacity:1}
 .kanban-col-remove:hover{background:#fee2e2;color:#ef4444}
+/* ── Collabs CRM ── */
+.collabs-wrap{padding:24px;max-width:1100px;margin:0 auto}
+.collabs-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.collabs-status-tabs{display:flex;gap:6px}
+.collab-status-tab{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);transition:all .15s}
+.collab-status-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.collabs-pipeline{font-size:13px;color:var(--text2);font-weight:500}
+.collabs-grid{display:flex;flex-direction:column;gap:10px}
+.collab-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:box-shadow .15s;display:flex;align-items:flex-start;gap:16px}
+.collab-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+.collab-avatar{width:44px;height:44px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0;letter-spacing:-0.5px}
+.collab-main{flex:1;min-width:0}
+.collab-company{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
+.collab-desc{font-size:13px;color:var(--text2);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.collab-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.collab-price{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-light);padding:2px 9px;border-radius:10px}
+.collab-deliverables{font-size:12px;color:var(--text2);padding:2px 8px;border:1px solid var(--border);border-radius:10px}
+.collab-date{font-size:12px;color:var(--text3)}
+.collab-contact{font-size:12px;color:var(--text2)}
+.collab-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+/* Collab drawer */
+.collab-drawer-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.3);display:none}
+.collab-drawer-overlay.open{display:block}
+.collab-drawer{position:fixed;right:0;top:0;bottom:0;width:420px;max-width:95vw;background:var(--card);border-left:1px solid var(--border);z-index:501;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;overflow:hidden}
+.collab-drawer.open{transform:translateX(0)}
+.collab-drawer-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.collab-drawer-body{flex:1;overflow-y:auto;padding:20px 24px}
+.collab-field-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.collab-field-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);box-sizing:border-box;font-family:inherit}
+.collab-field-input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.collab-field{margin-bottom:16px}
+.collab-drawer-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+.collab-status-select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+/* Income */
+.income-wrap{padding:24px;max-width:900px;margin:0 auto}
+.income-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.income-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.income-stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.income-stat-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.income-stat-value{font-size:22px;font-weight:800;color:var(--text)}
+.income-stat-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.income-list{display:flex;flex-direction:column;gap:8px}
+.income-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.income-type-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.income-row-name{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.income-row-amount{font-size:15px;font-weight:800;color:var(--accent)}
+.income-row-date{font-size:12px;color:var(--text3);min-width:60px;text-align:right}
+/* Add modal */
+.collab-modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
+.collab-modal-overlay.open{display:flex}
+.collab-modal{background:var(--card);border-radius:16px;padding:28px 32px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.2)}
+.income-modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
+.income-modal-overlay.open{display:flex}
+.income-modal{background:var(--card);border-radius:16px;padding:28px 32px;width:420px;max-width:95vw;box-shadow:0 24px 80px rgba(0,0,0,.2)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -751,10 +805,8 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
     <button class="view-pill active" data-view="list">List</button>
     <button class="view-pill" data-view="calendar">Calendar</button>
     <button class="view-pill" data-view="tasks">Tasks</button>
-    <button class="view-pill" data-view="influencers">Influencers</button>
-    <button class="view-pill" data-view="inspo">✨ Inspo</button>
-    <button class="view-pill" data-view="insights">Insights</button>
-    <!-- Insights tab hidden -->
+    <button class="view-pill" data-view="collabs">Collabs</button>
+    <button class="view-pill" data-view="income">Income</button>
   </div>
   <div class="topbar-right">
 
@@ -937,33 +989,11 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
     </div>
   </div>
 
-  <!-- INFLUENCERS VIEW -->
-  <div class="view" id="view-influencers" style="display:none"></div>
-  <div class="view" id="view-inspo" style="display:none">
-    <!-- Static shell — JS replaces this on switch -->
-    <div class="inspo-header"><span class="inspo-title">&#10024; Inspo Boards</span></div>
-    <div class="inspo-boards-bar" id="inspo-boards-bar-static">
-      <div class="inspo-board-tab-wrap"><button class="inspo-board-tab active" data-board-init="sneaker_girlie">Sneaker Girlie</button></div>
-      <div class="inspo-board-tab-wrap"><button class="inspo-board-tab" data-board-init="always_on_crowd">Always on Crowd</button></div>
-      <div class="inspo-board-tab-wrap"><button class="inspo-board-tab" data-board-init="cool_mom">Cool Mom</button></div>
-      <div class="inspo-board-tab-wrap"><button class="inspo-board-tab" data-board-init="comfort_conv">Comfort Converter</button></div>
-      <button class="inspo-add-tab-btn">+ Add Board</button>
-    </div>
-    <div class="inspo-grid" id="inspo-grid-static">
-      <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 20px;text-align:center">
-        <div style="font-size:52px;margin-bottom:14px">&#128444;</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Nothing here yet</div>
-        <div style="font-size:13px;color:var(--text3);margin-bottom:22px">Paste a TikTok or Instagram link, or upload images and videos</div>
-      </div>
-      <div class="inspo-add-card" onclick="openInspoAddModal(activeInspoBoard||'sneaker_girlie')">
-        <div class="inspo-add-card-icon">+</div>
-        <div class="inspo-add-card-label">Add Inspo</div>
-      </div>
-    </div>
-  </div>
+  <!-- COLLABS VIEW -->
+  <div class="view" id="view-collabs" style="display:none"></div>
 
-  <!-- INSIGHTS VIEW -->
-  <div class="view" id="view-insights" style="display:none"></div>
+  <!-- INCOME STREAMS VIEW -->
+  <div class="view" id="view-income" style="display:none"></div>
 </div>
 
 
@@ -1438,6 +1468,8 @@ async function sbSync() {
     ['config',      'byggeligt_studio_config_v1'],
     ['auth_users',  'byggeligt_auth_users'],
     ['influencers', 'byggeligt_influencers_v1'],
+    ['collabs',     'byggeligt_collabs_v1'],
+    ['income',      'byggeligt_income_v1'],
     ['inspo',       'byggeligt_inspo_v1'],
     ['invites',     'byggeligt_invites_v1'],
     ['saved_views', 'byggeligt_studio_saved_views'],
@@ -2638,8 +2670,8 @@ function closeDetailModal() {
   if (viewId==='calendar') renderCalendar();
   else if (viewId==='tasks') renderKanban();
   else if (viewId==='campaigns') renderCampaigns();
-  else if (viewId==='influencers') renderInfluencers();
-  else if (viewId==='inspo') renderInspo();
+  else if (viewId==='collabs') renderCollabs();
+  else if (viewId==='income') renderIncome();
   else renderListView();
 }
 document.getElementById('modal-close').addEventListener('click', closeDetailModal);
@@ -3131,9 +3163,8 @@ function switchView(viewId) {
     }
   }
   else if (viewId==='campaigns') renderCampaigns();
-  else if (viewId==='influencers') renderInfluencers();
-  else if (viewId==='insights') renderInsights();
-  else if (viewId==='inspo') renderInspo();
+  else if (viewId==='collabs') renderCollabs();
+  else if (viewId==='income') renderIncome();
   else if (viewId==='list') renderListView();
 }
 document.querySelectorAll('.view-pill').forEach(pill=>{
@@ -5410,6 +5441,356 @@ async function insRenderIg(){
     }, 10000);
   }
 })();
+
+// ════════════════════════════════════════════════════════════
+//  COLLABS CRM
+// ════════════════════════════════════════════════════════════
+const COLLABS_KEY = 'byggeligt_collabs_v1';
+let COLLABS = [];
+function getCollabs(){try{return JSON.parse(localStorage.getItem(COLLABS_KEY)||'[]');}catch(e){return[];}}
+function saveCollabs(){localStorage.setItem(COLLABS_KEY,JSON.stringify(COLLABS));sbSet('collabs',COLLABS);}
+
+const COLLAB_STATUSES = [
+  {id:'potential', label:'Potential', color:'#8b5cf6', bg:'#ede9ff'},
+  {id:'ongoing',   label:'Ongoing',   color:'#10b981', bg:'#d1fae5'},
+  {id:'lost',      label:'Lost',      color:'#ef4444', bg:'#fee2e2'},
+  {id:'later',     label:'Later',     color:'#f59e0b', bg:'#fef3c7'},
+];
+let _collabStatus = 'potential';
+let _activeCollabId = null;
+
+function collabInitials(name){
+  return name.split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';
+}
+function collabAvatarColor(name){
+  const colors=['#3a1a0e','#5c2b18','#8b5cf6','#3b82f6','#10b981','#f59e0b','#ef4444'];
+  let h=0; for(let c of name) h=(h*31+c.charCodeAt(0))&0xffff;
+  return colors[h%colors.length];
+}
+function fmtPrice(p){
+  if(!p&&p!==0) return '—';
+  return 'DKK '+Number(p).toLocaleString('da-DK');
+}
+
+function renderCollabs(){
+  COLLABS = getCollabs();
+  const wrap = document.getElementById('view-collabs');
+  if(!wrap) return;
+  const filtered = COLLABS.filter(c=>c.status===_collabStatus);
+  const pipelineTotal = COLLABS.filter(c=>c.status==='potential').reduce((s,c)=>s+(Number(c.price)||0),0);
+  const ongoingTotal  = COLLABS.filter(c=>c.status==='ongoing').reduce((s,c)=>s+(Number(c.price)||0),0);
+
+  wrap.innerHTML = `
+  <div class="collabs-wrap">
+    <div class="collabs-topbar">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:var(--text)">Brand Collabs</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:1px">Pipeline: DKK ${pipelineTotal.toLocaleString('da-DK')} · Ongoing: DKK ${ongoingTotal.toLocaleString('da-DK')}</div>
+        </div>
+        <div class="collabs-status-tabs">
+          ${COLLAB_STATUSES.map(s=>`<button class="collab-status-tab${s.id===_collabStatus?' active':''}" onclick="setCollabStatus('${s.id}')">${s.label} <span style="opacity:.7;font-size:11px">${COLLABS.filter(c=>c.status===s.id).length}</span></button>`).join('')}
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="openAddCollabModal()">+ Add Deal</button>
+    </div>
+    ${filtered.length===0?`
+      <div style="text-align:center;padding:60px 20px;color:var(--text3)">
+        <div style="font-size:40px;margin-bottom:12px">🤝</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No ${_collabStatus} deals yet</div>
+        <div style="font-size:13px">Add a brand deal to start tracking your pipeline</div>
+      </div>
+    `:`
+      <div class="collabs-grid">
+        ${filtered.map(c=>{
+          const st = COLLAB_STATUSES.find(s=>s.id===c.status)||COLLAB_STATUSES[0];
+          return `<div class="collab-card" onclick="openCollabDrawer('${c.id}')">
+            <div class="collab-avatar" style="background:${collabAvatarColor(c.company||'?')}">${collabInitials(c.company||'?')}</div>
+            <div class="collab-main">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+                <div class="collab-company">${c.company||'Unnamed'}</div>
+                <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${st.bg};color:${st.color}">${st.label}</span>
+              </div>
+              <div class="collab-desc">${c.description||'No description'}</div>
+              <div class="collab-meta">
+                ${c.price?`<span class="collab-price">${fmtPrice(c.price)}</span>`:''}
+                ${c.deliverables?`<span class="collab-deliverables">📦 ${c.deliverables}</span>`:''}
+                ${c.contact?`<span class="collab-contact">👤 ${c.contact}</span>`:''}
+                ${c.dateContacted?`<span class="collab-date">📅 ${c.dateContacted}</span>`:''}
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    `}
+  </div>
+  <!-- Collab drawer -->
+  <div class="collab-drawer-overlay" id="collab-drawer-overlay" onclick="closeCollabDrawer()"></div>
+  <div class="collab-drawer" id="collab-drawer">
+    <div class="collab-drawer-header">
+      <div style="font-size:15px;font-weight:700;color:var(--text)" id="collab-drawer-title">Deal Details</div>
+      <button onclick="closeCollabDrawer()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">×</button>
+    </div>
+    <div class="collab-drawer-body" id="collab-drawer-body"></div>
+    <div class="collab-drawer-footer">
+      <button class="btn btn-primary" onclick="saveCollabDrawer()" style="flex:1">Save</button>
+      <button class="btn" onclick="deleteCollab()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+    </div>
+  </div>
+  <!-- Add deal modal -->
+  <div class="collab-modal-overlay" id="add-collab-overlay">
+    <div class="collab-modal">
+      <div style="font-size:16px;font-weight:800;margin-bottom:20px;color:var(--text)">Add Brand Deal</div>
+      <div class="collab-field"><div class="collab-field-label">Company / Brand *</div><input class="collab-field-input" id="nc-company" placeholder="e.g. Nike, H&M, Zalando"></div>
+      <div class="collab-field"><div class="collab-field-label">Campaign Brief / Description</div><textarea class="collab-field-input" id="nc-desc" rows="3" placeholder="What's the campaign about?"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="collab-field"><div class="collab-field-label">Package Price (DKK)</div><input class="collab-field-input" id="nc-price" type="number" placeholder="5000"></div>
+        <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="nc-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===_collabStatus?' selected':''}>${s.label}</option>`).join('')}</select></div>
+      </div>
+      <div class="collab-field"><div class="collab-field-label">Deliverables</div><input class="collab-field-input" id="nc-deliverables" placeholder="e.g. 2 Reels, 3 Stories, 1 YouTube video"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="nc-contact" placeholder="Sarah Johnson"></div>
+        <div class="collab-field"><div class="collab-field-label">Their Email</div><input class="collab-field-input" id="nc-email" type="email" placeholder="sarah@brand.com"></div>
+      </div>
+      <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="nc-date" type="date"></div>
+      <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="nc-notes" rows="2" placeholder="Any extra notes..."></textarea></div>
+      <div id="nc-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn" onclick="closeAddCollabModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewCollab()">Add Deal</button>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+window.setCollabStatus = function(s){ _collabStatus=s; renderCollabs(); };
+
+window.openAddCollabModal = function(){
+  const ov = document.getElementById('add-collab-overlay');
+  if(ov){ ov.classList.add('open'); document.getElementById('nc-company').focus(); }
+};
+window.closeAddCollabModal = function(){
+  const ov = document.getElementById('add-collab-overlay');
+  if(ov) ov.classList.remove('open');
+};
+window.saveNewCollab = function(){
+  const company = document.getElementById('nc-company').value.trim();
+  if(!company){ document.getElementById('nc-error').textContent='Company name is required'; return; }
+  const collab = {
+    id: uid(), company,
+    description: document.getElementById('nc-desc').value.trim(),
+    price: document.getElementById('nc-price').value||'',
+    status: document.getElementById('nc-status').value,
+    deliverables: document.getElementById('nc-deliverables').value.trim(),
+    contact: document.getElementById('nc-contact').value.trim(),
+    email: document.getElementById('nc-email').value.trim(),
+    dateContacted: document.getElementById('nc-date').value,
+    notes: document.getElementById('nc-notes').value.trim(),
+    _ts: Date.now()
+  };
+  COLLABS.unshift(collab);
+  saveCollabs();
+  _collabStatus = collab.status;
+  closeAddCollabModal();
+  renderCollabs();
+  toast('Deal added!','success');
+};
+
+window.openCollabDrawer = function(id){
+  _activeCollabId = id;
+  const c = COLLABS.find(x=>x.id===id);
+  if(!c) return;
+  const title = document.getElementById('collab-drawer-title');
+  const body  = document.getElementById('collab-drawer-body');
+  if(title) title.textContent = c.company||'Deal Details';
+  if(body) body.innerHTML = `
+    <div class="collab-field"><div class="collab-field-label">Company / Brand</div><input class="collab-field-input" id="cd-company" value="${(c.company||'').replace(/"/g,'&quot;')}"></div>
+    <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="cd-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===c.status?' selected':''}>${s.label}</option>`).join('')}</select></div>
+    <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="cd-desc" rows="4">${c.description||''}</textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Price (DKK)</div><input class="collab-field-input" id="cd-price" type="number" value="${c.price||''}"></div>
+      <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="cd-date" type="date" value="${c.dateContacted||''}"></div>
+    </div>
+    <div class="collab-field"><div class="collab-field-label">Deliverables</div><input class="collab-field-input" id="cd-deliverables" value="${(c.deliverables||'').replace(/"/g,'&quot;')}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="cd-contact" value="${(c.contact||'').replace(/"/g,'&quot;')}"></div>
+      <div class="collab-field"><div class="collab-field-label">Email</div><input class="collab-field-input" id="cd-email" type="email" value="${(c.email||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="cd-notes" rows="4">${c.notes||''}</textarea></div>
+    ${c.email?`<a href="mailto:${c.email}" style="display:inline-block;margin-top:4px;font-size:13px;color:var(--accent);text-decoration:none">✉ Email ${c.contact||c.email}</a>`:''}
+  `;
+  document.getElementById('collab-drawer-overlay').classList.add('open');
+  document.getElementById('collab-drawer').classList.add('open');
+};
+window.closeCollabDrawer = function(){
+  document.getElementById('collab-drawer-overlay')?.classList.remove('open');
+  document.getElementById('collab-drawer')?.classList.remove('open');
+  _activeCollabId = null;
+};
+window.saveCollabDrawer = function(){
+  const c = COLLABS.find(x=>x.id===_activeCollabId);
+  if(!c) return;
+  c.company     = document.getElementById('cd-company')?.value.trim()||c.company;
+  c.status      = document.getElementById('cd-status')?.value||c.status;
+  c.description = document.getElementById('cd-desc')?.value.trim();
+  c.price       = document.getElementById('cd-price')?.value;
+  c.dateContacted = document.getElementById('cd-date')?.value;
+  c.deliverables = document.getElementById('cd-deliverables')?.value.trim();
+  c.contact     = document.getElementById('cd-contact')?.value.trim();
+  c.email       = document.getElementById('cd-email')?.value.trim();
+  c.notes       = document.getElementById('cd-notes')?.value.trim();
+  c._ts         = Date.now();
+  _collabStatus = c.status;
+  saveCollabs();
+  closeCollabDrawer();
+  renderCollabs();
+  toast('Deal saved','success');
+};
+window.deleteCollab = function(){
+  if(!_activeCollabId) return;
+  if(!confirm('Delete this deal?')) return;
+  COLLABS = COLLABS.filter(x=>x.id!==_activeCollabId);
+  saveCollabs();
+  closeCollabDrawer();
+  renderCollabs();
+  toast('Deal deleted');
+};
+
+// ════════════════════════════════════════════════════════════
+//  INCOME STREAMS
+// ════════════════════════════════════════════════════════════
+const INCOME_KEY = 'byggeligt_income_v1';
+let INCOME = [];
+function getIncome(){try{return JSON.parse(localStorage.getItem(INCOME_KEY)||'[]');}catch(e){return[];}}
+function saveIncome(){localStorage.setItem(INCOME_KEY,JSON.stringify(INCOME));sbSet('income',INCOME);}
+
+const INCOME_TYPES = [
+  {id:'brand_deal', label:'Brand Deal', color:'#3a1a0e', bg:'#ecddd5'},
+  {id:'ugc',        label:'UGC',        color:'#7c3aed', bg:'#ede9ff'},
+  {id:'affiliate',  label:'Affiliate',  color:'#0891b2', bg:'#cffafe'},
+  {id:'merch',      label:'Merch',      color:'#059669', bg:'#d1fae5'},
+  {id:'event',      label:'Event/Speaking', color:'#d97706', bg:'#fef3c7'},
+  {id:'other',      label:'Other',      color:'#6b7280', bg:'#f3f4f6'},
+];
+
+function renderIncome(){
+  INCOME = getIncome();
+  const wrap = document.getElementById('view-income');
+  if(!wrap) return;
+
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const thisMonth = now.getMonth();
+  const yearTotal = INCOME.reduce((s,x)=>s+(Number(x.amount)||0),0);
+  const monthTotal = INCOME.filter(x=>{
+    if(!x.date) return false;
+    const d=new Date(x.date+'T00:00:00');
+    return d.getFullYear()===thisYear && d.getMonth()===thisMonth;
+  }).reduce((s,x)=>s+(Number(x.amount)||0),0);
+  const brandTotal = INCOME.filter(x=>x.type==='brand_deal').reduce((s,x)=>s+(Number(x.amount)||0),0);
+
+  const byType = {};
+  INCOME.forEach(x=>{
+    byType[x.type]=(byType[x.type]||0)+(Number(x.amount)||0);
+  });
+
+  const sorted = [...INCOME].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+
+  wrap.innerHTML = `
+  <div class="income-wrap">
+    <div class="income-topbar">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:var(--text)">Income Streams</div>
+        <div style="font-size:12px;color:var(--text3)">Track all your revenue as a creator</div>
+      </div>
+      <button class="btn btn-primary" onclick="openAddIncomeModal()">+ Add Income</button>
+    </div>
+    <div class="income-summary">
+      <div class="income-stat-card">
+        <div class="income-stat-label">Total Earned</div>
+        <div class="income-stat-value">DKK ${yearTotal.toLocaleString('da-DK')}</div>
+        <div class="income-stat-sub">All time</div>
+      </div>
+      <div class="income-stat-card">
+        <div class="income-stat-label">This Month</div>
+        <div class="income-stat-value">DKK ${monthTotal.toLocaleString('da-DK')}</div>
+        <div class="income-stat-sub">${now.toLocaleString('en',{month:'long',year:'numeric'})}</div>
+      </div>
+      <div class="income-stat-card">
+        <div class="income-stat-label">Brand Deals</div>
+        <div class="income-stat-value">DKK ${brandTotal.toLocaleString('da-DK')}</div>
+        <div class="income-stat-sub">${INCOME.filter(x=>x.type==='brand_deal').length} deals</div>
+      </div>
+      <div class="income-stat-card">
+        <div class="income-stat-label">Top Source</div>
+        <div class="income-stat-value" style="font-size:16px">${(()=>{const top=Object.entries(byType).sort((a,b)=>b[1]-a[1])[0];if(!top)return '—';const t=INCOME_TYPES.find(x=>x.id===top[0]);return t?t.label:top[0];})()}</div>
+        <div class="income-stat-sub">by revenue</div>
+      </div>
+    </div>
+    ${sorted.length===0?`
+      <div style="text-align:center;padding:60px 20px;color:var(--text3)">
+        <div style="font-size:40px;margin-bottom:12px">💰</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No income tracked yet</div>
+        <div style="font-size:13px">Add your first income entry to start tracking</div>
+      </div>
+    `:`
+      <div class="income-list">
+        ${sorted.map(x=>{
+          const t=INCOME_TYPES.find(tp=>tp.id===x.type)||INCOME_TYPES[INCOME_TYPES.length-1];
+          return `<div class="income-row">
+            <span class="income-type-badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
+            <div class="income-row-name">${x.name||'Unnamed'}</div>
+            <div class="income-row-amount">DKK ${Number(x.amount||0).toLocaleString('da-DK')}</div>
+            <div class="income-row-date">${x.date||''}</div>
+            <button onclick="deleteIncome('${x.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 4px" title="Delete">×</button>
+          </div>`;
+        }).join('')}
+      </div>
+    `}
+  </div>
+  <!-- Add income modal -->
+  <div class="income-modal-overlay" id="add-income-overlay">
+    <div class="income-modal">
+      <div style="font-size:16px;font-weight:800;margin-bottom:20px;color:var(--text)">Add Income</div>
+      <div class="collab-field"><div class="collab-field-label">Name / Description *</div><input class="collab-field-input" id="ni-name" placeholder="e.g. Nike Reel deal"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="collab-field"><div class="collab-field-label">Amount (DKK)</div><input class="collab-field-input" id="ni-amount" type="number" placeholder="5000"></div>
+        <div class="collab-field"><div class="collab-field-label">Type</div><select class="collab-field-input" id="ni-type">${INCOME_TYPES.map(t=>`<option value="${t.id}">${t.label}</option>`).join('')}</select></div>
+      </div>
+      <div class="collab-field"><div class="collab-field-label">Date</div><input class="collab-field-input" id="ni-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="ni-notes" rows="2" placeholder="Brand, campaign details..."></textarea></div>
+      <div id="ni-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn" onclick="closeAddIncomeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewIncome()">Add</button>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+window.openAddIncomeModal = function(){
+  const ov=document.getElementById('add-income-overlay');
+  if(ov){ov.classList.add('open');document.getElementById('ni-name').focus();}
+};
+window.closeAddIncomeModal = function(){
+  document.getElementById('add-income-overlay')?.classList.remove('open');
+};
+window.saveNewIncome = function(){
+  const name=document.getElementById('ni-name').value.trim();
+  if(!name){document.getElementById('ni-error').textContent='Name is required';return;}
+  INCOME.unshift({id:uid(),name,amount:document.getElementById('ni-amount').value,type:document.getElementById('ni-type').value,date:document.getElementById('ni-date').value,notes:document.getElementById('ni-notes').value.trim(),_ts:Date.now()});
+  saveIncome();
+  closeAddIncomeModal();
+  renderIncome();
+  toast('Income added!','success');
+};
+window.deleteIncome = function(id){
+  INCOME=INCOME.filter(x=>x.id!==id);
+  saveIncome();
+  renderIncome();
+};
 
 // ════════════════════════════════════════════════════════════
 //  AUTH — Email / Password
