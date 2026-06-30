@@ -1391,13 +1391,13 @@ const VIEWS_KEY  = 'byggeligt_studio_saved_views';
 const INF_KEY    = 'byggeligt_influencers_v1';
 
 // ── Supabase Sync ────────────────────────────────────────────────────────────
-const SB_URL = 'https://gayfrcoinmstztfxajmu.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdheWZyY29pbm1zdHp0Znhham11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNDYzMjMsImV4cCI6MjA5NzcyMjMyM30.gAwbeTRxuZV-YxhLwYkQqVHpspZ4hG8nKfZURsIYPwU';
+const SB_URL = 'https://dzabtjnkvckcwojtscod.supabase.co';
+const SB_KEY = 'sb_publishable_9U4ju8syFmL0wIYV600Q-w_3VVCzWP8';
 const SB_HDRS = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 
 async function sbGet(key) {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/aankl_store?key=eq.' + encodeURIComponent('byggeligt_' + key) + '&select=value', { headers: SB_HDRS });
+    const r = await fetch(SB_URL + '/rest/v1/byggeligt_store?key=eq.' + encodeURIComponent('byggeligt_' + key) + '&select=value', { headers: SB_HDRS });
     if (!r.ok) return null;
     const d = await r.json();
     return d.length ? d[0].value : null;
@@ -1406,7 +1406,7 @@ async function sbGet(key) {
 
 async function sbSet(key, value) {
   try {
-    await fetch(SB_URL + '/rest/v1/aankl_store', {
+    await fetch(SB_URL + '/rest/v1/byggeligt_store', {
       method: 'POST',
       headers: Object.assign({}, SB_HDRS, { Prefer: 'resolution=merge-duplicates' }),
       body: JSON.stringify({ key: 'byggeligt_' + key, value: value, updated_at: new Date().toISOString() })
@@ -1423,7 +1423,7 @@ function sbStripDataUrls(inspoData) {
 
 async function sbGetUpdatedAt(key) {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/aankl_store?key=eq.' + encodeURIComponent('byggeligt_' + key) + '&select=updated_at', { headers: SB_HDRS });
+    const r = await fetch(SB_URL + '/rest/v1/byggeligt_store?key=eq.' + encodeURIComponent('byggeligt_' + key) + '&select=updated_at', { headers: SB_HDRS });
     if (!r.ok) return null;
     const d = await r.json();
     return d.length ? d[0].updated_at : null;
