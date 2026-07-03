@@ -30,9 +30,6 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .topbar-brand{display:flex;flex-direction:column;margin-right:8px}
 .topbar-brand-name{font-weight:700;font-size:16px;color:var(--text);letter-spacing:-0.3px}
 .topbar-brand-sub{font-size:11px;color:var(--text3);font-weight:400}
-.view-pills{display:flex;gap:4px;background:var(--bg);border-radius:var(--radius);padding:3px}
-.view-pill{padding:5px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;cursor:pointer;border:none;background:none}
-.view-pill.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1)}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--border)}
 .btn:hover{background:var(--bg)}
@@ -40,10 +37,17 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .btn-primary:hover{background:var(--accent-mid);border-color:var(--accent-mid)}
 .btn-icon{padding:7px;border-radius:var(--radius)}
 
-/* VIEWS */
-#app{padding:0 24px 80px}
+/* SIDEBAR LAYOUT */
+#sidebar{position:fixed;left:0;top:56px;bottom:0;width:220px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;z-index:90;display:flex;flex-direction:column;padding:12px 8px;gap:1px}
+#app{margin-left:220px;padding:0 32px 80px}
 .view{display:none}
 .view.active{display:block}
+.nav-sep{height:1px;background:var(--border);margin:8px 2px}
+.nav-section-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:10px 10px 4px;flex-shrink:0}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--accent-light);color:var(--text)}
+.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:600}
+.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;opacity:.8}
 .coming-soon{display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-size:18px;font-weight:500}
 
 /* LIST VIEW */
@@ -841,13 +845,6 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
   <div class="topbar-brand" style="flex-direction:row;align-items:center">
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzODAgOTAiPgogIDx0ZXh0IHg9IjE5MCIgeT0iNTgiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI2NiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zdHlsZT0iaXRhbGljIiBmaWxsPSIjMTExIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iLTIiPmJ5Z2dlbGlndDwvdGV4dD4KICA8dGV4dCB4PSIxOTAiIHk9Ijc4IiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSI1MDAiIGZpbGw9IiM0NDQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxMCI+U1RVRElPPC90ZXh0Pgo8L3N2Zz4=" alt="byggeligt" style="height:22px;flex-shrink:0">
   </div>
-  <div class="view-pills">
-    <button class="view-pill active" data-view="list">List</button>
-    <button class="view-pill" data-view="calendar">Calendar</button>
-    <button class="view-pill" data-view="tasks">Tasks</button>
-    <button class="view-pill" data-view="collabs">Collabs</button>
-    <button class="view-pill" data-view="income">Income</button>
-  </div>
   <div class="topbar-right">
 
     <button class="btn btn-icon" id="btn-settings" title="Settings">&#9881;</button>
@@ -862,9 +859,30 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 
 <!-- APP -->
 <div id="app">
+<div id="sidebar">
+  <button class="nav-item active" data-view="home" onclick="switchView('home')"><span class="nav-icon">🏠</span>Home</button>
+  <div class="nav-sep"></div>
+  <div class="nav-section-title">Content</div>
+  <button class="nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="nav-icon">📅</span>Calendar</button>
+  <button class="nav-item" data-view="list" onclick="switchView('list')"><span class="nav-icon">📋</span>Content List</button>
+  <div class="nav-sep"></div>
+  <div class="nav-section-title">Business</div>
+  <button class="nav-item" data-view="collabs" onclick="switchView('collabs')"><span class="nav-icon">🤝</span>Deals</button>
+  <button class="nav-item" data-view="contacts" onclick="switchView('contacts')"><span class="nav-icon">👥</span>Contacts</button>
+  <button class="nav-item" data-view="income" onclick="switchView('income')"><span class="nav-icon">💰</span>Income</button>
+  <div class="nav-sep"></div>
+  <div class="nav-section-title">Tasks</div>
+  <button class="nav-item" data-view="tasks" onclick="switchView('tasks')"><span class="nav-icon">✅</span>Tasks</button>
+</div>
+
+<!-- HOME / DASHBOARD VIEW -->
+<div class="view active" id="view-home" style="padding:32px 0 0;max-width:960px"></div>
+
+<!-- CONTACTS VIEW -->
+<div class="view" id="view-contacts" style="padding:32px 0 0;max-width:960px"></div>
 
   <!-- LIST VIEW -->
-  <div class="view active" id="view-list">
+  <div class="view" id="view-list">
     <div id="list-view-header">
       <button class="btn" id="btn-filter">&#9655; Filters</button>
       <span class="list-stats" id="list-stats"></span>
@@ -1498,6 +1516,7 @@ async function sbSync() {
     ['collabs',     'byggeligt_collabs_v1'],
     ['income',      'byggeligt_income_v1'],
     ['content_collabs','byggeligt_content_collabs_v1'],
+    ['contacts',       'byggeligt_contacts_v1'],
     ['inspo',       'byggeligt_inspo_v1'],
     ['invites',     'byggeligt_invites_v1'],
     ['saved_views', 'byggeligt_studio_saved_views'],
@@ -2693,8 +2712,8 @@ function openDetailModal(id) {
 function closeDetailModal() {
   document.getElementById('modal-overlay').classList.remove('show');
   activeDetailId = null;
-  const activeViewPill = document.querySelector('.view-pill.active');
-  const viewId = activeViewPill ? activeViewPill.dataset.view : 'list';
+  const activeViewPill = document.querySelector('.nav-item.active');
+  const viewId = activeViewPill ? activeViewPill.dataset.view : 'home';
   if (viewId==='calendar') renderCalendar();
   else if (viewId==='tasks') renderTasks();
   else if (viewId==='campaigns') renderCampaigns();
@@ -3098,7 +3117,7 @@ function renderSettingsContent(key) {
         }
         saveData();
         renderListView();
-        const avp = document.querySelector('.view-pill.active');
+        const avp = document.querySelector('.nav-item.active');
         if (avp && avp.dataset.view==='calendar') renderCalendar();
         else if (avp && avp.dataset.view==='kanban') renderKanban();
       });
@@ -3165,22 +3184,21 @@ document.getElementById('btn-add-content').addEventListener('click',()=>{
 //  VIEW SWITCHING
 // ====================================================================
 function switchView(viewId) {
-  document.querySelectorAll('.view-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>{v.classList.remove('active'); v.style.display='none';});
-  const pill = document.querySelector(`.view-pill[data-view="${viewId}"]`);
-  if (pill) pill.classList.add('active');
+  const navBtn = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+  if (navBtn) navBtn.classList.add('active');
   const viewEl = document.getElementById('view-'+viewId);
   if (viewEl) { viewEl.classList.add('active'); viewEl.style.display=''; }
-  if (viewId==='calendar') renderCalendar();
+  if (viewId==='home') renderDashboard();
+  else if (viewId==='calendar') renderCalendar();
   else if (viewId==='tasks') renderTasks();
   else if (viewId==='campaigns') renderCampaigns();
   else if (viewId==='collabs') renderCollabs();
+  else if (viewId==='contacts') renderContacts();
   else if (viewId==='income') renderIncome();
   else if (viewId==='list') renderListView();
 }
-document.querySelectorAll('.view-pill').forEach(pill=>{
-  pill.addEventListener('click',()=>switchView(pill.dataset.view));
-});
 
 // ====================================================================
 //  FILTER BUTTON
@@ -5386,7 +5404,7 @@ async function insRenderIg(){
   try { await sbSync(); } catch(e) { console.warn('Supabase offline, using local data:', e); }
   loadData();
   bindModalAutoSave();
-  renderListView();
+  switchView('home');
   // Auth init (moved here so it runs AFTER data is loaded from Supabase)
   (function runInitAuth(){
     var savedId = localStorage.getItem('byggeligt_current_user');
@@ -5952,58 +5970,55 @@ function fmtPrice(p){
   return 'DKK '+Number(p).toLocaleString('da-DK');
 }
 
+window._collabAutoFx=function(){
+  const amt=document.getElementById('nc-price')?.value;
+  const cur=document.getElementById('nc-currency')?.value||'DKK';
+  const dkkEl=document.getElementById('nc-pricedkk');
+  if(dkkEl&&amt){dkkEl.value=cur==='DKK'?amt:Math.round(parseFloat(amt)*(CC_FX[cur]||1));}
+};
+
 function renderCollabs(){
   COLLABS = getCollabs();
   const wrap = document.getElementById('view-collabs');
   if(!wrap) return;
   const filtered = COLLABS.filter(c=>c.status===_collabStatus);
-  const pipelineTotal = COLLABS.filter(c=>c.status==='potential').reduce((s,c)=>s+(Number(c.price)||0),0);
-  const ongoingTotal  = COLLABS.filter(c=>c.status==='ongoing').reduce((s,c)=>s+(Number(c.price)||0),0);
+  const counts = {};
+  COLLAB_STATUSES.forEach(s=>{ counts[s.id]=COLLABS.filter(c=>c.status===s.id).length; });
+  const activeDKK = COLLABS.filter(c=>c.status==='ongoing').reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
+  const pipelineDKK = COLLABS.filter(c=>c.status==='potential').reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
 
   wrap.innerHTML = `
-  <div class="collabs-wrap">
-    <div class="collabs-topbar">
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <div>
-          <div style="font-size:18px;font-weight:800;color:var(--text)">Brand Collabs</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:1px">Pipeline: DKK ${pipelineTotal.toLocaleString('da-DK')} · Ongoing: DKK ${ongoingTotal.toLocaleString('da-DK')}</div>
-        </div>
-        <div class="collabs-status-tabs">
-          ${COLLAB_STATUSES.map(s=>`<button class="collab-status-tab${s.id===_collabStatus?' active':''}" onclick="setCollabStatus('${s.id}')">${s.label} <span style="opacity:.7;font-size:11px">${COLLABS.filter(c=>c.status===s.id).length}</span></button>`).join('')}
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="openAddCollabModal()">+ Add Deal</button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-top:32px">
+    <div>
+      <div style="font-size:20px;font-weight:800;color:var(--text)">Brand Deals</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:2px">Active: <b style="color:var(--text)">DKK ${activeDKK.toLocaleString('da-DK')}</b> · Pipeline: <b style="color:var(--text)">DKK ${pipelineDKK.toLocaleString('da-DK')}</b></div>
     </div>
-    ${filtered.length===0?`
-      <div style="text-align:center;padding:60px 20px;color:var(--text3)">
-        <div style="font-size:40px;margin-bottom:12px">🤝</div>
-        <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No ${_collabStatus} deals yet</div>
-        <div style="font-size:13px">Add a brand deal to start tracking your pipeline</div>
-      </div>
-    `:`
-      <div class="collabs-grid">
-        ${filtered.map(c=>{
-          const st = COLLAB_STATUSES.find(s=>s.id===c.status)||COLLAB_STATUSES[0];
-          return `<div class="collab-card" onclick="openCollabDrawer('${c.id}')">
-            <div class="collab-avatar" style="background:${collabAvatarColor(c.company||'?')}">${collabInitials(c.company||'?')}</div>
-            <div class="collab-main">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
-                <div class="collab-company">${c.company||'Unnamed'}</div>
-                <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${st.bg};color:${st.color}">${st.label}</span>
-              </div>
-              <div class="collab-desc">${c.description||'No description'}</div>
-              <div class="collab-meta">
-                ${c.price?`<span class="collab-price">${fmtPrice(c.price)}</span>`:''}
-                ${c.deliverables?`<span class="collab-deliverables">📦 ${c.deliverables}</span>`:''}
-                ${c.contact?`<span class="collab-contact">👤 ${c.contact}</span>`:''}
-                ${c.dateContacted?`<span class="collab-date">📅 ${c.dateContacted}</span>`:''}
-              </div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-    `}
+    <button class="btn btn-primary" onclick="openAddCollabModal()">+ Add Deal</button>
   </div>
+  <div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px;width:fit-content">
+    ${COLLAB_STATUSES.map((s,i)=>`<button onclick="setCollabStatus('${s.id}')" style="padding:7px 16px;font-size:13px;font-weight:${s.id===_collabStatus?700:500};border:none;cursor:pointer;background:${s.id===_collabStatus?'var(--accent)':'var(--card)'};color:${s.id===_collabStatus?'#fff':'var(--text2)'};${i>0?'border-left:1.5px solid var(--border)':''};transition:all .15s">${s.label} <span style="opacity:.65;font-size:11px;font-weight:400">${counts[s.id]||0}</span></button>`).join('')}
+  </div>
+  ${filtered.length===0?`<div style="text-align:center;padding:60px 20px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">🤝</div><div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No ${_collabStatus} deals</div><div style="font-size:13px">Click + Add Deal to create one</div></div>`:`
+  <table class="stask-table"><thead><tr>
+    <th style="width:22%">Brand</th><th style="width:18%">Contact</th><th style="width:14%">Value</th><th style="width:14%">Status</th><th style="width:20%">Brief</th><th style="width:12%">Date</th>
+  </tr></thead><tbody>
+  ${filtered.map(c=>{
+    const st=COLLAB_STATUSES.find(s=>s.id===c.status)||COLLAB_STATUSES[0];
+    const dkk=Number(c.priceDKK||c.price)||0;
+    const origVal=c.price&&c.priceCurrency&&c.priceCurrency!=='DKK'?`<div style="font-size:11px;color:var(--text3)">${Number(c.price).toLocaleString()} ${c.priceCurrency}</div>`:'';
+    return `<tr class="stask-row" onclick="openCollabDrawer('${c.id}')">
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">${(c.company||'?')[0].toUpperCase()}</div>
+        <div class="stask-name">${c.company||'—'}</div>
+      </div></td>
+      <td style="color:var(--text2)">${c.contact||'—'}</td>
+      <td style="font-weight:600;color:var(--text)">${dkk?'DKK '+dkk.toLocaleString('da-DK'):'—'}${origVal}</td>
+      <td><span class="stask-badge" style="background:${st.bg};color:${st.color}"><span class="stask-status-dot" style="background:${st.color}"></span>${st.label}</span></td>
+      <td style="color:var(--text2);font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description||'—'}</td>
+      <td style="color:var(--text3);font-size:12px">${c.dateContacted||'—'}</td>
+    </tr>`;
+  }).join('')}
+  </tbody></table>`}
   <!-- Collab drawer -->
   <div class="collab-drawer-overlay" id="collab-drawer-overlay" onclick="closeCollabDrawer()"></div>
   <div class="collab-drawer" id="collab-drawer">
@@ -6019,20 +6034,24 @@ function renderCollabs(){
   </div>
   <!-- Add deal modal -->
   <div class="collab-modal-overlay" id="add-collab-overlay">
-    <div class="collab-modal">
-      <div style="font-size:16px;font-weight:800;margin-bottom:20px;color:var(--text)">Add Brand Deal</div>
+    <div class="collab-modal" style="max-width:500px">
+      <div style="font-size:16px;font-weight:800;margin-bottom:18px;color:var(--text)">Add Brand Deal</div>
       <div class="collab-field"><div class="collab-field-label">Company / Brand *</div><input class="collab-field-input" id="nc-company" placeholder="e.g. Nike, H&M, Zalando"></div>
-      <div class="collab-field"><div class="collab-field-label">Campaign Brief / Description</div><textarea class="collab-field-input" id="nc-desc" rows="3" placeholder="What's the campaign about?"></textarea></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="collab-field"><div class="collab-field-label">Package Price (DKK)</div><input class="collab-field-input" id="nc-price" type="number" placeholder="5000"></div>
         <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="nc-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===_collabStatus?' selected':''}>${s.label}</option>`).join('')}</select></div>
+        <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="nc-date" type="date"></div>
       </div>
-      <div class="collab-field"><div class="collab-field-label">Deliverables</div><input class="collab-field-input" id="nc-deliverables" placeholder="e.g. 2 Reels, 3 Stories, 1 YouTube video"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="collab-field"><div class="collab-field-label">Price</div><input class="collab-field-input" id="nc-price" type="number" placeholder="0" oninput="window._collabAutoFx()"></div>
+        <div class="collab-field"><div class="collab-field-label">Currency</div><select class="collab-field-input" id="nc-currency" onchange="window._collabAutoFx()"><option>DKK</option><option>USD</option><option>EUR</option></select></div>
+        <div class="collab-field"><div class="collab-field-label">≈ DKK</div><input class="collab-field-input" id="nc-pricedkk" type="number" placeholder="auto"></div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="nc-contact" placeholder="Sarah Johnson"></div>
+        <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="nc-contact" placeholder="Name"></div>
         <div class="collab-field"><div class="collab-field-label">Their Email</div><input class="collab-field-input" id="nc-email" type="email" placeholder="sarah@brand.com"></div>
       </div>
-      <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="nc-date" type="date"></div>
+      <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="nc-desc" rows="2" placeholder="What's the campaign about?"></textarea></div>
+      <div class="collab-field"><div class="collab-field-label">Deliverables</div><input class="collab-field-input" id="nc-deliverables" placeholder="e.g. 2 Reels, 3 Stories"></div>
       <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="nc-notes" rows="2" placeholder="Any extra notes..."></textarea></div>
       <div id="nc-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -6057,10 +6076,14 @@ window.closeAddCollabModal = function(){
 window.saveNewCollab = function(){
   const company = document.getElementById('nc-company').value.trim();
   if(!company){ document.getElementById('nc-error').textContent='Company name is required'; return; }
+  const cur = document.getElementById('nc-currency')?.value||'DKK';
+  const amt = document.getElementById('nc-price')?.value||'';
   const collab = {
     id: uid(), company,
     description: document.getElementById('nc-desc').value.trim(),
-    price: document.getElementById('nc-price').value||'',
+    price: amt,
+    priceCurrency: cur,
+    priceDKK: parseFloat(document.getElementById('nc-pricedkk')?.value)||toDKK(amt,cur),
     status: document.getElementById('nc-status').value,
     deliverables: document.getElementById('nc-deliverables').value.trim(),
     contact: document.getElementById('nc-contact').value.trim(),
@@ -6087,17 +6110,19 @@ window.openCollabDrawer = function(id){
   if(body) body.innerHTML = `
     <div class="collab-field"><div class="collab-field-label">Company / Brand</div><input class="collab-field-input" id="cd-company" value="${(c.company||'').replace(/"/g,'&quot;')}"></div>
     <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="cd-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===c.status?' selected':''}>${s.label}</option>`).join('')}</select></div>
-    <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="cd-desc" rows="4">${c.description||''}</textarea></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="collab-field"><div class="collab-field-label">Price (DKK)</div><input class="collab-field-input" id="cd-price" type="number" value="${c.price||''}"></div>
-      <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="cd-date" type="date" value="${c.dateContacted||''}"></div>
+    <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="cd-desc" rows="3">${c.description||''}</textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="collab-field"><div class="collab-field-label">Price</div><input class="collab-field-input" id="cd-price" type="number" value="${c.price||''}" oninput="(function(){const a=document.getElementById('cd-price')?.value,cur=document.getElementById('cd-currency')?.value||'DKK',el=document.getElementById('cd-pricedkk');if(el&&a)el.value=cur==='DKK'?a:Math.round(parseFloat(a)*(CC_FX[cur]||1));})()"></div>
+      <div class="collab-field"><div class="collab-field-label">Currency</div><select class="collab-field-input" id="cd-currency" onchange="(function(){const a=document.getElementById('cd-price')?.value,cur=document.getElementById('cd-currency')?.value||'DKK',el=document.getElementById('cd-pricedkk');if(el&&a)el.value=cur==='DKK'?a:Math.round(parseFloat(a)*(CC_FX[cur]||1));})()"><option${(!c.priceCurrency||c.priceCurrency==='DKK')?' selected':''}>DKK</option><option${c.priceCurrency==='USD'?' selected':''}>USD</option><option${c.priceCurrency==='EUR'?' selected':''}>EUR</option></select></div>
+      <div class="collab-field"><div class="collab-field-label">≈ DKK</div><input class="collab-field-input" id="cd-pricedkk" type="number" value="${c.priceDKK||c.price||''}"></div>
     </div>
-    <div class="collab-field"><div class="collab-field-label">Deliverables</div><input class="collab-field-input" id="cd-deliverables" value="${(c.deliverables||'').replace(/"/g,'&quot;')}"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="cd-contact" value="${(c.contact||'').replace(/"/g,'&quot;')}"></div>
       <div class="collab-field"><div class="collab-field-label">Email</div><input class="collab-field-input" id="cd-email" type="email" value="${(c.email||'').replace(/"/g,'&quot;')}"></div>
     </div>
-    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="cd-notes" rows="4">${c.notes||''}</textarea></div>
+    <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="cd-date" type="date" value="${c.dateContacted||''}"></div>
+    <div class="collab-field"><div class="collab-field-label">Deliverables</div><input class="collab-field-input" id="cd-deliverables" value="${(c.deliverables||'').replace(/"/g,'&quot;')}"></div>
+    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="cd-notes" rows="3">${c.notes||''}</textarea></div>
     ${c.email?`<a href="mailto:${c.email}" style="display:inline-block;margin-top:4px;font-size:13px;color:var(--accent);text-decoration:none">✉ Email ${c.contact||c.email}</a>`:''}
   `;
   document.getElementById('collab-drawer-overlay').classList.add('open');
@@ -6115,6 +6140,8 @@ window.saveCollabDrawer = function(){
   c.status      = document.getElementById('cd-status')?.value||c.status;
   c.description = document.getElementById('cd-desc')?.value.trim();
   c.price       = document.getElementById('cd-price')?.value;
+  c.priceCurrency = document.getElementById('cd-currency')?.value||'DKK';
+  c.priceDKK    = parseFloat(document.getElementById('cd-pricedkk')?.value)||toDKK(c.price,c.priceCurrency);
   c.dateContacted = document.getElementById('cd-date')?.value;
   c.deliverables = document.getElementById('cd-deliverables')?.value.trim();
   c.contact     = document.getElementById('cd-contact')?.value.trim();
@@ -6162,35 +6189,48 @@ function renderIncome(){
   const now = new Date();
   const thisYear = now.getFullYear();
   const thisMonth = now.getMonth();
-  const yearTotal = INCOME.reduce((s,x)=>s+(Number(x.amount)||0),0);
+  const allTotal = INCOME.reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
+  const yearTotal = INCOME.filter(x=>{
+    if(!x.date) return false;
+    const d=new Date(x.date+'T00:00:00');
+    return d.getFullYear()===thisYear;
+  }).reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
   const monthTotal = INCOME.filter(x=>{
     if(!x.date) return false;
     const d=new Date(x.date+'T00:00:00');
     return d.getFullYear()===thisYear && d.getMonth()===thisMonth;
-  }).reduce((s,x)=>s+(Number(x.amount)||0),0);
-  const brandTotal = INCOME.filter(x=>x.type==='brand_deal').reduce((s,x)=>s+(Number(x.amount)||0),0);
-
-  const byType = {};
-  INCOME.forEach(x=>{
-    byType[x.type]=(byType[x.type]||0)+(Number(x.amount)||0);
-  });
+  }).reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
+  const pipelineDKK = (getCollabs()||[]).filter(c=>c.status==='ongoing'||c.status==='potential').reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
 
   const sorted = [...INCOME].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
 
+  // Group by month
+  const byMonth={};
+  sorted.forEach(x=>{
+    const key=x.date?(new Date(x.date+'T00:00:00')).toLocaleDateString('en',{year:'numeric',month:'long'}):'Unknown';
+    if(!byMonth[key])byMonth[key]=[];
+    byMonth[key].push(x);
+  });
+
   wrap.innerHTML = `
-  <div class="income-wrap">
+  <div class="income-wrap" style="padding-top:32px">
     <div class="income-topbar">
       <div>
-        <div style="font-size:18px;font-weight:800;color:var(--text)">Income Streams</div>
-        <div style="font-size:12px;color:var(--text3)">Track all your revenue as a creator</div>
+        <div style="font-size:20px;font-weight:800;color:var(--text)">Income Streams</div>
+        <div style="font-size:13px;color:var(--text3)">Track all your revenue as a creator</div>
       </div>
       <button class="btn btn-primary" onclick="openAddIncomeModal()">+ Add Income</button>
     </div>
     <div class="income-summary">
       <div class="income-stat-card">
-        <div class="income-stat-label">Total Earned</div>
+        <div class="income-stat-label">Total (All Time)</div>
+        <div class="income-stat-value">DKK ${allTotal.toLocaleString('da-DK')}</div>
+        <div class="income-stat-sub">${INCOME.length} entries</div>
+      </div>
+      <div class="income-stat-card">
+        <div class="income-stat-label">This Year</div>
         <div class="income-stat-value">DKK ${yearTotal.toLocaleString('da-DK')}</div>
-        <div class="income-stat-sub">All time</div>
+        <div class="income-stat-sub">${thisYear}</div>
       </div>
       <div class="income-stat-card">
         <div class="income-stat-label">This Month</div>
@@ -6198,14 +6238,9 @@ function renderIncome(){
         <div class="income-stat-sub">${now.toLocaleString('en',{month:'long',year:'numeric'})}</div>
       </div>
       <div class="income-stat-card">
-        <div class="income-stat-label">Brand Deals</div>
-        <div class="income-stat-value">DKK ${brandTotal.toLocaleString('da-DK')}</div>
-        <div class="income-stat-sub">${INCOME.filter(x=>x.type==='brand_deal').length} deals</div>
-      </div>
-      <div class="income-stat-card">
-        <div class="income-stat-label">Top Source</div>
-        <div class="income-stat-value" style="font-size:16px">${(()=>{const top=Object.entries(byType).sort((a,b)=>b[1]-a[1])[0];if(!top)return '—';const t=INCOME_TYPES.find(x=>x.id===top[0]);return t?t.label:top[0];})()}</div>
-        <div class="income-stat-sub">by revenue</div>
+        <div class="income-stat-label">Pipeline</div>
+        <div class="income-stat-value">DKK ${pipelineDKK.toLocaleString('da-DK')}</div>
+        <div class="income-stat-sub">From active deals</div>
       </div>
     </div>
     ${sorted.length===0?`
@@ -6216,14 +6251,25 @@ function renderIncome(){
       </div>
     `:`
       <div class="income-list">
-        ${sorted.map(x=>{
-          const t=INCOME_TYPES.find(tp=>tp.id===x.type)||INCOME_TYPES[INCOME_TYPES.length-1];
-          return `<div class="income-row">
-            <span class="income-type-badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
-            <div class="income-row-name">${x.name||'Unnamed'}</div>
-            <div class="income-row-amount">DKK ${Number(x.amount||0).toLocaleString('da-DK')}</div>
-            <div class="income-row-date">${x.date||''}</div>
-            <button onclick="deleteIncome('${x.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 4px" title="Delete">×</button>
+        ${Object.entries(byMonth).map(([month,entries])=>{
+          const subtotal=entries.reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
+          return `<div style="margin-bottom:4px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:2px">
+              <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">${month}</span>
+              <span style="font-size:13px;font-weight:700;color:var(--text)">DKK ${subtotal.toLocaleString('da-DK')}</span>
+            </div>
+            ${entries.map(x=>{
+              const t=INCOME_TYPES.find(tp=>tp.id===x.type)||INCOME_TYPES[INCOME_TYPES.length-1];
+              const dkkVal=Number(x.amountDKK||x.amount||0);
+              const origStr=(x.currency&&x.currency!=='DKK')?` <span style="color:var(--text3);font-size:11px">(${Number(x.amount||0).toLocaleString()} ${x.currency})</span>`:'';
+              return `<div class="income-row">
+                <span class="income-type-badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
+                <div class="income-row-name">${x.name||'Unnamed'}</div>
+                <div class="income-row-amount">DKK ${dkkVal.toLocaleString('da-DK')}${origStr}</div>
+                <div class="income-row-date">${x.date||''}</div>
+                <button onclick="deleteIncome('${x.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 4px" title="Delete">×</button>
+              </div>`;
+            }).join('')}
           </div>`;
         }).join('')}
       </div>
@@ -6234,10 +6280,12 @@ function renderIncome(){
     <div class="income-modal">
       <div style="font-size:16px;font-weight:800;margin-bottom:20px;color:var(--text)">Add Income</div>
       <div class="collab-field"><div class="collab-field-label">Name / Description *</div><input class="collab-field-input" id="ni-name" placeholder="e.g. Nike Reel deal"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="collab-field"><div class="collab-field-label">Amount (DKK)</div><input class="collab-field-input" id="ni-amount" type="number" placeholder="5000"></div>
-        <div class="collab-field"><div class="collab-field-label">Type</div><select class="collab-field-input" id="ni-type">${INCOME_TYPES.map(t=>`<option value="${t.id}">${t.label}</option>`).join('')}</select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="collab-field"><div class="collab-field-label">Amount</div><input class="collab-field-input" id="ni-amount" type="number" placeholder="0" oninput="window._incAutoFx()"></div>
+        <div class="collab-field"><div class="collab-field-label">Currency</div><select class="collab-field-input" id="ni-currency" onchange="window._incAutoFx()"><option>DKK</option><option>USD</option><option>EUR</option></select></div>
+        <div class="collab-field"><div class="collab-field-label">≈ DKK</div><input class="collab-field-input" id="ni-dkk" type="number" placeholder="auto"></div>
       </div>
+      <div class="collab-field"><div class="collab-field-label">Type</div><select class="collab-field-input" id="ni-type">${INCOME_TYPES.map(t=>`<option value="${t.id}">${t.label}</option>`).join('')}</select></div>
       <div class="collab-field"><div class="collab-field-label">Date</div><input class="collab-field-input" id="ni-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
       <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="ni-notes" rows="2" placeholder="Brand, campaign details..."></textarea></div>
       <div id="ni-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
@@ -6250,6 +6298,12 @@ function renderIncome(){
   `;
 }
 
+window._incAutoFx=function(){
+  const amt=document.getElementById('ni-amount')?.value;
+  const cur=document.getElementById('ni-currency')?.value||'DKK';
+  const dkkEl=document.getElementById('ni-dkk');
+  if(dkkEl&&amt){dkkEl.value=cur==='DKK'?amt:Math.round(parseFloat(amt)*(CC_FX[cur]||1));}
+};
 window.openAddIncomeModal = function(){
   const ov=document.getElementById('add-income-overlay');
   if(ov){ov.classList.add('open');document.getElementById('ni-name').focus();}
@@ -6260,7 +6314,9 @@ window.closeAddIncomeModal = function(){
 window.saveNewIncome = function(){
   const name=document.getElementById('ni-name').value.trim();
   if(!name){document.getElementById('ni-error').textContent='Name is required';return;}
-  INCOME.unshift({id:uid(),name,amount:document.getElementById('ni-amount').value,type:document.getElementById('ni-type').value,date:document.getElementById('ni-date').value,notes:document.getElementById('ni-notes').value.trim(),_ts:Date.now()});
+  const cur=document.getElementById('ni-currency')?.value||'DKK';
+  const amt=document.getElementById('ni-amount').value;
+  INCOME.unshift({id:uid(),name,amount:amt,currency:cur,amountDKK:parseFloat(document.getElementById('ni-dkk')?.value)||toDKK(amt,cur),type:document.getElementById('ni-type').value,date:document.getElementById('ni-date').value,notes:document.getElementById('ni-notes').value.trim(),_ts:Date.now()});
   saveIncome();
   closeAddIncomeModal();
   renderIncome();
@@ -6270,6 +6326,210 @@ window.deleteIncome = function(id){
   INCOME=INCOME.filter(x=>x.id!==id);
   saveIncome();
   renderIncome();
+};
+
+// ════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════════════════════════
+function renderDashboard(){
+  STASKS=getSTasks();
+  COLLABS=getCollabs();
+  INCOME=getIncome();
+  CONTENT_COLLABS=getCCollabs();
+  const wrap=document.getElementById('view-home');
+  if(!wrap) return;
+
+  const now=new Date();
+  const thisYear=now.getFullYear();
+  const thisMonth=now.getMonth();
+
+  const activeDeals=COLLABS.filter(c=>c.status==='ongoing');
+  const pipelineDeals=COLLABS.filter(c=>c.status==='potential');
+  const pipelineDKK=pipelineDeals.reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
+  const activeDKK=activeDeals.reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
+
+  const monthIncome=INCOME.filter(x=>{
+    if(!x.date)return false;
+    const d=new Date(x.date+'T00:00:00');
+    return d.getFullYear()===thisYear&&d.getMonth()===thisMonth;
+  }).reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
+
+  const openTasks=STASKS.filter(t=>t.status!=='done');
+  const upcomingTasks=[...STASKS].filter(t=>t.dueDate&&t.status!=='done').sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).slice(0,5);
+  const recentCollabs=[...COLLABS].sort((a,b)=>(b._ts||0)-(a._ts||0)).slice(0,3);
+
+  wrap.innerHTML=`
+<div style="margin-bottom:28px">
+  <div style="font-size:22px;font-weight:800;color:var(--text)">Good ${now.getHours()<12?'morning':now.getHours()<18?'afternoon':'evening'} 👋</div>
+  <div style="font-size:14px;color:var(--text3);margin-top:4px">${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;cursor:pointer" onclick="switchView('collabs')">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Active Deals</div>
+    <div style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px">${activeDeals.length}</div>
+    <div style="font-size:13px;color:var(--text3)">Pipeline: <span style="color:var(--accent);font-weight:600">DKK ${pipelineDKK.toLocaleString('da-DK')}</span></div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;cursor:pointer" onclick="switchView('income')">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">This Month</div>
+    <div style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px">DKK ${monthIncome.toLocaleString('da-DK')}</div>
+    <div style="font-size:13px;color:var(--text3)">Income in ${now.toLocaleString('en',{month:'long'})}</div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;cursor:pointer" onclick="switchView('tasks')">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Open Tasks</div>
+    <div style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px">${openTasks.length}</div>
+    <div style="font-size:13px;color:var(--text3)">${upcomingTasks.length>0?'Next due: '+upcomingTasks[0].dueDate:'No deadlines set'}</div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px">Upcoming Tasks</div>
+    ${upcomingTasks.length===0?`<div style="color:var(--text3);font-size:13px">No upcoming tasks with deadlines</div>`:
+    upcomingTasks.map(t=>{
+      const overdue=new Date(t.dueDate+'T00:00:00')<now;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchView('tasks')">
+        <div style="flex:1;font-size:13px;font-weight:500;color:var(--text)">${t.title||'Untitled'}</div>
+        <div style="font-size:12px;font-weight:600;color:${overdue?'#ef4444':'var(--text3)'}">${t.dueDate}</div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px">Recent Deals</div>
+    ${recentCollabs.length===0?`<div style="color:var(--text3);font-size:13px">No deals yet — add your first collab</div>`:
+    recentCollabs.map(c=>{
+      const st=COLLAB_STATUSES.find(s=>s.id===c.status)||COLLAB_STATUSES[0];
+      const val=Number(c.priceDKK||c.price)||0;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchView('collabs')">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">${(c.company||'?')[0].toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${c.company||'—'}</div>
+          <div style="font-size:11px;color:var(--text3)">${c.contact||'No contact'}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:var(--text)">${val?'DKK '+val.toLocaleString('da-DK'):'—'}</div>
+          <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;background:${st.bg};color:${st.color}">${st.label}</span>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+</div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  CONTACTS
+// ════════════════════════════════════════════════════════════
+const CONTACTS_KEY='byggeligt_contacts_v1';
+let CONTACTS=[];
+function getContacts(){try{return JSON.parse(localStorage.getItem(CONTACTS_KEY)||'[]');}catch(e){return[];}}
+function saveContacts(){localStorage.setItem(CONTACTS_KEY,JSON.stringify(CONTACTS));sbSet('contacts',CONTACTS);}
+let _activeContactId=null;
+
+function renderContacts(){
+  CONTACTS=getContacts();
+  const wrap=document.getElementById('view-contacts');
+  if(!wrap) return;
+  wrap.innerHTML=`
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+  <div>
+    <div style="font-size:20px;font-weight:800;color:var(--text)">Contacts</div>
+    <div style="font-size:13px;color:var(--text3);margin-top:2px">Brand managers, PR agencies & collaborators</div>
+  </div>
+  <button class="btn btn-primary" onclick="window.openAddContactModal()">+ Add Contact</button>
+</div>
+${CONTACTS.length===0?`<div style="text-align:center;padding:60px 20px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">👥</div><div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No contacts yet</div><div style="font-size:13px">Add brand managers and PR contacts to build your network</div></div>`:`
+<table class="stask-table"><thead><tr>
+  <th>Name</th><th>Company</th><th>Role</th><th>Email</th><th>Phone</th>
+</tr></thead><tbody>
+${CONTACTS.map(c=>`<tr class="stask-row" onclick="window.openContactDrawer('${c.id}')">
+  <td><div class="stask-name">${c.name||'—'}</div></td>
+  <td style="color:var(--text2)">${c.company||'—'}</td>
+  <td style="color:var(--text2)">${c.role||'—'}</td>
+  <td style="color:var(--text2)">${c.email?`<a href="mailto:${c.email}" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none">${c.email}</a>`:'—'}</td>
+  <td style="color:var(--text2)">${c.phone||'—'}</td>
+</tr>`).join('')}
+</tbody></table>`}
+<!-- Drawer -->
+<div class="stask-drawer-overlay" id="contact-drawer-overlay" onclick="window.closeContactDrawer()"></div>
+<div class="stask-drawer" id="contact-drawer">
+  <div class="stask-drawer-header">
+    <div style="font-size:15px;font-weight:700;color:var(--text)" id="contact-drawer-title">Contact</div>
+    <button onclick="window.closeContactDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
+  </div>
+  <div class="stask-drawer-body" id="contact-drawer-body"></div>
+  <div class="stask-drawer-footer">
+    <button class="btn btn-primary" onclick="window.saveContactDrawer()" style="flex:1">Save</button>
+    <button class="btn" onclick="window.deleteContact()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+  </div>
+</div>
+<!-- Add modal -->
+<div class="stask-modal-overlay" id="add-contact-overlay">
+  <div class="stask-modal" style="max-width:480px">
+    <div style="font-size:16px;font-weight:800;margin-bottom:18px;color:var(--text)">Add Contact</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Name *</div><input class="stask-field-input" id="nct-name" placeholder="Sarah Johnson"></div>
+      <div class="stask-field"><div class="stask-field-label">Company</div><input class="stask-field-input" id="nct-company" placeholder="Brand name"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Role</div><input class="stask-field-input" id="nct-role" placeholder="PR Manager"></div>
+      <div class="stask-field"><div class="stask-field-label">Phone</div><input class="stask-field-input" id="nct-phone" type="tel" placeholder="+45 ..."></div>
+    </div>
+    <div class="stask-field"><div class="stask-field-label">Email</div><input class="stask-field-input" id="nct-email" type="email" placeholder="sarah@brand.com"></div>
+    <div class="stask-field"><div class="stask-field-label">Notes</div><textarea class="stask-field-input" id="nct-notes" rows="2" placeholder="How you met, what to remember..."></textarea></div>
+    <div id="nct-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn" onclick="window.closeAddContactModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="window.saveNewContact()">Add</button>
+    </div>
+  </div>
+</div>`;
+}
+
+window.openAddContactModal=function(){document.getElementById('add-contact-overlay')?.classList.add('open');setTimeout(()=>document.getElementById('nct-name')?.focus(),50);};
+window.closeAddContactModal=function(){document.getElementById('add-contact-overlay')?.classList.remove('open');};
+window.saveNewContact=function(){
+  const name=document.getElementById('nct-name')?.value.trim();
+  if(!name){document.getElementById('nct-error').textContent='Name is required';return;}
+  CONTACTS.unshift({id:uid(),name,company:document.getElementById('nct-company')?.value.trim(),role:document.getElementById('nct-role')?.value.trim(),email:document.getElementById('nct-email')?.value.trim(),phone:document.getElementById('nct-phone')?.value.trim(),notes:document.getElementById('nct-notes')?.value.trim(),_ts:Date.now()});
+  saveContacts();window.closeAddContactModal();renderContacts();toast('Contact added!','success');
+};
+window.openContactDrawer=function(id){
+  _activeContactId=id;
+  const c=CONTACTS.find(x=>x.id===id);if(!c)return;
+  document.getElementById('contact-drawer-title').textContent=c.name||'Contact';
+  document.getElementById('contact-drawer-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Name</div><input class="stask-field-input" id="dct-name" value="${(c.name||'').replace(/"/g,'&quot;')}"></div>
+      <div class="stask-field"><div class="stask-field-label">Company</div><input class="stask-field-input" id="dct-company" value="${(c.company||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Role</div><input class="stask-field-input" id="dct-role" value="${(c.role||'').replace(/"/g,'&quot;')}"></div>
+      <div class="stask-field"><div class="stask-field-label">Phone</div><input class="stask-field-input" id="dct-phone" value="${c.phone||''}"></div>
+    </div>
+    <div class="stask-field"><div class="stask-field-label">Email</div><input class="stask-field-input" id="dct-email" type="email" value="${c.email||''}"></div>
+    <div class="stask-field"><div class="stask-field-label">Notes</div><textarea class="stask-field-input" id="dct-notes" rows="4">${c.notes||''}</textarea></div>
+  `;
+  document.getElementById('contact-drawer-overlay')?.classList.add('open');
+  document.getElementById('contact-drawer')?.classList.add('open');
+};
+window.closeContactDrawer=function(){
+  document.getElementById('contact-drawer-overlay')?.classList.remove('open');
+  document.getElementById('contact-drawer')?.classList.remove('open');
+  _activeContactId=null;
+};
+window.saveContactDrawer=function(){
+  const c=CONTACTS.find(x=>x.id===_activeContactId);if(!c)return;
+  c.name=document.getElementById('dct-name')?.value.trim()||c.name;
+  c.company=document.getElementById('dct-company')?.value.trim();
+  c.role=document.getElementById('dct-role')?.value.trim();
+  c.phone=document.getElementById('dct-phone')?.value.trim();
+  c.email=document.getElementById('dct-email')?.value.trim();
+  c.notes=document.getElementById('dct-notes')?.value.trim();
+  c._ts=Date.now();
+  saveContacts();window.closeContactDrawer();renderContacts();toast('Contact saved','success');
+};
+window.deleteContact=function(){
+  if(!_activeContactId||!confirm('Delete this contact?'))return;
+  CONTACTS=CONTACTS.filter(x=>x.id!==_activeContactId);
+  saveContacts();window.closeContactDrawer();renderContacts();toast('Contact deleted');
 };
 
 // ════════════════════════════════════════════════════════════
