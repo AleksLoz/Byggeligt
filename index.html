@@ -1486,6 +1486,7 @@ async function sbSync() {
     ['tasks',       'byggeligt_tasks_v1'],
     ['collabs',     'byggeligt_collabs_v1'],
     ['income',      'byggeligt_income_v1'],
+    ['content_collabs','byggeligt_content_collabs_v1'],
     ['inspo',       'byggeligt_inspo_v1'],
     ['invites',     'byggeligt_invites_v1'],
     ['saved_views', 'byggeligt_studio_saved_views'],
@@ -5463,10 +5464,67 @@ const WORK_TAGS=[
   {id:'some',     label:'SoMe',     color:'#5b21b6', bg:'#ede9ff'},
   {id:'byggeligt',label:'Byggeligt',color:'#3a1a0e', bg:'#ecddd5'},
 ];
-let _staskSection='work'; // 'work' | 'home'
+let _staskSection='work'; // 'work' | 'home' | 'content'
 let _staskTagFilter='all';
 let _staskStatusFilter='all';
 let _activeStaskId=null;
+
+// ── Content Collabs ──────────────────────────────────────────
+const CONTENT_COLLABS_KEY='byggeligt_content_collabs_v1';
+let CONTENT_COLLABS=[];
+function getCCollabs(){try{return JSON.parse(localStorage.getItem(CONTENT_COLLABS_KEY)||'[]');}catch(e){return[];}}
+function saveCCollabs(){localStorage.setItem(CONTENT_COLLABS_KEY,JSON.stringify(CONTENT_COLLABS));sbSet('content_collabs',CONTENT_COLLABS);}
+
+const CC_PROGRESS=[
+  {id:'contacted',    label:'Contacted',     color:'#6b7280',bg:'#f3f4f6'},
+  {id:'negotiating',  label:'Negotiating',   color:'#3b82f6',bg:'#dbeafe'},
+  {id:'respond',      label:'Respond',       color:'#f59e0b',bg:'#fef3c7'},
+  {id:'chose_product',label:'Chose Product', color:'#8b5cf6',bg:'#ede9ff'},
+  {id:'product_sent', label:'Product Sent',  color:'#0891b2',bg:'#cffafe'},
+  {id:'shoot',        label:'Shoot',         color:'#d97706',bg:'#ffedd5'},
+  {id:'post',         label:'Post',          color:'#059669',bg:'#d1fae5'},
+  {id:'send_invoice', label:'Send Invoice',  color:'#dc2626',bg:'#fee2e2'},
+  {id:'invoice_sent', label:'Invoice Sent',  color:'#10b981',bg:'#dcfce7'},
+];
+const CC_LEAD=[
+  {id:'potential',label:'Potential',color:'#8b5cf6',bg:'#ede9ff'},
+  {id:'ongoing',  label:'Ongoing',  color:'#10b981',bg:'#d1fae5'},
+  {id:'lost',     label:'Lost',     color:'#ef4444',bg:'#fee2e2'},
+  {id:'later',    label:'Later',    color:'#f59e0b',bg:'#fef3c7'},
+  {id:'done',     label:'Done',     color:'#3a1a0e',bg:'#ecddd5'},
+];
+const CC_FX={DKK:1,USD:6.9,EUR:7.46};
+function toDKK(amt,cur){return Math.round((parseFloat(amt)||0)*(CC_FX[cur]||1));}
+let _ccTab='active';
+let _activeCCId=null;
+
+function _ccAutoFx(pfx){
+  const amt=document.getElementById(pfx+'-amount')?.value;
+  const cur=document.getElementById(pfx+'-currency')?.value||'DKK';
+  const dkkEl=document.getElementById(pfx+'-dkk');
+  if(dkkEl&&amt&&cur!=='DKK') dkkEl.value=toDKK(amt,cur);
+  else if(dkkEl&&cur==='DKK') dkkEl.value=amt||'';
+}
+
+function _ccTable(list){
+  if(!list.length) return `<div style="text-align:center;padding:50px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">🤝</div><div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:4px">No collabs here</div><div style="font-size:13px">Click + Add Collab to get started</div></div>`;
+  return `<table class="stask-table"><thead><tr>
+    <th>Brand</th><th>Progress</th><th>Lead Status</th><th>Collab Date</th><th>Responsible</th><th>Amount</th>
+  </tr></thead><tbody>${list.map(c=>{
+    const prog=CC_PROGRESS.find(p=>p.id===c.progress)||CC_PROGRESS[0];
+    const lead=CC_LEAD.find(s=>s.id===c.leadStatus)||CC_LEAD[0];
+    const dkk=c.moneyDKK||toDKK(c.moneyAmount,c.moneyCurrency);
+    return `<tr class="stask-row" onclick="window.openCCDrawer('${c.id}')">
+      <td><div class="stask-name">${c.brand||'—'}</div></td>
+      <td><span class="stask-badge" style="background:${prog.bg};color:${prog.color}"><span class="stask-status-dot" style="background:${prog.color}"></span>${prog.label}</span></td>
+      <td><span class="stask-badge" style="background:${lead.bg};color:${lead.color}">${lead.label}</span></td>
+      <td style="color:var(--text2)">${c.collabDate||'—'}</td>
+      <td style="color:var(--text2)">${c.responsible||'—'}</td>
+      <td style="color:var(--text);font-weight:600">${c.moneyAmount?(parseFloat(c.moneyAmount).toLocaleString()+' '+(c.moneyCurrency||'DKK')+(c.moneyCurrency&&c.moneyCurrency!=='DKK'&&dkk?'<div style="font-size:11px;color:var(--text3);font-weight:400">≈ '+dkk.toLocaleString()+' DKK</div>':'')):'—'}</td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+// ─────────────────────────────────────────────────────────────
 
 function _staskTable(tasks){
   if(!tasks.length) return `<div style="text-align:center;padding:50px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">✅</div><div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:4px">No tasks here</div><div style="font-size:13px">Click + Add Task to create one</div></div>`;
@@ -5490,26 +5548,82 @@ function _staskTable(tasks){
 
 function renderTasks(){
   STASKS=getSTasks();
+  CONTENT_COLLABS=getCCollabs();
   const wrap=document.getElementById('view-tasks');
   if(!wrap) return;
-  const workTasks=STASKS.filter(t=>t.section==='work'||(t.section===undefined&&t.tags&&t.tags.length));
-  const homeTasks=STASKS.filter(t=>t.section==='home');
-  // For backward compat, untagged/unsectioned go to work
-  const allWork=STASKS.filter(t=>t.section!=='home');
   const section=_staskSection;
+
+  const sectionToggle=`<div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden">
+    <button onclick="window.setStaskSection('work')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='work'?'var(--accent)':'var(--card)'};color:${section==='work'?'#fff':'var(--text2)'};transition:all .15s">Work</button>
+    <button onclick="window.setStaskSection('home')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='home'?'var(--accent)':'var(--card)'};color:${section==='home'?'#fff':'var(--text2)'};border-left:1.5px solid var(--border);transition:all .15s">Home</button>
+    <button onclick="window.setStaskSection('content')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='content'?'var(--accent)':'var(--card)'};color:${section==='content'?'#fff':'var(--text2)'};border-left:1.5px solid var(--border);transition:all .15s">Content</button>
+  </div>`;
+
+  if(section==='content'){
+    const active=CONTENT_COLLABS.filter(c=>c.leadStatus!=='done');
+    const done=CONTENT_COLLABS.filter(c=>c.leadStatus==='done');
+    const list=_ccTab==='active'?active:done;
+    wrap.innerHTML=`
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+  ${sectionToggle}
+  <button class="btn btn-primary" onclick="window.openAddCCModal()">+ Add Collab</button>
+</div>
+<div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px;width:fit-content">
+  <button onclick="window.setCCTab('active')" style="padding:7px 20px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:${_ccTab==='active'?'var(--accent-mid)':'var(--card)'};color:${_ccTab==='active'?'#fff':'var(--text2)'};transition:all .15s">Brand Collabs <span style="opacity:.7;font-weight:400">${active.length}</span></button>
+  <button onclick="window.setCCTab('done')" style="padding:7px 20px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:${_ccTab==='done'?'var(--accent-mid)':'var(--card)'};color:${_ccTab==='done'?'#fff':'var(--text2)'};border-left:1.5px solid var(--border);transition:all .15s">Done <span style="opacity:.7;font-weight:400">${done.length}</span></button>
+</div>
+${_ccTable(list)}
+<div class="stask-drawer-overlay" id="cc-drawer-overlay" onclick="window.closeCCDrawer()"></div>
+<div class="stask-drawer" id="cc-drawer" style="width:min(500px,95vw)">
+  <div class="stask-drawer-header">
+    <div style="font-size:15px;font-weight:700;color:var(--text)" id="cc-drawer-title">Collab Details</div>
+    <button onclick="window.closeCCDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
+  </div>
+  <div class="stask-drawer-body" id="cc-drawer-body"></div>
+  <div class="stask-drawer-footer">
+    <button class="btn btn-primary" onclick="window.saveCCDrawer()" style="flex:1">Save</button>
+    <button class="btn" onclick="window.deleteCC()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+  </div>
+</div>
+<div class="stask-modal-overlay" id="add-cc-overlay">
+  <div class="stask-modal" style="max-width:480px">
+    <div style="font-size:16px;font-weight:800;margin-bottom:18px;color:var(--text)">Add Brand Collab</div>
+    <div class="stask-field"><div class="stask-field-label">Brand *</div><input class="stask-field-input" id="nc-brand" placeholder="Brand name"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Progress</div><select class="stask-field-input" id="nc-progress">${CC_PROGRESS.map(p=>`<option value="${p.id}">${p.label}</option>`).join('')}</select></div>
+      <div class="stask-field"><div class="stask-field-label">Lead Status</div><select class="stask-field-input" id="nc-lead">${CC_LEAD.map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}</select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Collab Date</div><input class="stask-field-input" id="nc-date" type="date"></div>
+      <div class="stask-field"><div class="stask-field-label">Responsible</div><input class="stask-field-input" id="nc-responsible" placeholder="Person"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="stask-field"><div class="stask-field-label">Amount</div><input class="stask-field-input" id="nc-amount" type="number" placeholder="0" oninput="window._ccAutoFx('nc')"></div>
+      <div class="stask-field"><div class="stask-field-label">Currency</div><select class="stask-field-input" id="nc-currency" onchange="window._ccAutoFx('nc')"><option>DKK</option><option>USD</option><option>EUR</option></select></div>
+      <div class="stask-field"><div class="stask-field-label">≈ DKK</div><input class="stask-field-input" id="nc-dkk" type="number" placeholder="auto"></div>
+    </div>
+    <div id="nc-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn" onclick="window.closeAddCCModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="window.saveNewCC()">Add</button>
+    </div>
+  </div>
+</div>`;
+    return;
+  }
+
+  // Work / Home
+  const allWork=STASKS.filter(t=>t.section!=='home'&&t.section!=='content');
+  const homeTasks=STASKS.filter(t=>t.section==='home');
   let viewTasks=section==='work'?allWork:homeTasks;
   if(section==='work'&&_staskTagFilter!=='all') viewTasks=viewTasks.filter(t=>(t.tags||[]).includes(_staskTagFilter));
   if(_staskStatusFilter!=='all') viewTasks=viewTasks.filter(t=>t.status===_staskStatusFilter);
 
   wrap.innerHTML=`
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-  <div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden">
-    <button onclick="window.setStaskSection('work')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='work'?'var(--accent)':'var(--card)'};color:${section==='work'?'#fff':'var(--text2)'};transition:all .15s">Work</button>
-    <button onclick="window.setStaskSection('home')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='home'?'var(--accent)':'var(--card)'};color:${section==='home'?'#fff':'var(--text2)'};border-left:1.5px solid var(--border);transition:all .15s">Home</button>
-  </div>
+  ${sectionToggle}
   <button class="btn btn-primary" onclick="window.openAddStaskModal()">+ Add Task</button>
 </div>
-
 ${section==='work'?`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
   <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-right:4px">Tag</span>
   <button class="stask-filter-btn${_staskTagFilter==='all'?' active':''}" onclick="window.setStaskTag('all')">All</button>
@@ -5522,10 +5636,7 @@ ${section==='work'?`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wra
   <button class="stask-filter-btn${_staskStatusFilter==='all'?' active':''}" onclick="window.setStaskStatus('all')">All</button>
   ${STASK_STATUSES.map(s=>`<button class="stask-filter-btn${_staskStatusFilter===s.id?' active':''}" onclick="window.setStaskStatus('${s.id}')">${s.label}</button>`).join('')}
 </div>`}
-
 ${_staskTable(viewTasks)}
-
-<!-- Drawer -->
 <div class="stask-drawer-overlay" id="stask-drawer-overlay" onclick="window.closeStaskDrawer()"></div>
 <div class="stask-drawer" id="stask-drawer">
   <div class="stask-drawer-header">
@@ -5538,7 +5649,6 @@ ${_staskTable(viewTasks)}
     <button class="btn" onclick="window.deleteStask()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
   </div>
 </div>
-<!-- Add modal -->
 <div class="stask-modal-overlay" id="add-stask-overlay">
   <div class="stask-modal">
     <div style="font-size:16px;font-weight:800;margin-bottom:20px;color:var(--text)">Add Task</div>
@@ -5569,7 +5679,6 @@ ${_staskTable(viewTasks)}
   </div>
 </div>`;
 
-  // Wire section radio to show/hide tags
   document.querySelectorAll('input[name="nt-section"]').forEach(r=>{
     r.addEventListener('change',()=>{
       const tw=document.getElementById('nt-tags-wrap');
@@ -5578,6 +5687,7 @@ ${_staskTable(viewTasks)}
   });
 }
 
+window._ccAutoFx=_ccAutoFx;
 window.setStaskSection=function(s){_staskSection=s;_staskTagFilter='all';_staskStatusFilter='all';renderTasks();};
 window.setStaskTag=function(t){_staskTagFilter=t;renderTasks();};
 window.setStaskStatus=function(s){_staskStatusFilter=s;renderTasks();};
@@ -5659,6 +5769,107 @@ window.deleteStask=function(){
   STASKS=STASKS.filter(x=>x.id!==_activeStaskId);
   saveSTasks();closeStaskDrawer();renderTasks();toast('Task deleted');
 };
+
+// ── Content Collabs functions ────────────────────────────────
+window.setCCTab=function(t){_ccTab=t;renderTasks();};
+window.openAddCCModal=function(){
+  document.getElementById('add-cc-overlay')?.classList.add('open');
+  setTimeout(()=>document.getElementById('nc-brand')?.focus(),50);
+};
+window.closeAddCCModal=function(){document.getElementById('add-cc-overlay')?.classList.remove('open');};
+window.saveNewCC=function(){
+  const brand=document.getElementById('nc-brand')?.value.trim();
+  if(!brand){document.getElementById('nc-error').textContent='Brand name is required';return;}
+  const amt=document.getElementById('nc-amount')?.value;
+  const cur=document.getElementById('nc-currency')?.value||'DKK';
+  const dkk=document.getElementById('nc-dkk')?.value||toDKK(amt,cur);
+  CONTENT_COLLABS.unshift({id:uid(),brand,progress:document.getElementById('nc-progress')?.value||'contacted',leadStatus:document.getElementById('nc-lead')?.value||'potential',collabDate:document.getElementById('nc-date')?.value,responsible:document.getElementById('nc-responsible')?.value.trim(),moneyAmount:parseFloat(amt)||0,moneyCurrency:cur,moneyDKK:parseFloat(dkk)||0,reels:0,stories:0,reelDates:[],concept:'',comment:'',contactName:'',contactEmail:'',upsale:'',_ts:Date.now()});
+  saveCCollabs();closeAddCCModal();renderTasks();toast('Collab added!','success');
+};
+window.openCCDrawer=function(id){
+  _activeCCId=id;
+  const c=CONTENT_COLLABS.find(x=>x.id===id);if(!c)return;
+  document.getElementById('cc-drawer-title').textContent=c.brand||'Collab';
+  const reelCount=parseInt(c.reels)||0;
+  const reelDatesHtml=reelCount>0?Array.from({length:reelCount},(_,i)=>`<div class="stask-field"><div class="stask-field-label">Reel ${i+1} Date</div><input class="stask-field-input cc-reel-date" type="date" value="${(c.reelDates||[])[i]||''}"></div>`).join(''):'';
+  document.getElementById('cc-drawer-body').innerHTML=`
+    <div class="stask-field"><div class="stask-field-label">Brand</div><input class="stask-field-input" id="dc-brand" value="${(c.brand||'').replace(/"/g,'&quot;')}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Progress</div><select class="stask-field-input" id="dc-progress">${CC_PROGRESS.map(p=>`<option value="${p.id}"${p.id===c.progress?' selected':''}>${p.label}</option>`).join('')}</select></div>
+      <div class="stask-field"><div class="stask-field-label">Lead Status</div><select class="stask-field-input" id="dc-lead">${CC_LEAD.map(s=>`<option value="${s.id}"${s.id===c.leadStatus?' selected':''}>${s.label}</option>`).join('')}</select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Collab Date</div><input class="stask-field-input" id="dc-date" type="date" value="${c.collabDate||''}"></div>
+      <div class="stask-field"><div class="stask-field-label">Responsible</div><input class="stask-field-input" id="dc-responsible" value="${(c.responsible||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="stask-field"><div class="stask-field-label">Amount</div><input class="stask-field-input" id="dc-amount" type="number" value="${c.moneyAmount||''}" oninput="window._ccAutoFx('dc')"></div>
+      <div class="stask-field"><div class="stask-field-label">Currency</div><select class="stask-field-input" id="dc-currency" onchange="window._ccAutoFx('dc')"><option${c.moneyCurrency==='DKK'?' selected':''}>DKK</option><option${c.moneyCurrency==='USD'?' selected':''}>USD</option><option${c.moneyCurrency==='EUR'?' selected':''}>EUR</option></select></div>
+      <div class="stask-field"><div class="stask-field-label">≈ DKK</div><input class="stask-field-input" id="dc-dkk" type="number" value="${c.moneyDKK||''}"></div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:12px 0 14px"></div>
+    <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Deliverables</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Reels</div><input class="stask-field-input" id="dc-reels" type="number" min="0" value="${c.reels||0}" oninput="window._ccUpdateReelDates()"></div>
+      <div class="stask-field"><div class="stask-field-label">Stories</div><input class="stask-field-input" id="dc-stories" type="number" min="0" value="${c.stories||0}"></div>
+    </div>
+    <div id="dc-reel-dates">${reelDatesHtml}</div>
+    <div style="border-top:1px solid var(--border);margin:12px 0 14px"></div>
+    <div class="stask-field"><div class="stask-field-label">Concept</div><textarea class="stask-field-input" id="dc-concept" rows="3" placeholder="Content concept, brief, angle...">${c.concept||''}</textarea></div>
+    <div class="stask-field"><div class="stask-field-label">Comment</div><textarea class="stask-field-input" id="dc-comment" rows="2" placeholder="Internal notes...">${c.comment||''}</textarea></div>
+    <div style="border-top:1px solid var(--border);margin:12px 0 14px"></div>
+    <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Contact</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Contact Name</div><input class="stask-field-input" id="dc-contact-name" value="${(c.contactName||'').replace(/"/g,'&quot;')}"></div>
+      <div class="stask-field"><div class="stask-field-label">Contact Email</div><input class="stask-field-input" id="dc-contact-email" type="email" value="${c.contactEmail||''}"></div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:12px 0 14px"></div>
+    <div class="stask-field"><div class="stask-field-label">Upsale Opportunities</div><textarea class="stask-field-input" id="dc-upsale" rows="2" placeholder="Future potential, add-ons, follow-up ideas...">${c.upsale||''}</textarea></div>
+  `;
+  document.getElementById('cc-drawer-overlay')?.classList.add('open');
+  document.getElementById('cc-drawer')?.classList.add('open');
+};
+window._ccUpdateReelDates=function(){
+  const n=parseInt(document.getElementById('dc-reels')?.value)||0;
+  const existing=[...document.querySelectorAll('.cc-reel-date')].map(el=>el.value);
+  const wrap=document.getElementById('dc-reel-dates');
+  if(!wrap)return;
+  wrap.innerHTML=n>0?Array.from({length:n},(_,i)=>`<div class="stask-field"><div class="stask-field-label">Reel ${i+1} Date</div><input class="stask-field-input cc-reel-date" type="date" value="${existing[i]||''}"></div>`).join(''):'';
+};
+window.closeCCDrawer=function(){
+  document.getElementById('cc-drawer-overlay')?.classList.remove('open');
+  document.getElementById('cc-drawer')?.classList.remove('open');
+  _activeCCId=null;
+};
+window.saveCCDrawer=function(){
+  const c=CONTENT_COLLABS.find(x=>x.id===_activeCCId);if(!c)return;
+  c.brand=document.getElementById('dc-brand')?.value.trim()||c.brand;
+  c.progress=document.getElementById('dc-progress')?.value||c.progress;
+  const newLead=document.getElementById('dc-lead')?.value||c.leadStatus;
+  c.leadStatus=newLead;
+  c.collabDate=document.getElementById('dc-date')?.value;
+  c.responsible=document.getElementById('dc-responsible')?.value.trim();
+  c.moneyAmount=parseFloat(document.getElementById('dc-amount')?.value)||0;
+  c.moneyCurrency=document.getElementById('dc-currency')?.value||'DKK';
+  c.moneyDKK=parseFloat(document.getElementById('dc-dkk')?.value)||toDKK(c.moneyAmount,c.moneyCurrency);
+  c.reels=parseInt(document.getElementById('dc-reels')?.value)||0;
+  c.stories=parseInt(document.getElementById('dc-stories')?.value)||0;
+  c.reelDates=[...document.querySelectorAll('.cc-reel-date')].map(el=>el.value);
+  c.concept=document.getElementById('dc-concept')?.value.trim();
+  c.comment=document.getElementById('dc-comment')?.value.trim();
+  c.contactName=document.getElementById('dc-contact-name')?.value.trim();
+  c.contactEmail=document.getElementById('dc-contact-email')?.value.trim();
+  c.upsale=document.getElementById('dc-upsale')?.value.trim();
+  c._ts=Date.now();
+  if(newLead==='done') _ccTab='done'; else _ccTab='active';
+  saveCCollabs();closeCCDrawer();renderTasks();toast('Collab saved','success');
+};
+window.deleteCC=function(){
+  if(!_activeCCId||!confirm('Delete this collab?'))return;
+  CONTENT_COLLABS=CONTENT_COLLABS.filter(x=>x.id!==_activeCCId);
+  saveCCollabs();closeCCDrawer();renderTasks();toast('Collab deleted');
+};
+// ────────────────────────────────────────────────────────────
 
 const COLLABS_KEY = 'byggeligt_collabs_v1';
 let COLLABS = [];
