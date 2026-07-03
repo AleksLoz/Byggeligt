@@ -819,6 +819,17 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 .stask-modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
 .stask-modal-overlay.open{display:flex}
 .stask-modal{background:var(--card);border-radius:16px;padding:28px 32px;width:460px;max-width:95vw;box-shadow:0 24px 80px rgba(0,0,0,.2)}
+/* Custom dropdown */
+.cdd-trigger{display:flex;align-items:center;gap:7px;text-align:left;cursor:pointer;width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);box-sizing:border-box;font-family:inherit;transition:border-color .15s}
+.cdd-trigger:hover{border-color:var(--border2)}
+.cdd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.cdd-chevron{margin-left:auto;color:var(--text3);font-size:11px;flex-shrink:0}
+#cdd-panel{position:fixed;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.18);padding:5px;min-width:180px;display:none;animation:cddIn .1s ease}
+#cdd-panel.open{display:block}
+@keyframes cddIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.cdd-opt{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--text);transition:background .1s;border:none;width:100%;background:transparent;font-family:inherit;text-align:left}
+.cdd-opt:hover{background:var(--accent-light)}
+.cdd-opt.cdd-sel{background:var(--accent-light);font-weight:600}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -5469,6 +5480,49 @@ let _staskTagFilter='all';
 let _staskStatusFilter='all';
 let _activeStaskId=null;
 
+// ── Custom Dropdown ──────────────────────────────────────────
+const _cddReg={};
+let _cddCb=null,_cddTrigger=null;
+function _initCDDPanel(){
+  if(document.getElementById('cdd-panel'))return;
+  const p=document.createElement('div');p.id='cdd-panel';document.body.appendChild(p);
+  document.addEventListener('click',e=>{if(!e.target.closest('#cdd-panel')&&!e.target.closest('.cdd-trigger'))closeCDD();});
+}
+function openCDD(el,items,cur,cb){
+  _initCDDPanel();_cddTrigger=el;_cddCb=cb;
+  const p=document.getElementById('cdd-panel');
+  p.innerHTML=items.map(it=>`<button class="cdd-opt${it.id===cur?' cdd-sel':''}" onclick="window._cddPick('${it.id}')"><span class="cdd-dot" style="background:${it.color}"></span>${it.label}</button>`).join('');
+  const r=el.getBoundingClientRect();
+  p.style.top=(r.bottom+5)+'px';p.style.left=r.left+'px';p.style.minWidth=Math.max(r.width,180)+'px';
+  // Clamp to viewport bottom
+  p.classList.add('open');
+  requestAnimationFrame(()=>{
+    const ph=p.offsetHeight,wh=window.innerHeight;
+    if(r.bottom+5+ph>wh) p.style.top=Math.max(5,r.top-ph-5)+'px';
+  });
+}
+function closeCDD(){document.getElementById('cdd-panel')?.classList.remove('open');_cddCb=null;_cddTrigger=null;}
+window._cddPick=function(val){
+  if(_cddTrigger&&_cddCb){
+    const items=_cddReg[_cddTrigger.id]||[];
+    const it=items.find(x=>x.id===val);
+    if(it){_cddTrigger.dataset.cddVal=val;_cddTrigger.innerHTML=`<span class="cdd-dot" style="background:${it.color}"></span>${it.label}<span class="cdd-chevron">▾</span>`;}
+    _cddCb(val);
+  }
+  closeCDD();
+};
+window._openCDD=function(el){
+  const items=_cddReg[el.id]||[];
+  openCDD(el,items,el.dataset.cddVal||'',()=>{});
+};
+function cddBtn(id,items,curVal){
+  _cddReg[id]=items;
+  const it=items.find(x=>x.id===curVal)||items[0];
+  return `<button class="stask-field-input cdd-trigger" id="${id}" data-cdd-val="${it?.id||''}" onclick="event.stopPropagation();_cddReg['${id}']&&openCDD(this,_cddReg['${id}'],this.dataset.cddVal,function(){})"><span class="cdd-dot" style="background:${it?.color||'#aaa'}"></span>${it?.label||'Select'}<span class="cdd-chevron">▾</span></button>`;
+}
+function cddVal(id){return document.getElementById(id)?.dataset?.cddVal||'';}
+// ─────────────────────────────────────────────────────────────
+
 // ── Content Collabs ──────────────────────────────────────────
 const CONTENT_COLLABS_KEY='byggeligt_content_collabs_v1';
 let CONTENT_COLLABS=[];
@@ -5590,8 +5644,8 @@ ${_ccTable(list)}
     <div style="font-size:16px;font-weight:800;margin-bottom:18px;color:var(--text)">Add Brand Collab</div>
     <div class="stask-field"><div class="stask-field-label">Brand *</div><input class="stask-field-input" id="nc-brand" placeholder="Brand name"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Progress</div><select class="stask-field-input" id="nc-progress">${CC_PROGRESS.map(p=>`<option value="${p.id}">${p.label}</option>`).join('')}</select></div>
-      <div class="stask-field"><div class="stask-field-label">Lead Status</div><select class="stask-field-input" id="nc-lead">${CC_LEAD.map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}</select></div>
+      <div class="stask-field"><div class="stask-field-label">Progress</div>${cddBtn('nc-progress',CC_PROGRESS,'contacted')}</div>
+      <div class="stask-field"><div class="stask-field-label">Lead Status</div>${cddBtn('nc-lead',CC_LEAD,'potential')}</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="stask-field"><div class="stask-field-label">Collab Date</div><input class="stask-field-input" id="nc-date" type="date"></div>
@@ -5656,7 +5710,7 @@ ${_staskTable(viewTasks)}
     <div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="nt-desc" rows="3" placeholder="Details, context, notes..."></textarea></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="stask-field"><div class="stask-field-label">Due Date</div><input class="stask-field-input" id="nt-date" type="date"></div>
-      <div class="stask-field"><div class="stask-field-label">Status</div><select class="stask-field-input" id="nt-status">${STASK_STATUSES.map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}</select></div>
+      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('nt-status',STASK_STATUSES,'todo')}</div>
     </div>
     <div class="stask-field"><div class="stask-field-label">Section</div>
       <div style="display:flex;gap:8px">
@@ -5707,7 +5761,7 @@ window.saveNewStask=function(){
   if(!title){document.getElementById('nt-error').textContent='Task name is required';return;}
   const section=document.querySelector('input[name="nt-section"]:checked')?.value||'work';
   const tags=section==='work'?[...document.querySelectorAll('input[name="nt-tag"]:checked')].map(x=>x.value):[];
-  STASKS.unshift({id:uid(),title,description:document.getElementById('nt-desc')?.value.trim(),dueDate:document.getElementById('nt-date')?.value,status:document.getElementById('nt-status')?.value||'todo',section,tags,responsible:document.getElementById('nt-responsible')?.value.trim(),link:document.getElementById('nt-link')?.value.trim(),_ts:Date.now()});
+  STASKS.unshift({id:uid(),title,description:document.getElementById('nt-desc')?.value.trim(),dueDate:document.getElementById('nt-date')?.value,status:cddVal('nt-status')||'todo',section,tags,responsible:document.getElementById('nt-responsible')?.value.trim(),link:document.getElementById('nt-link')?.value.trim(),_ts:Date.now()});
   saveSTasks();closeAddStaskModal();renderTasks();toast('Task added!','success');
 };
 window.openStaskDrawer=function(id){
@@ -5722,7 +5776,7 @@ window.openStaskDrawer=function(id){
     <div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="dt-desc" rows="5">${t.description||''}</textarea></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="stask-field"><div class="stask-field-label">Due Date</div><input class="stask-field-input" id="dt-date" type="date" value="${t.dueDate||''}"></div>
-      <div class="stask-field"><div class="stask-field-label">Status</div><select class="stask-field-input" id="dt-status">${STASK_STATUSES.map(s=>`<option value="${s.id}"${s.id===t.status?' selected':''}>${s.label}</option>`).join('')}</select></div>
+      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('dt-status',STASK_STATUSES,t.status||'todo')}</div>
     </div>
     <div class="stask-field"><div class="stask-field-label">Section</div>
       <div style="display:flex;gap:10px">
@@ -5755,7 +5809,7 @@ window.saveStaskDrawer=function(){
   t.title=document.getElementById('dt-title')?.value.trim()||t.title;
   t.description=document.getElementById('dt-desc')?.value.trim();
   t.dueDate=document.getElementById('dt-date')?.value;
-  t.status=document.getElementById('dt-status')?.value||t.status;
+  t.status=cddVal('dt-status')||t.status;
   t.section=document.querySelector('input[name="dt-section"]:checked')?.value||t.section||'work';
   t.tags=t.section==='work'?[...document.querySelectorAll('input[name="dt-tag"]:checked')].map(x=>x.value):[];
   t.responsible=document.getElementById('dt-responsible')?.value.trim();
@@ -5783,7 +5837,7 @@ window.saveNewCC=function(){
   const amt=document.getElementById('nc-amount')?.value;
   const cur=document.getElementById('nc-currency')?.value||'DKK';
   const dkk=document.getElementById('nc-dkk')?.value||toDKK(amt,cur);
-  CONTENT_COLLABS.unshift({id:uid(),brand,progress:document.getElementById('nc-progress')?.value||'contacted',leadStatus:document.getElementById('nc-lead')?.value||'potential',collabDate:document.getElementById('nc-date')?.value,responsible:document.getElementById('nc-responsible')?.value.trim(),moneyAmount:parseFloat(amt)||0,moneyCurrency:cur,moneyDKK:parseFloat(dkk)||0,reels:0,stories:0,reelDates:[],concept:'',comment:'',contactName:'',contactEmail:'',upsale:'',_ts:Date.now()});
+  CONTENT_COLLABS.unshift({id:uid(),brand,progress:cddVal('nc-progress')||'contacted',leadStatus:cddVal('nc-lead')||'potential',collabDate:document.getElementById('nc-date')?.value,responsible:document.getElementById('nc-responsible')?.value.trim(),moneyAmount:parseFloat(amt)||0,moneyCurrency:cur,moneyDKK:parseFloat(dkk)||0,reels:0,stories:0,reelDates:[],concept:'',comment:'',contactName:'',contactEmail:'',upsale:'',_ts:Date.now()});
   saveCCollabs();closeAddCCModal();renderTasks();toast('Collab added!','success');
 };
 window.openCCDrawer=function(id){
@@ -5795,8 +5849,8 @@ window.openCCDrawer=function(id){
   document.getElementById('cc-drawer-body').innerHTML=`
     <div class="stask-field"><div class="stask-field-label">Brand</div><input class="stask-field-input" id="dc-brand" value="${(c.brand||'').replace(/"/g,'&quot;')}"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Progress</div><select class="stask-field-input" id="dc-progress">${CC_PROGRESS.map(p=>`<option value="${p.id}"${p.id===c.progress?' selected':''}>${p.label}</option>`).join('')}</select></div>
-      <div class="stask-field"><div class="stask-field-label">Lead Status</div><select class="stask-field-input" id="dc-lead">${CC_LEAD.map(s=>`<option value="${s.id}"${s.id===c.leadStatus?' selected':''}>${s.label}</option>`).join('')}</select></div>
+      <div class="stask-field"><div class="stask-field-label">Progress</div>${cddBtn('dc-progress',CC_PROGRESS,c.progress||'contacted')}</div>
+      <div class="stask-field"><div class="stask-field-label">Lead Status</div>${cddBtn('dc-lead',CC_LEAD,c.leadStatus||'potential')}</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="stask-field"><div class="stask-field-label">Collab Date</div><input class="stask-field-input" id="dc-date" type="date" value="${c.collabDate||''}"></div>
@@ -5844,8 +5898,8 @@ window.closeCCDrawer=function(){
 window.saveCCDrawer=function(){
   const c=CONTENT_COLLABS.find(x=>x.id===_activeCCId);if(!c)return;
   c.brand=document.getElementById('dc-brand')?.value.trim()||c.brand;
-  c.progress=document.getElementById('dc-progress')?.value||c.progress;
-  const newLead=document.getElementById('dc-lead')?.value||c.leadStatus;
+  c.progress=cddVal('dc-progress')||c.progress;
+  const newLead=cddVal('dc-lead')||c.leadStatus;
   c.leadStatus=newLead;
   c.collabDate=document.getElementById('dc-date')?.value;
   c.responsible=document.getElementById('dc-responsible')?.value.trim();
