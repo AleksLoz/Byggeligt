@@ -1520,6 +1520,7 @@ async function sbSync() {
     ['collabs',     'byggeligt_collabs_v1'],
     ['income',      'byggeligt_income_v1'],
     ['content_collabs','byggeligt_content_collabs_v1'],
+    ['content_tasks',  'byggeligt_content_tasks_v1'],
     ['contacts',       'byggeligt_contacts_v1'],
     ['inspo',       'byggeligt_inspo_v1'],
     ['invites',     'byggeligt_invites_v1'],
@@ -5547,7 +5548,32 @@ function cddBtn(id,items,curVal){
 function cddVal(id){return document.getElementById(id)?.dataset?.cddVal||'';}
 // ─────────────────────────────────────────────────────────────
 
-// ── Content Collabs ──────────────────────────────────────────
+// ── Content Planner ──────────────────────────────────────────
+const CONTENT_TASKS_KEY='byggeligt_content_tasks_v1';
+let CONTENT_TASKS=[];
+function getCTasks(){try{return JSON.parse(localStorage.getItem(CONTENT_TASKS_KEY)||'[]');}catch(e){return[];}}
+function saveCTasks(){localStorage.setItem(CONTENT_TASKS_KEY,JSON.stringify(CONTENT_TASKS));sbSet('content_tasks',CONTENT_TASKS);}
+
+const CT_STATUSES=[
+  {id:'todo',   label:'To Do',   color:'#6b7280',bg:'#f3f4f6'},
+  {id:'planned',label:'Planned', color:'#3b82f6',bg:'#dbeafe'},
+  {id:'idea',   label:'Idea',    color:'#8b5cf6',bg:'#ede9ff'},
+  {id:'done',   label:'Done',    color:'#10b981',bg:'#d1fae5'},
+];
+const CT_TYPES=[
+  {id:'organic',label:'Organic',color:'#059669',bg:'#d1fae5'},
+  {id:'ad',     label:'Ad',     color:'#d97706',bg:'#ffedd5'},
+];
+const CT_FORMATS=[
+  {id:'reel',  label:'Reel',  color:'#7c3aed',bg:'#ede9ff'},
+  {id:'story', label:'Story', color:'#0891b2',bg:'#cffafe'},
+  {id:'post',  label:'Post',  color:'#3a1a0e',bg:'#ecddd5'},
+  {id:'collab',label:'Collab',color:'#10b981',bg:'#d1fae5'},
+];
+let _ctMonth=new Date().getMonth(); // 0-indexed
+let _ctYear=new Date().getFullYear();
+
+// ── Content Collabs (legacy, kept for data compat) ───────────
 const CONTENT_COLLABS_KEY='byggeligt_content_collabs_v1';
 let CONTENT_COLLABS=[];
 function getCCollabs(){try{return JSON.parse(localStorage.getItem(CONTENT_COLLABS_KEY)||'[]');}catch(e){return[];}}
@@ -5640,52 +5666,93 @@ function renderTasks(){
   </div>`;
 
   if(section==='content'){
-    const active=CONTENT_COLLABS.filter(c=>c.leadStatus!=='done');
-    const done=CONTENT_COLLABS.filter(c=>c.leadStatus==='done');
-    const list=_ccTab==='active'?active:done;
+    CONTENT_TASKS=getCTasks();
+    const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const monthLabel=MONTH_NAMES[_ctMonth]+' '+_ctYear;
+    const monthTasks=CONTENT_TASKS.filter(t=>{
+      if(!t.dueDate) return false;
+      const d=new Date(t.dueDate+'T00:00:00');
+      return d.getFullYear()===_ctYear&&d.getMonth()===_ctMonth;
+    });
+    const noDateTasks=CONTENT_TASKS.filter(t=>!t.dueDate);
+
+    function ctBadge(items,val){
+      const it=items.find(x=>x.id===val)||items[0];
+      return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${it.bg};color:${it.color}">${it.label}</span>`;
+    }
+
+    function ctRow(t){
+      const st=CT_STATUSES.find(s=>s.id===t.status)||CT_STATUSES[0];
+      const fmt=CT_FORMATS.find(f=>f.id===t.format);
+      const typ=CT_TYPES.find(tp=>tp.id===t.type);
+      const day=t.dueDate?new Date(t.dueDate+'T00:00:00').getDate():'—';
+      return `<tr class="stask-row" onclick="window.openCTDrawer('${t.id}')">
+        <td style="padding:10px 12px;font-size:13px;font-weight:600;color:var(--text)">${t.title||'Untitled'}</td>
+        <td style="padding:10px 8px">${ctBadge(CT_STATUSES,t.status||'todo')}</td>
+        <td style="padding:10px 8px">${fmt?ctBadge(CT_FORMATS,t.format):''}</td>
+        <td style="padding:10px 8px">${typ?ctBadge(CT_TYPES,t.type):''}</td>
+        <td style="padding:10px 8px;font-size:12px;color:var(--text2)">${t.dueDate?'<span style="font-weight:700;color:var(--text)">'+day+'</span> '+MONTH_NAMES[_ctMonth].slice(0,3):'—'}</td>
+        <td style="padding:10px 8px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none">🔗 Link</a>`:''}
+        </td>
+      </tr>`;
+    }
+
+    function ctTable(tasks, emptyMsg){
+      if(!tasks.length) return `<div style="padding:20px 0;font-size:13px;color:var(--text3)">${emptyMsg}</div>`;
+      return `<table class="stask-table" style="margin-bottom:0"><thead><tr>
+        <th style="padding:0 12px 10px">Title</th><th>Status</th><th>Format</th><th>Type</th><th>Date</th><th>Link</th>
+      </tr></thead><tbody>${tasks.map(ctRow).join('')}</tbody></table>`;
+    }
+
     wrap.innerHTML=`
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
   ${sectionToggle}
-  <button class="btn btn-primary" onclick="window.openAddCCModal()">+ Add Collab</button>
+  <button class="btn btn-primary" onclick="window.openAddCTModal()">+ Add Content</button>
 </div>
-<div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px;width:fit-content">
-  <button onclick="window.setCCTab('active')" style="padding:7px 20px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:${_ccTab==='active'?'var(--accent-mid)':'var(--card)'};color:${_ccTab==='active'?'#fff':'var(--text2)'};transition:all .15s">Brand Collabs <span style="opacity:.7;font-weight:400">${active.length}</span></button>
-  <button onclick="window.setCCTab('done')" style="padding:7px 20px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:${_ccTab==='done'?'var(--accent-mid)':'var(--card)'};color:${_ccTab==='done'?'#fff':'var(--text2)'};border-left:1.5px solid var(--border);transition:all .15s">Done <span style="opacity:.7;font-weight:400">${done.length}</span></button>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+  <button onclick="window.ctPrevMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">‹</button>
+  <div style="font-size:18px;font-weight:800;color:var(--text);min-width:180px;text-align:center">${monthLabel}</div>
+  <button onclick="window.ctNextMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">›</button>
+  <span style="font-size:12px;color:var(--text3);margin-left:4px">${monthTasks.length} piece${monthTasks.length!==1?'s':''}</span>
 </div>
-${_ccTable(list)}
-<div class="stask-drawer-overlay" id="cc-drawer-overlay" onclick="window.closeCCDrawer()"></div>
-<div class="stask-drawer" id="cc-drawer" style="width:min(500px,95vw)">
-  <div class="stask-drawer-header">
-    <div style="font-size:15px;font-weight:700;color:var(--text)" id="cc-drawer-title">Collab Details</div>
-    <button onclick="window.closeCCDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
+<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">📅 ${monthLabel} Campaign</div>
+  ${ctTable(monthTasks,'No content planned for this month. Click + Add Content to start.')}
+</div>
+${noDateTasks.length?`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
+  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">💡 Ideas / No Date</div>
+  ${ctTable(noDateTasks,'')}
+</div>`:''}
+<div class="bigmodal-overlay" id="ct-bigmodal-overlay" onclick="if(event.target===this)window.closeCTDrawer()">
+  <div class="bigmodal" id="ct-bigmodal">
+    <div class="bigmodal-header">
+      <div style="font-size:16px;font-weight:800;color:var(--text)">Content Details</div>
+      <button onclick="window.closeCTDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
+    </div>
+    <div class="bigmodal-body" id="ct-bigmodal-body"></div>
+    <div class="bigmodal-footer">
+      <button class="btn btn-primary" onclick="window.saveCTDrawer()" style="flex:1">Save</button>
+      <button class="btn" onclick="window.deleteCT()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+    </div>
   </div>
-  <div class="stask-drawer-body" id="cc-drawer-body"></div>
-  <div class="stask-drawer-footer">
-    <button class="btn btn-primary" onclick="window.saveCCDrawer()" style="flex:1">Save</button>
-    <button class="btn" onclick="window.deleteCC()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
-  </div>
 </div>
-<div class="stask-modal-overlay" id="add-cc-overlay">
-  <div class="stask-modal" style="max-width:480px">
-    <div style="font-size:16px;font-weight:800;margin-bottom:18px;color:var(--text)">Add Brand Collab</div>
-    <div class="stask-field"><div class="stask-field-label">Brand *</div><input class="stask-field-input" id="nc-brand" placeholder="Brand name"></div>
+<div class="stask-modal-overlay" id="add-ct-overlay">
+  <div class="stask-modal" style="max-width:460px">
+    <div style="font-size:16px;font-weight:800;margin-bottom:18px;color:var(--text)">Add Content</div>
+    <div class="stask-field"><div class="stask-field-label">Title *</div><input class="stask-field-input" id="nct-title" placeholder="e.g. Bedroom reveal reel"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Progress</div>${cddBtn('nc-progress',CC_PROGRESS,'contacted')}</div>
-      <div class="stask-field"><div class="stask-field-label">Lead Status</div>${cddBtn('nc-lead',CC_LEAD,'potential')}</div>
+      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('nct-status',CT_STATUSES,'todo')}</div>
+      <div class="stask-field"><div class="stask-field-label">Format</div>${cddBtn('nct-format',CT_FORMATS,'reel')}</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Collab Date</div><input class="stask-field-input" id="nc-date" type="date"></div>
-      <div class="stask-field"><div class="stask-field-label">Responsible</div><input class="stask-field-input" id="nc-responsible" placeholder="Person"></div>
+      <div class="stask-field"><div class="stask-field-label">Type</div>${cddBtn('nct-type',CT_TYPES,'organic')}</div>
+      <div class="stask-field"><div class="stask-field-label">Publish Date</div><input class="stask-field-input" id="nct-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-      <div class="stask-field"><div class="stask-field-label">Amount</div><input class="stask-field-input" id="nc-amount" type="number" placeholder="0" oninput="window._ccAutoFx('nc')"></div>
-      <div class="stask-field"><div class="stask-field-label">Currency</div><select class="stask-field-input" id="nc-currency" onchange="window._ccAutoFx('nc')"><option>DKK</option><option>USD</option><option>EUR</option></select></div>
-      <div class="stask-field"><div class="stask-field-label">≈ DKK</div><input class="stask-field-input" id="nc-dkk" type="number" placeholder="auto"></div>
-    </div>
-    <div id="nc-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
+    <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="nct-link" type="url" placeholder="https://..."></div>
+    <div id="nct-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-      <button class="btn" onclick="window.closeAddCCModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="window.saveNewCC()">Add</button>
+      <button class="btn" onclick="window.closeAddCTModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="window.saveNewCT()">Add</button>
     </div>
   </div>
 </div>`;
@@ -5855,7 +5922,70 @@ window.deleteStask=function(){
   saveSTasks();closeStaskDrawer();renderTasks();toast('Task deleted');
 };
 
-// ── Content Collabs functions ────────────────────────────────
+// ── Content Planner functions ────────────────────────────────
+let _activeCTId=null;
+window.ctPrevMonth=function(){_ctMonth--;if(_ctMonth<0){_ctMonth=11;_ctYear--;}renderTasks();};
+window.ctNextMonth=function(){_ctMonth++;if(_ctMonth>11){_ctMonth=0;_ctYear++;}renderTasks();};
+window.openAddCTModal=function(){
+  document.getElementById('add-ct-overlay')?.classList.add('open');
+  setTimeout(()=>document.getElementById('nct-title')?.focus(),50);
+};
+window.closeAddCTModal=function(){document.getElementById('add-ct-overlay')?.classList.remove('open');};
+window.saveNewCT=function(){
+  const title=document.getElementById('nct-title')?.value.trim();
+  if(!title){document.getElementById('nct-error').textContent='Title is required';return;}
+  CONTENT_TASKS=getCTasks();
+  CONTENT_TASKS.push({id:uid(),title,status:cddVal('nct-status')||'todo',format:cddVal('nct-format')||'reel',type:cddVal('nct-type')||'organic',dueDate:document.getElementById('nct-date')?.value||'',link:document.getElementById('nct-link')?.value.trim()||'',_ts:Date.now()});
+  saveCTasks();closeAddCTModal();renderTasks();toast('Content added!','success');
+};
+window.openCTDrawer=function(id){
+  CONTENT_TASKS=getCTasks();
+  const t=CONTENT_TASKS.find(x=>x.id===id);if(!t)return;
+  _activeCTId=id;
+  const ov=document.getElementById('ct-bigmodal-overlay');
+  const body=document.getElementById('ct-bigmodal-body');
+  if(ov)ov.style.display='flex';
+  if(body)body.innerHTML=`
+    <div class="collab-field"><div class="collab-field-label">Title</div><input class="collab-field-input" id="ctd-title" value="${(t.title||'').replace(/"/g,'&quot;')}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Status</div>${cddBtn('ctd-status',CT_STATUSES,t.status||'todo')}</div>
+      <div class="collab-field"><div class="collab-field-label">Format</div>${cddBtn('ctd-format',CT_FORMATS,t.format||'reel')}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Type</div>${cddBtn('ctd-type',CT_TYPES,t.type||'organic')}</div>
+      <div class="collab-field"><div class="collab-field-label">Publish Date</div><input class="collab-field-input" id="ctd-date" type="date" value="${t.dueDate||''}"></div>
+    </div>
+    <div class="collab-field"><div class="collab-field-label">Link</div><input class="collab-field-input" id="ctd-link" type="url" value="${(t.link||'').replace(/"/g,'&quot;')}" placeholder="https://..."></div>
+    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="ctd-notes" rows="3" placeholder="Caption ideas, brief, reminders...">${t.notes||''}</textarea></div>
+  `;
+};
+window.closeCTDrawer=function(){
+  const ov=document.getElementById('ct-bigmodal-overlay');
+  if(ov)ov.style.display='none';
+  _activeCTId=null;
+};
+window.saveCTDrawer=function(){
+  CONTENT_TASKS=getCTasks();
+  const t=CONTENT_TASKS.find(x=>x.id===_activeCTId);if(!t)return;
+  t.title  =document.getElementById('ctd-title')?.value.trim()||t.title;
+  t.status =cddVal('ctd-status')||t.status;
+  t.format =cddVal('ctd-format')||t.format;
+  t.type   =cddVal('ctd-type')||t.type;
+  t.dueDate=document.getElementById('ctd-date')?.value||'';
+  t.link   =document.getElementById('ctd-link')?.value.trim()||'';
+  t.notes  =document.getElementById('ctd-notes')?.value.trim()||'';
+  t._ts    =Date.now();
+  saveCTasks();closeCTDrawer();renderTasks();toast('Content saved','success');
+};
+window.deleteCT=function(){
+  if(!_activeCTId)return;
+  if(!confirm('Delete this content item?'))return;
+  CONTENT_TASKS=getCTasks();
+  CONTENT_TASKS=CONTENT_TASKS.filter(x=>x.id!==_activeCTId);
+  saveCTasks();closeCTDrawer();renderTasks();toast('Deleted');
+};
+
+// ── Content Collabs functions (legacy) ───────────────────────
 window.setCCTab=function(t){_ccTab=t;renderTasks();};
 window.openAddCCModal=function(){
   document.getElementById('add-cc-overlay')?.classList.add('open');
