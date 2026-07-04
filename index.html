@@ -862,17 +862,17 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 <div id="sidebar">
   <button class="nav-item active" data-view="home" onclick="switchView('home')"><span class="nav-icon">🏠</span>Home</button>
   <div class="nav-sep"></div>
-  <div class="nav-section-title">Content</div>
-  <button class="nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="nav-icon">📅</span>Calendar</button>
-  <button class="nav-item" data-view="list" onclick="switchView('list')"><span class="nav-icon">📋</span>Content List</button>
+  <div class="nav-section-title">Tasks</div>
+  <button class="nav-item" data-view="tasks" onclick="switchView('tasks')"><span class="nav-icon">✅</span>Tasks</button>
   <div class="nav-sep"></div>
   <div class="nav-section-title">Business</div>
   <button class="nav-item" data-view="collabs" onclick="switchView('collabs')"><span class="nav-icon">🤝</span>Deals</button>
   <button class="nav-item" data-view="contacts" onclick="switchView('contacts')"><span class="nav-icon">👥</span>Contacts</button>
   <button class="nav-item" data-view="income" onclick="switchView('income')"><span class="nav-icon">💰</span>Income</button>
   <div class="nav-sep"></div>
-  <div class="nav-section-title">Tasks</div>
-  <button class="nav-item" data-view="tasks" onclick="switchView('tasks')"><span class="nav-icon">✅</span>Tasks</button>
+  <div class="nav-section-title">Content</div>
+  <button class="nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="nav-icon">📅</span>Calendar</button>
+  <button class="nav-item" data-view="list" onclick="switchView('list')"><span class="nav-icon">📋</span>Content List</button>
 </div>
 
 <!-- HOME / DASHBOARD VIEW -->
@@ -3287,6 +3287,8 @@ function getCalContent() {
 function buildCalFilterRow() {
   const row = document.getElementById('cal-filter-row');
   if (!row) return;
+  row.innerHTML = '';
+  return;
   const types = [
     {id:'all', label:'All'},
     {id:'campaigns', label:'📣 Campaigns'},
@@ -5953,6 +5955,7 @@ const COLLAB_STATUSES = [
   {id:'ongoing',   label:'Ongoing',   color:'#10b981', bg:'#d1fae5'},
   {id:'lost',      label:'Lost',      color:'#ef4444', bg:'#fee2e2'},
   {id:'later',     label:'Later',     color:'#f59e0b', bg:'#fef3c7'},
+  {id:'done',      label:'Done',      color:'#3a1a0e', bg:'#ecddd5'},
 ];
 let _collabStatus = 'potential';
 let _activeCollabId = null;
@@ -6000,10 +6003,11 @@ function renderCollabs(){
   </div>
   ${filtered.length===0?`<div style="text-align:center;padding:60px 20px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">🤝</div><div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No ${_collabStatus} deals</div><div style="font-size:13px">Click + Add Deal to create one</div></div>`:`
   <table class="stask-table"><thead><tr>
-    <th style="width:22%">Brand</th><th style="width:18%">Contact</th><th style="width:14%">Value</th><th style="width:14%">Status</th><th style="width:20%">Brief</th><th style="width:12%">Date</th>
+    <th style="width:20%">Brand</th><th style="width:16%">Contact</th><th style="width:13%">Value</th><th style="width:12%">Status</th><th style="width:19%">Stage</th><th style="width:12%">Brief</th><th style="width:8%">Date</th>
   </tr></thead><tbody>
   ${filtered.map(c=>{
     const st=COLLAB_STATUSES.find(s=>s.id===c.status)||COLLAB_STATUSES[0];
+    const stg=CC_PROGRESS.find(p=>p.id===c.stage);
     const dkk=Number(c.priceDKK||c.price)||0;
     const origVal=c.price&&c.priceCurrency&&c.priceCurrency!=='DKK'?`<div style="font-size:11px;color:var(--text3)">${Number(c.price).toLocaleString()} ${c.priceCurrency}</div>`:'';
     return `<tr class="stask-row" onclick="openCollabDrawer('${c.id}')">
@@ -6014,7 +6018,8 @@ function renderCollabs(){
       <td style="color:var(--text2)">${c.contact||'—'}</td>
       <td style="font-weight:600;color:var(--text)">${dkk?'DKK '+dkk.toLocaleString('da-DK'):'—'}${origVal}</td>
       <td><span class="stask-badge" style="background:${st.bg};color:${st.color}"><span class="stask-status-dot" style="background:${st.color}"></span>${st.label}</span></td>
-      <td style="color:var(--text2);font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description||'—'}</td>
+      <td>${stg?`<span class="stask-badge" style="background:${stg.bg};color:${stg.color}">${stg.label}</span>`:'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
+      <td style="color:var(--text2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px">${c.description||'—'}</td>
       <td style="color:var(--text3);font-size:12px">${c.dateContacted||'—'}</td>
     </tr>`;
   }).join('')}
@@ -6039,8 +6044,9 @@ function renderCollabs(){
       <div class="collab-field"><div class="collab-field-label">Company / Brand *</div><input class="collab-field-input" id="nc-company" placeholder="e.g. Nike, H&M, Zalando"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="nc-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===_collabStatus?' selected':''}>${s.label}</option>`).join('')}</select></div>
-        <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="nc-date" type="date"></div>
+        <div class="collab-field"><div class="collab-field-label">Stage</div><select class="collab-field-input" id="nc-stage"><option value="">— No stage —</option>${CC_PROGRESS.map(p=>`<option value="${p.id}">${p.label}</option>`).join('')}</select></div>
       </div>
+      <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="nc-date" type="date"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
         <div class="collab-field"><div class="collab-field-label">Price</div><input class="collab-field-input" id="nc-price" type="number" placeholder="0" oninput="window._collabAutoFx()"></div>
         <div class="collab-field"><div class="collab-field-label">Currency</div><select class="collab-field-input" id="nc-currency" onchange="window._collabAutoFx()"><option>DKK</option><option>USD</option><option>EUR</option></select></div>
@@ -6085,6 +6091,7 @@ window.saveNewCollab = function(){
     priceCurrency: cur,
     priceDKK: parseFloat(document.getElementById('nc-pricedkk')?.value)||toDKK(amt,cur),
     status: document.getElementById('nc-status').value,
+    stage: document.getElementById('nc-stage')?.value||'',
     deliverables: document.getElementById('nc-deliverables').value.trim(),
     contact: document.getElementById('nc-contact').value.trim(),
     email: document.getElementById('nc-email').value.trim(),
@@ -6109,7 +6116,10 @@ window.openCollabDrawer = function(id){
   if(title) title.textContent = c.company||'Deal Details';
   if(body) body.innerHTML = `
     <div class="collab-field"><div class="collab-field-label">Company / Brand</div><input class="collab-field-input" id="cd-company" value="${(c.company||'').replace(/"/g,'&quot;')}"></div>
-    <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="cd-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===c.status?' selected':''}>${s.label}</option>`).join('')}</select></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="cd-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===c.status?' selected':''}>${s.label}</option>`).join('')}</select></div>
+      <div class="collab-field"><div class="collab-field-label">Stage</div><select class="collab-field-input" id="cd-stage"><option value="">— No stage —</option>${CC_PROGRESS.map(p=>`<option value="${p.id}"${p.id===c.stage?' selected':''}>${p.label}</option>`).join('')}</select></div>
+    </div>
     <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="cd-desc" rows="3">${c.description||''}</textarea></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
       <div class="collab-field"><div class="collab-field-label">Price</div><input class="collab-field-input" id="cd-price" type="number" value="${c.price||''}" oninput="(function(){const a=document.getElementById('cd-price')?.value,cur=document.getElementById('cd-currency')?.value||'DKK',el=document.getElementById('cd-pricedkk');if(el&&a)el.value=cur==='DKK'?a:Math.round(parseFloat(a)*(CC_FX[cur]||1));})()"></div>
@@ -6138,6 +6148,7 @@ window.saveCollabDrawer = function(){
   if(!c) return;
   c.company     = document.getElementById('cd-company')?.value.trim()||c.company;
   c.status      = document.getElementById('cd-status')?.value||c.status;
+  c.stage       = document.getElementById('cd-stage')?.value||'';
   c.description = document.getElementById('cd-desc')?.value.trim();
   c.price       = document.getElementById('cd-price')?.value;
   c.priceCurrency = document.getElementById('cd-currency')?.value||'DKK';
@@ -6173,12 +6184,11 @@ function getIncome(){try{return JSON.parse(localStorage.getItem(INCOME_KEY)||'[]
 function saveIncome(){localStorage.setItem(INCOME_KEY,JSON.stringify(INCOME));sbSet('income',INCOME);}
 
 const INCOME_TYPES = [
-  {id:'brand_deal', label:'Brand Deal', color:'#3a1a0e', bg:'#ecddd5'},
-  {id:'ugc',        label:'UGC',        color:'#7c3aed', bg:'#ede9ff'},
-  {id:'affiliate',  label:'Affiliate',  color:'#0891b2', bg:'#cffafe'},
-  {id:'merch',      label:'Merch',      color:'#059669', bg:'#d1fae5'},
-  {id:'event',      label:'Event/Speaking', color:'#d97706', bg:'#fef3c7'},
-  {id:'other',      label:'Other',      color:'#6b7280', bg:'#f3f4f6'},
+  {id:'collabs',   label:'Collabs',   color:'#3a1a0e', bg:'#ecddd5'},
+  {id:'affiliate', label:'Affiliate', color:'#0891b2', bg:'#cffafe'},
+  {id:'facebook',  label:'Facebook',  color:'#1877f2', bg:'#dbeafe'},
+  {id:'interior',  label:'Interior',  color:'#92400e', bg:'#fef3c7'},
+  {id:'some',      label:'SoMe',      color:'#7c3aed', bg:'#ede9ff'},
 ];
 
 function renderIncome(){
@@ -6256,7 +6266,10 @@ function renderIncome(){
           return `<div style="margin-bottom:4px">
             <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:2px">
               <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">${month}</span>
-              <span style="font-size:13px;font-weight:700;color:var(--text)">DKK ${subtotal.toLocaleString('da-DK')}</span>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-size:13px;font-weight:700;color:var(--text)">DKK ${subtotal.toLocaleString('da-DK')}</span>
+                <button onclick="window.openAddIncomeModal('${entries[0]?.date?.slice(0,7)||''}')" style="font-size:11px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent-light);border-radius:6px;padding:2px 8px;cursor:pointer">+ Add</button>
+              </div>
             </div>
             ${entries.map(x=>{
               const t=INCOME_TYPES.find(tp=>tp.id===x.type)||INCOME_TYPES[INCOME_TYPES.length-1];
@@ -6304,9 +6317,17 @@ window._incAutoFx=function(){
   const dkkEl=document.getElementById('ni-dkk');
   if(dkkEl&&amt){dkkEl.value=cur==='DKK'?amt:Math.round(parseFloat(amt)*(CC_FX[cur]||1));}
 };
-window.openAddIncomeModal = function(){
+window.openAddIncomeModal = function(monthPrefix){
   const ov=document.getElementById('add-income-overlay');
-  if(ov){ov.classList.add('open');document.getElementById('ni-name').focus();}
+  if(ov){
+    ov.classList.add('open');
+    const dateEl=document.getElementById('ni-date');
+    if(dateEl){
+      if(monthPrefix) dateEl.value=monthPrefix+'-01';
+      else dateEl.value=new Date().toISOString().slice(0,10);
+    }
+    document.getElementById('ni-name')?.focus();
+  }
 };
 window.closeAddIncomeModal = function(){
   document.getElementById('add-income-overlay')?.classList.remove('open');
