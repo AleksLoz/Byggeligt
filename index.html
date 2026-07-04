@@ -48,6 +48,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .nav-item:hover{background:var(--accent-light);color:var(--text)}
 .nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:600}
 .nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;opacity:.8}
+.nav-icon-img{width:18px;height:18px;object-fit:contain;flex-shrink:0;filter:brightness(0) opacity(.55)}
+.nav-item.active .nav-icon-img{filter:brightness(0) opacity(.9)}
+.nav-item:hover .nav-icon-img{filter:brightness(0) opacity(.75)}
 .coming-soon{display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-size:18px;font-weight:500}
 
 /* LIST VIEW */
@@ -867,16 +870,16 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 <!-- APP -->
 <div id="app">
 <div id="sidebar">
-  <button class="nav-item active" data-view="home" onclick="switchView('home')"><span class="nav-icon">🏠</span>Home</button>
+  <button class="nav-item active" data-view="home" onclick="switchView('home')"><img class="nav-icon-img" src="icon-home.png">Home</button>
   <div class="nav-sep"></div>
   <div class="nav-section-title">Tasks</div>
-  <button class="nav-item" data-view="tasks" onclick="switchView('tasks')"><span class="nav-icon">✅</span>Tasks</button>
-  <button class="nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="nav-icon">📅</span>Calendar</button>
+  <button class="nav-item" data-view="tasks" onclick="switchView('tasks')"><img class="nav-icon-img" src="icon-tasks.png">Tasks</button>
+  <button class="nav-item" data-view="calendar" onclick="switchView('calendar')"><img class="nav-icon-img" src="icon-calendar.png">Calendar</button>
   <div class="nav-sep"></div>
   <div class="nav-section-title">Business</div>
-  <button class="nav-item" data-view="collabs" onclick="switchView('collabs')"><span class="nav-icon">🤝</span>Deals</button>
-  <button class="nav-item" data-view="contacts" onclick="switchView('contacts')"><span class="nav-icon">👥</span>Contacts</button>
-  <button class="nav-item" data-view="income" onclick="switchView('income')"><span class="nav-icon">💰</span>Income</button>
+  <button class="nav-item" data-view="collabs" onclick="switchView('collabs')"><img class="nav-icon-img" src="icon-deals.png">Deals</button>
+  <button class="nav-item" data-view="contacts" onclick="switchView('contacts')"><img class="nav-icon-img" src="icon-contacts.png">Contacts</button>
+  <button class="nav-item" data-view="income" onclick="switchView('income')"><img class="nav-icon-img" src="icon-income.png">Income</button>
 </div>
 
 <!-- HOME / DASHBOARD VIEW -->
@@ -5504,6 +5507,8 @@ let _staskSection='work'; // 'work' | 'home' | 'content'
 let _staskTagFilter='all';
 let _staskStatusFilter='all';
 let _activeStaskId=null;
+let _taskMonth=new Date().getMonth();
+let _taskYear=new Date().getFullYear();
 
 // ── Custom Dropdown ──────────────────────────────────────────
 const _cddReg={};
@@ -5716,13 +5721,17 @@ function renderTasks(){
   <span style="font-size:12px;color:var(--text3);margin-left:4px">${monthTasks.length} piece${monthTasks.length!==1?'s':''}</span>
 </div>
 <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
-  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">📅 ${monthLabel} Campaign</div>
-  ${ctTable(monthTasks,'No content planned for this month. Click + Add Content to start.')}
+  ${monthTasks.length?ctTable(monthTasks,''): `<div id="ct-month-drop" ondragover="event.preventDefault()" ondrop="window.ctDropToMonth(event)"
+    ondragenter="this.style.background='var(--accent-light)'" ondragleave="this.style.background=''"
+    style="padding:32px 20px;text-align:center;font-size:13px;color:var(--text3);border:2px dashed var(--border);border-radius:10px;transition:background .15s">
+    Drop ideas here to schedule them this month, or click + Add Content
+  </div>`}
+  ${monthTasks.length?`<tbody id="ct-month-drop" ondragover="event.preventDefault()" ondrop="window.ctDropToMonth(event)"></tbody>`:''}
 </div>
-${noDateTasks.length?`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
-  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">💡 Ideas / No Date</div>
-  ${ctTable(noDateTasks,'')}
-</div>`:''}
+<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
+  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">💡 Ideas</div>
+  ${noDateTasks.length?ctTable(noDateTasks,''):'<div style="font-size:13px;color:var(--text3);padding:8px 0">No ideas yet. Add content without a date.</div>'}
+</div>
 <div class="bigmodal-overlay" id="ct-bigmodal-overlay" onclick="if(event.target===this)window.closeCTDrawer()">
   <div class="bigmodal" id="ct-bigmodal">
     <div class="bigmodal-header">
@@ -5759,31 +5768,83 @@ ${noDateTasks.length?`<div style="background:var(--card);border:1.5px solid var(
     return;
   }
 
-  // Work / Home
-  const allWork=STASKS.filter(t=>t.section!=='home'&&t.section!=='content');
-  const homeTasks=STASKS.filter(t=>t.section==='home');
-  let viewTasks=section==='work'?allWork:homeTasks;
-  if(section==='work'&&_staskTagFilter!=='all') viewTasks=viewTasks.filter(t=>(t.tags||[]).includes(_staskTagFilter));
-  if(_staskStatusFilter!=='all') viewTasks=viewTasks.filter(t=>t.status===_staskStatusFilter);
+  // Work / Home — month-based view
+  const MONTH_NAMES_T=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const allInSection = section==='work'
+    ? STASKS.filter(t=>t.section!=='home'&&t.section!=='content')
+    : STASKS.filter(t=>t.section==='home');
+
+  const monthTasksST = allInSection.filter(t=>{
+    if(!t.dueDate) return false;
+    const d=new Date(t.dueDate+'T00:00:00');
+    return d.getFullYear()===_taskYear && d.getMonth()===_taskMonth;
+  });
+  const ideaTasksST = allInSection.filter(t=>!t.dueDate);
+
+  function stTaskRow(t){
+    const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
+    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
+    const day=t.dueDate?new Date(t.dueDate+'T00:00:00').getDate():'';
+    return `<tr class="stask-row" draggable="true" data-id="${t.id}"
+      ondragstart="event.dataTransfer.setData('taskId','${t.id}');event.dataTransfer.setData('src','ideas')"
+      onclick="window.openStaskDrawer('${t.id}')">
+      <td style="padding:10px 12px;font-size:13px;font-weight:600;color:var(--text);cursor:grab">⠿ ${t.title||'Untitled'}</td>
+      <td style="padding:10px 8px"><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color}">${st.label}</span></td>
+      ${section==='work'?`<td style="padding:10px 8px">${tagHtml}</td>`:''}
+      <td style="padding:10px 8px;font-size:12px;color:var(--text2)">${day?'<span style="font-weight:700;color:var(--text)">'+day+'</span> '+MONTH_NAMES_T[_taskMonth].slice(0,3):'—'}</td>
+      <td style="padding:10px 8px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none">🔗</a>`:''}</td>
+    </tr>`;
+  }
+
+  function stMonthTable(tasks){
+    if(!tasks.length) return `<div id="st-month-drop" ondragover="event.preventDefault()" ondrop="window.stDropToMonth(event)"
+      style="padding:32px 20px;text-align:center;font-size:13px;color:var(--text3);border:2px dashed var(--border);border-radius:10px;transition:background .15s"
+      ondragenter="this.style.background='var(--accent-light)'" ondragleave="this.style.background=''">
+      Drop ideas here to schedule them this month, or click + Add Task
+    </div>`;
+    return `<table class="stask-table" style="margin-bottom:0"><thead><tr>
+      <th style="padding:0 12px 10px">Task</th><th>Status</th>${section==='work'?'<th>Tags</th>':''}
+      <th>Date</th><th>Link</th>
+    </tr></thead>
+    <tbody id="st-month-drop" ondragover="event.preventDefault()" ondrop="window.stDropToMonth(event)">
+      ${tasks.map(stTaskRow).join('')}
+      <tr style="height:8px"></tr>
+    </tbody></table>`;
+  }
+
+  function stIdeaRow(t){
+    const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
+    return `<tr class="stask-row" draggable="true" data-id="${t.id}"
+      ondragstart="event.dataTransfer.setData('taskId','${t.id}');event.dataTransfer.setData('src','ideas')"
+      onclick="window.openStaskDrawer('${t.id}')">
+      <td style="padding:10px 12px;font-size:13px;font-weight:600;color:var(--text);cursor:grab">⠿ ${t.title||'Untitled'}</td>
+      <td style="padding:10px 8px"><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color}">${st.label}</span></td>
+      <td colspan="3" style="padding:10px 8px;font-size:12px;color:var(--text3)">No date — drag up to schedule</td>
+    </tr>`;
+  }
 
   wrap.innerHTML=`
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
   ${sectionToggle}
   <button class="btn btn-primary" onclick="window.openAddStaskModal()">+ Add Task</button>
 </div>
-${section==='work'?`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
-  <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-right:4px">Tag</span>
-  <button class="stask-filter-btn${_staskTagFilter==='all'?' active':''}" onclick="window.setStaskTag('all')">All</button>
-  ${WORK_TAGS.map(tg=>`<button class="stask-filter-btn${_staskTagFilter===tg.id?' active':''}" onclick="window.setStaskTag('${tg.id}')" style="${_staskTagFilter===tg.id?'background:'+tg.color+';border-color:'+tg.color+';color:#fff':''}">${tg.label}</button>`).join('')}
-  <span style="margin-left:8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Status</span>
-  <button class="stask-filter-btn${_staskStatusFilter==='all'?' active':''}" onclick="window.setStaskStatus('all')">All</button>
-  ${STASK_STATUSES.map(s=>`<button class="stask-filter-btn${_staskStatusFilter===s.id?' active':''}" onclick="window.setStaskStatus('${s.id}')">${s.label}</button>`).join('')}
-</div>`:`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
-  <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-right:4px">Status</span>
-  <button class="stask-filter-btn${_staskStatusFilter==='all'?' active':''}" onclick="window.setStaskStatus('all')">All</button>
-  ${STASK_STATUSES.map(s=>`<button class="stask-filter-btn${_staskStatusFilter===s.id?' active':''}" onclick="window.setStaskStatus('${s.id}')">${s.label}</button>`).join('')}
-</div>`}
-${_staskTable(viewTasks)}
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+  <button onclick="window.taskPrevMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">‹</button>
+  <div style="font-size:18px;font-weight:800;color:var(--text);min-width:180px;text-align:center">${MONTH_NAMES_T[_taskMonth]} ${_taskYear}</div>
+  <button onclick="window.taskNextMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">›</button>
+  <span style="font-size:12px;color:var(--text3);margin-left:4px">${monthTasksST.length} task${monthTasksST.length!==1?'s':''}</span>
+</div>
+<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+  ${stMonthTable(monthTasksST)}
+</div>
+${ideaTasksST.length||true?`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
+  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">💡 Ideas</div>
+  ${ideaTasksST.length?`<table class="stask-table" style="margin-bottom:0"><thead><tr>
+    <th style="padding:0 12px 10px">Task</th><th>Status</th>${section==='work'?'<th>Tags</th>':''}
+    <th colspan="2"></th>
+  </tr></thead><tbody>${ideaTasksST.map(stIdeaRow).join('')}</tbody></table>`
+  :`<div style="font-size:13px;color:var(--text3);padding:8px 0">No ideas yet. Add a task without a date.</div>`}
+</div>`:''}
 <div class="stask-drawer-overlay" id="stask-drawer-overlay" style="display:none"></div>
 <div class="stask-drawer" id="stask-drawer" style="display:none"></div>
 <div class="bigmodal-overlay" id="stask-bigmodal-overlay" onclick="if(event.target===this)window.closeStaskDrawer()">
@@ -5810,16 +5871,16 @@ ${_staskTable(viewTasks)}
     </div>
     <div class="stask-field"><div class="stask-field-label">Section</div>
       <div style="display:flex;gap:8px">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="work" checked> Work</label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="home"> Home</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="work" ${section==='work'?'checked':''}> Work</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="home" ${section==='home'?'checked':''}> Home</label>
       </div>
     </div>
-    <div class="stask-field" id="nt-tags-wrap"><div class="stask-field-label">Tags (Work)</div>
+    <div class="stask-field" id="nt-tags-wrap" style="${section!=='work'?'display:none':''}"><div class="stask-field-label">Tags</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${WORK_TAGS.map(tg=>`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px"><input type="checkbox" name="nt-tag" value="${tg.id}"> <span style="padding:2px 8px;border-radius:8px;background:${tg.bg};color:${tg.color};font-weight:600;font-size:12px">${tg.label}</span></label>`).join('')}
       </div>
     </div>
-    <div class="stask-field"><div class="stask-field-label">Responsible Person</div><input class="stask-field-input" id="nt-responsible" placeholder="Who owns this?"></div>
+    <div class="stask-field"><div class="stask-field-label">Responsible</div><input class="stask-field-input" id="nt-responsible" placeholder="Who owns this?"></div>
     <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="nt-link" type="url" placeholder="https://..."></div>
     <div id="nt-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
@@ -5841,6 +5902,26 @@ window._ccAutoFx=_ccAutoFx;
 window.setStaskSection=function(s){_staskSection=s;_staskTagFilter='all';_staskStatusFilter='all';renderTasks();};
 window.setStaskTag=function(t){_staskTagFilter=t;renderTasks();};
 window.setStaskStatus=function(s){_staskStatusFilter=s;renderTasks();};
+window.taskPrevMonth=function(){_taskMonth--;if(_taskMonth<0){_taskMonth=11;_taskYear--;}renderTasks();};
+window.taskNextMonth=function(){_taskMonth++;if(_taskMonth>11){_taskMonth=0;_taskYear++;}renderTasks();};
+window.stDropToMonth=function(e){
+  e.preventDefault();
+  const id=e.dataTransfer.getData('taskId');if(!id)return;
+  STASKS=getSTasks();
+  const t=STASKS.find(x=>x.id===id);if(!t)return;
+  const d=new Date(_taskYear,_taskMonth,1);
+  t.dueDate=d.toISOString().slice(0,10);t._ts=Date.now();
+  saveSTasks();renderTasks();toast('Scheduled for '+d.toLocaleDateString('en-GB',{month:'long',year:'numeric'}),'success');
+};
+window.ctDropToMonth=function(e){
+  e.preventDefault();
+  const id=e.dataTransfer.getData('taskId');if(!id)return;
+  CONTENT_TASKS=getCTasks();
+  const t=CONTENT_TASKS.find(x=>x.id===id);if(!t)return;
+  const d=new Date(_ctYear,_ctMonth,1);
+  t.dueDate=d.toISOString().slice(0,10);t._ts=Date.now();
+  saveCTasks();renderTasks();toast('Scheduled for '+d.toLocaleDateString('en-GB',{month:'long',year:'numeric'}),'success');
+};
 window.openAddStaskModal=function(){
   const ov=document.getElementById('add-stask-overlay');
   if(ov){
