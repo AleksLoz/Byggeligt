@@ -834,6 +834,13 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 .cdd-opt{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--text);transition:background .1s;border:none;width:100%;background:transparent;font-family:inherit;text-align:left}
 .cdd-opt:hover{background:var(--accent-light)}
 .cdd-opt.cdd-sel{background:var(--accent-light);font-weight:600}
+/* Big center modal */
+.bigmodal-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px}
+.bigmodal-overlay.open{display:flex}
+.bigmodal{background:var(--card);border-radius:16px;width:600px;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.25);overflow:hidden}
+.bigmodal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.bigmodal-body{flex:1;overflow-y:auto;padding:20px 24px}
+.bigmodal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -864,15 +871,12 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
   <div class="nav-sep"></div>
   <div class="nav-section-title">Tasks</div>
   <button class="nav-item" data-view="tasks" onclick="switchView('tasks')"><span class="nav-icon">✅</span>Tasks</button>
+  <button class="nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="nav-icon">📅</span>Calendar</button>
   <div class="nav-sep"></div>
   <div class="nav-section-title">Business</div>
   <button class="nav-item" data-view="collabs" onclick="switchView('collabs')"><span class="nav-icon">🤝</span>Deals</button>
   <button class="nav-item" data-view="contacts" onclick="switchView('contacts')"><span class="nav-icon">👥</span>Contacts</button>
   <button class="nav-item" data-view="income" onclick="switchView('income')"><span class="nav-icon">💰</span>Income</button>
-  <div class="nav-sep"></div>
-  <div class="nav-section-title">Content</div>
-  <button class="nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="nav-icon">📅</span>Calendar</button>
-  <button class="nav-item" data-view="list" onclick="switchView('list')"><span class="nav-icon">📋</span>Content List</button>
 </div>
 
 <!-- HOME / DASHBOARD VIEW -->
@@ -5609,8 +5613,10 @@ function _staskTable(tasks){
       const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
       const overdue=t.dueDate&&new Date(t.dueDate+'T00:00:00')<new Date()&&t.status!=='done';
       const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
+      const collabCol=t.collabId?(COLLABS.find(x=>x.id===t.collabId)):null;
+      const collabBadge=collabCol?`<span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px">🤝 ${collabCol.company||''}</span>`:'';
       return `<tr class="stask-row" onclick="window.openStaskDrawer('${t.id}')">
-        <td><div class="stask-name">${t.title||'Untitled'}</div>${tagHtml?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${tagHtml}</div>`:''}</td>
+        <td><div class="stask-name">${t.title||'Untitled'}${collabBadge}</div>${tagHtml?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${tagHtml}</div>`:''}</td>
         <td><span class="stask-badge" style="background:${st.bg};color:${st.color}"><span class="stask-status-dot" style="background:${st.color}"></span>${st.label}</span></td>
         <td style="color:${overdue?'#ef4444':'var(--text2)'}${overdue?';font-weight:600':''}">${t.dueDate||'—'}</td>
         <td style="color:var(--text2)">${t.responsible||'—'}</td>
@@ -5711,16 +5717,19 @@ ${section==='work'?`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wra
   ${STASK_STATUSES.map(s=>`<button class="stask-filter-btn${_staskStatusFilter===s.id?' active':''}" onclick="window.setStaskStatus('${s.id}')">${s.label}</button>`).join('')}
 </div>`}
 ${_staskTable(viewTasks)}
-<div class="stask-drawer-overlay" id="stask-drawer-overlay" onclick="window.closeStaskDrawer()"></div>
-<div class="stask-drawer" id="stask-drawer">
-  <div class="stask-drawer-header">
-    <div style="font-size:15px;font-weight:700;color:var(--text)" id="stask-drawer-title">Task Details</div>
-    <button onclick="window.closeStaskDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
-  </div>
-  <div class="stask-drawer-body" id="stask-drawer-body"></div>
-  <div class="stask-drawer-footer">
-    <button class="btn btn-primary" onclick="window.saveStaskDrawer()" style="flex:1">Save</button>
-    <button class="btn" onclick="window.deleteStask()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+<div class="stask-drawer-overlay" id="stask-drawer-overlay" style="display:none"></div>
+<div class="stask-drawer" id="stask-drawer" style="display:none"></div>
+<div class="bigmodal-overlay" id="stask-bigmodal-overlay" onclick="if(event.target===this)window.closeStaskDrawer()">
+  <div class="bigmodal" id="stask-bigmodal">
+    <div class="bigmodal-header">
+      <div style="font-size:16px;font-weight:800;color:var(--text)" id="stask-bigmodal-title">Task Details</div>
+      <button onclick="window.closeStaskDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
+    </div>
+    <div class="bigmodal-body" id="stask-bigmodal-body"></div>
+    <div class="bigmodal-footer">
+      <button class="btn btn-primary" onclick="window.saveStaskDrawer()" style="flex:1">Save</button>
+      <button class="btn" onclick="window.deleteStask()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+    </div>
   </div>
 </div>
 <div class="stask-modal-overlay" id="add-stask-overlay">
@@ -5787,17 +5796,22 @@ window.saveNewStask=function(){
 window.openStaskDrawer=function(id){
   _activeStaskId=id;
   const t=STASKS.find(x=>x.id===id);if(!t)return;
-  const el=document.getElementById('stask-drawer-title');
+  const el=document.getElementById('stask-bigmodal-title');
   if(el)el.textContent=t.title||'Task';
-  const body=document.getElementById('stask-drawer-body');
+  const body=document.getElementById('stask-bigmodal-body');
   const sec=t.section||'work';
+  const collabBadge=t.collabId?(function(){const col=COLLABS.find(x=>x.id===t.collabId);return col?`<div style="font-size:12px;color:var(--accent);margin-bottom:12px">🤝 Linked to deal: <b>${col.company||''}</b></div>`:''})():'';
   if(body)body.innerHTML=`
-    <div class="stask-field"><div class="stask-field-label">Task Name</div><input class="stask-field-input" id="dt-title" value="${(t.title||'').replace(/"/g,'&quot;')}"></div>
-    <div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="dt-desc" rows="5">${t.description||''}</textarea></div>
+    ${collabBadge}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Task Name</div><input class="stask-field-input" id="dt-title" value="${(t.title||'').replace(/"/g,'&quot;')}"></div>
       <div class="stask-field"><div class="stask-field-label">Due Date</div><input class="stask-field-input" id="dt-date" type="date" value="${t.dueDate||''}"></div>
-      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('dt-status',STASK_STATUSES,t.status||'todo')}</div>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('dt-status',STASK_STATUSES,t.status||'todo')}</div>
+      <div class="stask-field"><div class="stask-field-label">Responsible Person</div><input class="stask-field-input" id="dt-responsible" value="${(t.responsible||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="dt-desc" rows="4">${t.description||''}</textarea></div>
     <div class="stask-field"><div class="stask-field-label">Section</div>
       <div style="display:flex;gap:10px">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="dt-section" value="work"${sec==='work'?' checked':''}> Work</label>
@@ -5809,19 +5823,16 @@ window.openStaskDrawer=function(id){
         ${WORK_TAGS.map(tg=>`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px"><input type="checkbox" name="dt-tag" value="${tg.id}"${(t.tags||[]).includes(tg.id)?' checked':''}> <span style="padding:2px 8px;border-radius:8px;background:${tg.bg};color:${tg.color};font-weight:600;font-size:12px">${tg.label}</span></label>`).join('')}
       </div>
     </div>
-    <div class="stask-field"><div class="stask-field-label">Responsible Person</div><input class="stask-field-input" id="dt-responsible" value="${(t.responsible||'').replace(/"/g,'&quot;')}"></div>
     <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="dt-link" type="url" value="${t.link||''}"></div>
     ${t.link?`<a href="${t.link}" target="_blank" style="font-size:13px;color:var(--accent);text-decoration:none;display:inline-block;margin-top:-8px;margin-bottom:14px">↗ Open link</a>`:''}
   `;
   document.querySelectorAll('input[name="dt-section"]').forEach(r=>{
     r.addEventListener('change',()=>{const tw=document.getElementById('dt-tags-wrap');if(tw)tw.style.display=r.value==='work'?'block':'none';});
   });
-  document.getElementById('stask-drawer-overlay')?.classList.add('open');
-  document.getElementById('stask-drawer')?.classList.add('open');
+  document.getElementById('stask-bigmodal-overlay')?.classList.add('open');
 };
 window.closeStaskDrawer=function(){
-  document.getElementById('stask-drawer-overlay')?.classList.remove('open');
-  document.getElementById('stask-drawer')?.classList.remove('open');
+  document.getElementById('stask-bigmodal-overlay')?.classList.remove('open');
   _activeStaskId=null;
 };
 window.saveStaskDrawer=function(){
@@ -6010,31 +6021,36 @@ function renderCollabs(){
     const stg=CC_PROGRESS.find(p=>p.id===c.stage);
     const dkk=Number(c.priceDKK||c.price)||0;
     const origVal=c.price&&c.priceCurrency&&c.priceCurrency!=='DKK'?`<div style="font-size:11px;color:var(--text3)">${Number(c.price).toLocaleString()} ${c.priceCurrency}</div>`:'';
+    const logoHtml=c.website?`<img src="https://logo.clearbit.com/${c.website}" style="width:30px;height:30px;border-radius:8px;object-fit:contain;background:#fff;flex-shrink:0" onerror="this.outerHTML='<div style=\\'width:30px;height:30px;border-radius:8px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0\\'>${(c.company||'?')[0].toUpperCase()}</div>'">`:`<div style="width:30px;height:30px;border-radius:8px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">${(c.company||'?')[0].toUpperCase()}</div>`;
     return `<tr class="stask-row" onclick="openCollabDrawer('${c.id}')">
       <td><div style="display:flex;align-items:center;gap:8px">
-        <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">${(c.company||'?')[0].toUpperCase()}</div>
-        <div class="stask-name">${c.company||'—'}</div>
+        <div onclick="event.stopPropagation();openCollabDrawer('${c.id}')" style="cursor:pointer;flex-shrink:0">${logoHtml}</div>
+        <div class="stask-name" onclick="event.stopPropagation();window.inlineEditCollab('${c.id}','company',this)" title="Click to edit">${c.company||'—'}</div>
       </div></td>
       <td style="color:var(--text2)">${c.contact||'—'}</td>
-      <td style="font-weight:600;color:var(--text)">${dkk?'DKK '+dkk.toLocaleString('da-DK'):'—'}${origVal}</td>
-      <td><span class="stask-badge" style="background:${st.bg};color:${st.color}"><span class="stask-status-dot" style="background:${st.color}"></span>${st.label}</span></td>
-      <td>${stg?`<span class="stask-badge" style="background:${stg.bg};color:${stg.color}">${stg.label}</span>`:'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
+      <td onclick="event.stopPropagation();window.inlineEditCollab('${c.id}','price',this)" title="Click to edit" style="font-weight:600;color:var(--text);cursor:pointer">${dkk?'DKK '+dkk.toLocaleString('da-DK'):'—'}${origVal}</td>
+      <td onclick="event.stopPropagation();window.inlineEditCollab('${c.id}','status',this)" title="Click to edit" style="cursor:pointer"><span class="stask-badge" style="background:${st.bg};color:${st.color}"><span class="stask-status-dot" style="background:${st.color}"></span>${st.label}</span></td>
+      <td onclick="event.stopPropagation();window.inlineEditCollab('${c.id}','stage',this)" title="Click to edit" style="cursor:pointer">${stg?`<span class="stask-badge" style="background:${stg.bg};color:${stg.color}">${stg.label}</span>`:'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
       <td style="color:var(--text2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px">${c.description||'—'}</td>
-      <td style="color:var(--text3);font-size:12px">${c.dateContacted||'—'}</td>
+      <td onclick="event.stopPropagation();window.inlineEditCollab('${c.id}','date',this)" title="Click to edit" style="color:var(--text3);font-size:12px;cursor:pointer">${c.dateContacted||'—'}</td>
     </tr>`;
   }).join('')}
   </tbody></table>`}
-  <!-- Collab drawer -->
-  <div class="collab-drawer-overlay" id="collab-drawer-overlay" onclick="closeCollabDrawer()"></div>
-  <div class="collab-drawer" id="collab-drawer">
-    <div class="collab-drawer-header">
-      <div style="font-size:15px;font-weight:700;color:var(--text)" id="collab-drawer-title">Deal Details</div>
-      <button onclick="closeCollabDrawer()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">×</button>
-    </div>
-    <div class="collab-drawer-body" id="collab-drawer-body"></div>
-    <div class="collab-drawer-footer">
-      <button class="btn btn-primary" onclick="saveCollabDrawer()" style="flex:1">Save</button>
-      <button class="btn" onclick="deleteCollab()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+  <!-- Collab drawer (kept for CSS compat, not used functionally) -->
+  <div class="collab-drawer-overlay" id="collab-drawer-overlay" style="display:none"></div>
+  <div class="collab-drawer" id="collab-drawer" style="display:none"></div>
+  <!-- Collab bigmodal -->
+  <div class="bigmodal-overlay" id="collab-bigmodal-overlay" onclick="if(event.target===this)closeCollabDrawer()">
+    <div class="bigmodal" id="collab-bigmodal">
+      <div class="bigmodal-header">
+        <div style="font-size:16px;font-weight:800;color:var(--text)" id="collab-bigmodal-title">Deal Details</div>
+        <button onclick="closeCollabDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
+      </div>
+      <div class="bigmodal-body" id="collab-bigmodal-body"></div>
+      <div class="bigmodal-footer">
+        <button class="btn btn-primary" onclick="saveCollabDrawer()" style="flex:1">Save</button>
+        <button class="btn" onclick="deleteCollab()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
+      </div>
     </div>
   </div>
   <!-- Add deal modal -->
@@ -6111,16 +6127,26 @@ window.openCollabDrawer = function(id){
   _activeCollabId = id;
   const c = COLLABS.find(x=>x.id===id);
   if(!c) return;
-  const title = document.getElementById('collab-drawer-title');
-  const body  = document.getElementById('collab-drawer-body');
+  const title = document.getElementById('collab-bigmodal-title');
+  const body  = document.getElementById('collab-bigmodal-body');
   if(title) title.textContent = c.company||'Deal Details';
+  const dealTasksHtml = (c.dealTasks||[]).map((dt)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" ${dt.done?'checked':''} onchange="window.toggleDealTask('${c.id}','${dt.id}',this.checked)" style="flex-shrink:0;width:16px;height:16px;cursor:pointer">
+      <input class="stask-field-input" value="${(dt.title||'').replace(/"/g,'&quot;')}" onchange="window.updateDealTask('${c.id}','${dt.id}','title',this.value)" style="flex:1;padding:4px 8px;font-size:13px;${dt.done?'text-decoration:line-through;opacity:.6':''}">
+      <input class="stask-field-input" type="date" value="${dt.dueDate||''}" onchange="window.updateDealTask('${c.id}','${dt.id}','dueDate',this.value)" style="width:130px;padding:4px 8px;font-size:13px">
+      <button onclick="window.deleteDealTask('${c.id}','${dt.id}')" style="color:#ef4444;background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;line-height:1">×</button>
+    </div>
+  `).join('');
   if(body) body.innerHTML = `
-    <div class="collab-field"><div class="collab-field-label">Company / Brand</div><input class="collab-field-input" id="cd-company" value="${(c.company||'').replace(/"/g,'&quot;')}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Company / Brand</div><input class="collab-field-input" id="cd-company" value="${(c.company||'').replace(/"/g,'&quot;')}"></div>
+      <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="cd-date" type="date" value="${c.dateContacted||''}"></div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="collab-field"><div class="collab-field-label">Status</div><select class="collab-field-input" id="cd-status">${COLLAB_STATUSES.map(s=>`<option value="${s.id}"${s.id===c.status?' selected':''}>${s.label}</option>`).join('')}</select></div>
       <div class="collab-field"><div class="collab-field-label">Stage</div><select class="collab-field-input" id="cd-stage"><option value="">— No stage —</option>${CC_PROGRESS.map(p=>`<option value="${p.id}"${p.id===c.stage?' selected':''}>${p.label}</option>`).join('')}</select></div>
     </div>
-    <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="cd-desc" rows="3">${c.description||''}</textarea></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
       <div class="collab-field"><div class="collab-field-label">Price</div><input class="collab-field-input" id="cd-price" type="number" value="${c.price||''}" oninput="(function(){const a=document.getElementById('cd-price')?.value,cur=document.getElementById('cd-currency')?.value||'DKK',el=document.getElementById('cd-pricedkk');if(el&&a)el.value=cur==='DKK'?a:Math.round(parseFloat(a)*(CC_FX[cur]||1));})()"></div>
       <div class="collab-field"><div class="collab-field-label">Currency</div><select class="collab-field-input" id="cd-currency" onchange="(function(){const a=document.getElementById('cd-price')?.value,cur=document.getElementById('cd-currency')?.value||'DKK',el=document.getElementById('cd-pricedkk');if(el&&a)el.value=cur==='DKK'?a:Math.round(parseFloat(a)*(CC_FX[cur]||1));})()"><option${(!c.priceCurrency||c.priceCurrency==='DKK')?' selected':''}>DKK</option><option${c.priceCurrency==='USD'?' selected':''}>USD</option><option${c.priceCurrency==='EUR'?' selected':''}>EUR</option></select></div>
@@ -6130,17 +6156,27 @@ window.openCollabDrawer = function(id){
       <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="cd-contact" value="${(c.contact||'').replace(/"/g,'&quot;')}"></div>
       <div class="collab-field"><div class="collab-field-label">Email</div><input class="collab-field-input" id="cd-email" type="email" value="${(c.email||'').replace(/"/g,'&quot;')}"></div>
     </div>
-    <div class="collab-field"><div class="collab-field-label">Date Contacted</div><input class="collab-field-input" id="cd-date" type="date" value="${c.dateContacted||''}"></div>
-    <div class="collab-field"><div class="collab-field-label">Deliverables</div><input class="collab-field-input" id="cd-deliverables" value="${(c.deliverables||'').replace(/"/g,'&quot;')}"></div>
-    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="cd-notes" rows="3">${c.notes||''}</textarea></div>
-    ${c.email?`<a href="mailto:${c.email}" style="display:inline-block;margin-top:4px;font-size:13px;color:var(--accent);text-decoration:none">✉ Email ${c.contact||c.email}</a>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Instagram Handle</div><input class="collab-field-input" id="cd-instagram" placeholder="@nikedk" value="${(c.instagram||'').replace(/"/g,'&quot;')}"></div>
+      <div class="collab-field"><div class="collab-field-label">Website / Domain</div><input class="collab-field-input" id="cd-website" placeholder="nike.com" value="${(c.website||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="cd-desc" rows="2">${c.description||''}</textarea></div>
+    <div class="collab-field"><div class="collab-field-label">Deliverables (text)</div><input class="collab-field-input" id="cd-deliverables" value="${(c.deliverables||'').replace(/"/g,'&quot;')}"></div>
+    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="cd-notes" rows="2">${c.notes||''}</textarea></div>
+    ${c.email?`<a href="mailto:${c.email}" style="display:inline-block;margin-bottom:14px;font-size:13px;color:var(--accent);text-decoration:none">✉ Email ${c.contact||c.email}</a>`:''}
+    <div style="border-top:1px solid var(--border);margin:8px 0 14px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Deliverables / Tasks</div>
+      <button onclick="window.addDealTask('${c.id}')" style="font-size:12px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent-light);border-radius:6px;padding:3px 10px;cursor:pointer">+ Add</button>
+    </div>
+    <div id="deal-tasks-list">
+      ${dealTasksHtml||'<div style="font-size:13px;color:var(--text3);padding:8px 0">No deliverables yet. Click + Add to create one.</div>'}
+    </div>
   `;
-  document.getElementById('collab-drawer-overlay').classList.add('open');
-  document.getElementById('collab-drawer').classList.add('open');
+  document.getElementById('collab-bigmodal-overlay').classList.add('open');
 };
 window.closeCollabDrawer = function(){
-  document.getElementById('collab-drawer-overlay')?.classList.remove('open');
-  document.getElementById('collab-drawer')?.classList.remove('open');
+  document.getElementById('collab-bigmodal-overlay')?.classList.remove('open');
   _activeCollabId = null;
 };
 window.saveCollabDrawer = function(){
@@ -6158,9 +6194,12 @@ window.saveCollabDrawer = function(){
   c.contact     = document.getElementById('cd-contact')?.value.trim();
   c.email       = document.getElementById('cd-email')?.value.trim();
   c.notes       = document.getElementById('cd-notes')?.value.trim();
+  c.instagram   = document.getElementById('cd-instagram')?.value.trim();
+  c.website     = document.getElementById('cd-website')?.value.trim().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
   c._ts         = Date.now();
   _collabStatus = c.status;
   saveCollabs();
+  syncDealTasksToTasks(c);
   closeCollabDrawer();
   renderCollabs();
   toast('Deal saved','success');
@@ -6173,6 +6212,75 @@ window.deleteCollab = function(){
   closeCollabDrawer();
   renderCollabs();
   toast('Deal deleted');
+};
+
+// ── Inline editing in collab table ──────────────────────────
+window.inlineEditCollab = function(id, field, cell){
+  const c = COLLABS.find(x=>x.id===id); if(!c) return;
+  event.stopPropagation();
+  if(field==='status'){
+    openCDD(cell, COLLAB_STATUSES, c.status, function(val){
+      c.status=val; _collabStatus=val; saveCollabs(); renderCollabs(); toast('Saved','success');
+    });
+    return;
+  }
+  if(field==='stage'){
+    const items=[{id:'',label:'— No stage —',color:'#999',bg:'#f3f4f6'},...CC_PROGRESS];
+    openCDD(cell, items, c.stage||'', function(val){
+      c.stage=val; saveCollabs(); renderCollabs(); toast('Saved','success');
+    });
+    return;
+  }
+  const currentVal = field==='price'?(c.price||''):field==='date'?(c.dateContacted||''):field==='company'?(c.company||''):field==='deliverables'?(c.deliverables||''):'';
+  const inputType = field==='date'?'date':field==='price'?'number':'text';
+  const inp = document.createElement('input');
+  inp.type = inputType;
+  inp.value = currentVal;
+  inp.style.cssText = 'width:100%;border:1.5px solid var(--accent);border-radius:6px;padding:4px 8px;font-size:13px;background:var(--card);color:var(--text);font-family:inherit';
+  cell.innerHTML = '';
+  cell.appendChild(inp);
+  inp.focus(); inp.select();
+  const save = function(){
+    const v = inp.value.trim();
+    if(field==='price'){c.price=v;c.priceDKK=toDKK(v,c.priceCurrency||'DKK');}
+    else if(field==='date') c.dateContacted=v;
+    else if(field==='company') c.company=v;
+    else if(field==='deliverables') c.deliverables=v;
+    saveCollabs(); renderCollabs(); toast('Saved','success');
+  };
+  inp.addEventListener('blur', save);
+  inp.addEventListener('keydown', function(e){ if(e.key==='Enter'){e.preventDefault();save();} if(e.key==='Escape') renderCollabs(); });
+};
+
+// ── Deal Tasks (deliverables linked to Tasks) ────────────────
+window.syncDealTasksToTasks = function(collab){
+  STASKS = getSTasks();
+  STASKS = STASKS.filter(t=>t.collabId !== collab.id);
+  (collab.dealTasks||[]).filter(dt=>!dt.done).forEach(dt=>{
+    STASKS.push({id:dt.id+'_task', title:dt.title, section:'work', status:'todo', dueDate:dt.dueDate, responsible:collab.company, collabId:collab.id, tags:[], _ts:Date.now()});
+  });
+  saveSTasks();
+};
+window.addDealTask = function(collabId){
+  const c = COLLABS.find(x=>x.id===collabId); if(!c) return;
+  if(!c.dealTasks) c.dealTasks=[];
+  c.dealTasks.push({id:uid(), title:'New deliverable', dueDate:'', done:false});
+  saveCollabs(); syncDealTasksToTasks(c); openCollabDrawer(collabId);
+};
+window.toggleDealTask = function(collabId, taskId, done){
+  const c=COLLABS.find(x=>x.id===collabId); if(!c) return;
+  const dt=(c.dealTasks||[]).find(x=>x.id===taskId); if(!dt) return;
+  dt.done=done; saveCollabs(); syncDealTasksToTasks(c);
+};
+window.updateDealTask = function(collabId, taskId, field, value){
+  const c=COLLABS.find(x=>x.id===collabId); if(!c) return;
+  const dt=(c.dealTasks||[]).find(x=>x.id===taskId); if(!dt) return;
+  dt[field]=value; saveCollabs(); syncDealTasksToTasks(c);
+};
+window.deleteDealTask = function(collabId, taskId){
+  const c=COLLABS.find(x=>x.id===collabId); if(!c) return;
+  c.dealTasks=(c.dealTasks||[]).filter(x=>x.id!==taskId);
+  saveCollabs(); syncDealTasksToTasks(c); openCollabDrawer(collabId);
 };
 
 // ════════════════════════════════════════════════════════════
@@ -6190,6 +6298,12 @@ const INCOME_TYPES = [
   {id:'interior',  label:'Interior',  color:'#92400e', bg:'#fef3c7'},
   {id:'some',      label:'SoMe',      color:'#7c3aed', bg:'#ede9ff'},
 ];
+
+let _incomeYear = new Date().getFullYear();
+let _incomeMonth = new Date().getMonth();
+
+window.incPrevMonth = function(){ _incomeMonth--; if(_incomeMonth<0){_incomeMonth=11;_incomeYear--;} renderIncome(); };
+window.incNextMonth = function(){ _incomeMonth++; if(_incomeMonth>11){_incomeMonth=0;_incomeYear++;} renderIncome(); };
 
 function renderIncome(){
   INCOME = getIncome();
@@ -6212,15 +6326,17 @@ function renderIncome(){
   }).reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
   const pipelineDKK = (getCollabs()||[]).filter(c=>c.status==='ongoing'||c.status==='potential').reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
 
-  const sorted = [...INCOME].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+  // Selected month entries
+  const selYYYYMM = `${_incomeYear}-${String(_incomeMonth+1).padStart(2,'0')}`;
+  const selMonthEntries = INCOME.filter(x=>x.date&&x.date.startsWith(selYYYYMM));
+  // Auto-entries from ongoing collabs with lastContentDate in this month
+  const ongoingCollabs = (getCollabs()||[]).filter(c=>c.status==='ongoing'&&c.lastContentDate&&c.lastContentDate.startsWith(selYYYYMM));
+  const selMonthLabel = new Date(_incomeYear, _incomeMonth, 1).toLocaleString('en',{month:'long',year:'numeric'});
+  const manualSubtotal = selMonthEntries.reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
+  const autoSubtotal = ongoingCollabs.reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
+  const selSubtotal = manualSubtotal + autoSubtotal;
 
-  // Group by month
-  const byMonth={};
-  sorted.forEach(x=>{
-    const key=x.date?(new Date(x.date+'T00:00:00')).toLocaleDateString('en',{year:'numeric',month:'long'}):'Unknown';
-    if(!byMonth[key])byMonth[key]=[];
-    byMonth[key].push(x);
-  });
+  const navBtnStyle = 'background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;color:var(--text);font-weight:700;transition:background .15s';
 
   wrap.innerHTML = `
   <div class="income-wrap" style="padding-top:32px">
@@ -6229,7 +6345,6 @@ function renderIncome(){
         <div style="font-size:20px;font-weight:800;color:var(--text)">Income Streams</div>
         <div style="font-size:13px;color:var(--text3)">Track all your revenue as a creator</div>
       </div>
-      <button class="btn btn-primary" onclick="openAddIncomeModal()">+ Add Income</button>
     </div>
     <div class="income-summary">
       <div class="income-stat-card">
@@ -6253,36 +6368,43 @@ function renderIncome(){
         <div class="income-stat-sub">From active deals</div>
       </div>
     </div>
-    ${sorted.length===0?`
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      <button onclick="window.incPrevMonth()" style="${navBtnStyle}">←</button>
+      <div style="font-size:16px;font-weight:700;min-width:160px;text-align:center">${selMonthLabel}</div>
+      <button onclick="window.incNextMonth()" style="${navBtnStyle}">→</button>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <span style="font-size:14px;font-weight:700;color:var(--text)">DKK ${selSubtotal.toLocaleString('da-DK')}</span>
+        <button class="btn btn-primary" onclick="openAddIncomeModal('${selYYYYMM}')">+ Add Income</button>
+      </div>
+    </div>
+    ${(selMonthEntries.length===0&&ongoingCollabs.length===0)?`
       <div style="text-align:center;padding:60px 20px;color:var(--text3)">
         <div style="font-size:40px;margin-bottom:12px">💰</div>
-        <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No income tracked yet</div>
-        <div style="font-size:13px">Add your first income entry to start tracking</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">No income in ${selMonthLabel}</div>
+        <div style="font-size:13px">Click + Add Income to log an entry</div>
       </div>
     `:`
       <div class="income-list">
-        ${Object.entries(byMonth).map(([month,entries])=>{
-          const subtotal=entries.reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
-          return `<div style="margin-bottom:4px">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:2px">
-              <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">${month}</span>
-              <div style="display:flex;align-items:center;gap:12px">
-                <span style="font-size:13px;font-weight:700;color:var(--text)">DKK ${subtotal.toLocaleString('da-DK')}</span>
-                <button onclick="window.openAddIncomeModal('${entries[0]?.date?.slice(0,7)||''}')" style="font-size:11px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent-light);border-radius:6px;padding:2px 8px;cursor:pointer">+ Add</button>
-              </div>
-            </div>
-            ${entries.map(x=>{
-              const t=INCOME_TYPES.find(tp=>tp.id===x.type)||INCOME_TYPES[INCOME_TYPES.length-1];
-              const dkkVal=Number(x.amountDKK||x.amount||0);
-              const origStr=(x.currency&&x.currency!=='DKK')?` <span style="color:var(--text3);font-size:11px">(${Number(x.amount||0).toLocaleString()} ${x.currency})</span>`:'';
-              return `<div class="income-row">
-                <span class="income-type-badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
-                <div class="income-row-name">${x.name||'Unnamed'}</div>
-                <div class="income-row-amount">DKK ${dkkVal.toLocaleString('da-DK')}${origStr}</div>
-                <div class="income-row-date">${x.date||''}</div>
-                <button onclick="deleteIncome('${x.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 4px" title="Delete">×</button>
-              </div>`;
-            }).join('')}
+        ${selMonthEntries.map(x=>{
+          const t=INCOME_TYPES.find(tp=>tp.id===x.type)||INCOME_TYPES[INCOME_TYPES.length-1];
+          const dkkVal=Number(x.amountDKK||x.amount||0);
+          const origStr=(x.currency&&x.currency!=='DKK')?` <span style="color:var(--text3);font-size:11px">(${Number(x.amount||0).toLocaleString()} ${x.currency})</span>`:'';
+          return `<div class="income-row">
+            <span class="income-type-badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
+            <div class="income-row-name">${x.name||'Unnamed'}</div>
+            <div class="income-row-amount">DKK ${dkkVal.toLocaleString('da-DK')}${origStr}</div>
+            <div class="income-row-date">${x.date||''}</div>
+            <button onclick="deleteIncome('${x.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 4px" title="Delete">×</button>
+          </div>`;
+        }).join('')}
+        ${ongoingCollabs.map(c=>{
+          const dkkVal=Number(c.priceDKK||c.price||0);
+          return `<div class="income-row" style="background:var(--accent-light);font-style:italic;border-color:var(--accent-light)">
+            <span class="income-type-badge" style="background:#d1fae5;color:#10b981">Auto (Deal)</span>
+            <div class="income-row-name">🤝 ${c.company||'Unknown Deal'}</div>
+            <div class="income-row-amount">DKK ${dkkVal.toLocaleString('da-DK')}</div>
+            <div class="income-row-date">${c.lastContentDate||''}</div>
+            <div style="width:24px"></div>
           </div>`;
         }).join('')}
       </div>
