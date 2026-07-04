@@ -5711,21 +5711,24 @@ function renderTasks(){
       const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
       const fmt=CT_FORMATS.find(f=>f.id===t.format);
       const typ=CT_TYPES.find(tp=>tp.id===t.type);
+      const st=CT_STATUSES.find(s=>s.id===t.status)||CT_STATUSES[0];
       return `<tr class="stask-row" draggable="true" data-id="${t.id}"
         ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
         onclick="window.openCTDrawer('${t.id}')">
-        <td style="width:44px;padding:12px 4px 12px 16px">
+        <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
           <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleCT('${t.id}')"></button>
         </td>
-        <td style="padding:12px 8px">
-          <div class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text)">${t.title||'Untitled'}</div>
-          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
-            ${fmt?ctBadge(CT_FORMATS,t.format):''}${typ?ctBadge(CT_TYPES,t.type):''}
+        <td style="padding:11px 8px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
+            <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap">${t.title||'Untitled'}</span>
+            ${fmt?ctBadge(CT_FORMATS,t.format):''}
+            ${typ?ctBadge(CT_TYPES,t.type):''}
+            <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
+            ${t.responsible?`<span style="font-size:11px;color:var(--text3)">${t.responsible}</span>`:''}
           </div>
         </td>
-        <td style="padding:12px 10px">${ctBadge(CT_STATUSES,t.status||'todo')}</td>
-        <td style="padding:12px 10px;font-size:12px;color:var(--text3);white-space:nowrap">${isIdea?'<span style="font-size:11px">drag → month</span>':dateStr}</td>
-        <td style="padding:12px 10px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.7">↗</a>`:''}</td>
+        <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;text-align:right">${isIdea?'<span style="font-size:11px;opacity:.6">no date</span>':dateStr}</td>
+        <td style="padding:11px 12px;font-size:12px;text-align:right">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:''}</td>
       </tr>`;
     }
 
@@ -5737,7 +5740,7 @@ function renderTasks(){
         Drop an idea here to schedule it, or <span style="color:var(--accent);font-weight:600">+ Add Content</span>
       </div>`;
       return `<table class="stask-table" style="margin-bottom:0">
-      <thead><tr><th style="width:44px"></th><th>Content</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <thead><tr><th style="width:44px"></th><th>Content · Status · Type</th><th style="text-align:right">Date</th><th style="width:32px"></th></tr></thead>
       <tbody id="ct-month-drop" ondragover="event.preventDefault()" ondrop="window.ctDropToMonth(event)">
         ${tasks.map(t=>ctRow(t,false)).join('')}
       </tbody></table>`;
@@ -5822,22 +5825,25 @@ function renderTasks(){
   function stTaskRow(t){
     const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
     const done=t.status==='done';
-    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
+    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
     const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
     const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
     return `<tr class="stask-row" draggable="true" data-id="${t.id}"
       ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
       onclick="window.openStaskDrawer('${t.id}')">
-      <td style="width:44px;padding:12px 4px 12px 16px">
+      <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
         <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${t.id}')"></button>
       </td>
-      <td style="padding:12px 8px">
-        <div class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text)">${t.title||'Untitled'}</div>
-        ${tagHtml?`<div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tagHtml}</div>`:''}
+      <td style="padding:11px 8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
+          <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap">${t.title||'Untitled'}</span>
+          ${tagHtml}
+          <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
+          ${t.responsible?`<span style="font-size:11px;color:var(--text3);white-space:nowrap">${t.responsible}</span>`:''}
+        </div>
       </td>
-      <td style="padding:12px 10px;white-space:nowrap">${stBadge(st)}</td>
-      <td style="padding:12px 10px;font-size:12px;color:var(--text3);white-space:nowrap">${dateStr}</td>
-      <td style="padding:12px 10px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.7">↗</a>`:''}</td>
+      <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;text-align:right">${dateStr}</td>
+      <td style="padding:11px 12px;font-size:12px;text-align:right">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:''}</td>
     </tr>`;
   }
 
@@ -5851,7 +5857,9 @@ function renderTasks(){
     return `<table class="stask-table" style="margin-bottom:0">
     <thead><tr>
       <th style="width:44px"></th>
-      <th>Task</th><th>Status</th><th>Date</th><th></th>
+      <th>Task · Status · Tags</th>
+      <th style="text-align:right">Date</th>
+      <th style="width:32px"></th>
     </tr></thead>
     <tbody id="st-month-drop"
       ondragover="event.preventDefault()"
@@ -5863,17 +5871,23 @@ function renderTasks(){
   function stIdeaRow(t){
     const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
     const done=t.status==='done';
+    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
     return `<tr class="stask-row" draggable="true" data-id="${t.id}"
       ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
       onclick="window.openStaskDrawer('${t.id}')">
-      <td style="width:44px;padding:12px 4px 12px 16px">
+      <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
         <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${t.id}')"></button>
       </td>
-      <td style="padding:12px 8px">
-        <div class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text)">${t.title||'Untitled'}</div>
+      <td style="padding:11px 8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
+          <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap">${t.title||'Untitled'}</span>
+          ${tagHtml}
+          <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
+          ${t.responsible?`<span style="font-size:11px;color:var(--text3);white-space:nowrap">${t.responsible}</span>`:''}
+        </div>
       </td>
-      <td style="padding:12px 10px">${stBadge(st)}</td>
-      <td colspan="2" style="padding:12px 10px;font-size:12px;color:var(--text3)">drag → month to schedule</td>
+      <td style="padding:11px 10px;font-size:11px;color:var(--text3);text-align:right;white-space:nowrap;opacity:.6">no date</td>
+      <td style="width:32px"></td>
     </tr>`;
   }
 
