@@ -6153,25 +6153,32 @@ window.openCollabDrawer = function(id){
       <div class="collab-field"><div class="collab-field-label">≈ DKK</div><input class="collab-field-input" id="cd-pricedkk" type="number" value="${c.priceDKK||c.price||''}"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="cd-contact" value="${(c.contact||'').replace(/"/g,'&quot;')}"></div>
-      <div class="collab-field"><div class="collab-field-label">Email</div><input class="collab-field-input" id="cd-email" type="email" value="${(c.email||'').replace(/"/g,'&quot;')}"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="collab-field"><div class="collab-field-label">Instagram Handle</div><input class="collab-field-input" id="cd-instagram" placeholder="@nikedk" value="${(c.instagram||'').replace(/"/g,'&quot;')}"></div>
       <div class="collab-field"><div class="collab-field-label">Website / Domain</div><input class="collab-field-input" id="cd-website" placeholder="nike.com" value="${(c.website||'').replace(/"/g,'&quot;')}"></div>
     </div>
-    <div class="collab-field"><div class="collab-field-label">Campaign Brief</div><textarea class="collab-field-input" id="cd-desc" rows="2">${c.description||''}</textarea></div>
-    <div class="collab-field"><div class="collab-field-label">Deliverables (text)</div><input class="collab-field-input" id="cd-deliverables" value="${(c.deliverables||'').replace(/"/g,'&quot;')}"></div>
-    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="cd-notes" rows="2">${c.notes||''}</textarea></div>
-    ${c.email?`<a href="mailto:${c.email}" style="display:inline-block;margin-bottom:14px;font-size:13px;color:var(--accent);text-decoration:none">✉ Email ${c.contact||c.email}</a>`:''}
-    <div style="border-top:1px solid var(--border);margin:8px 0 14px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Contact Person</div><input class="collab-field-input" id="cd-contact" value="${(c.contact||'').replace(/"/g,'&quot;')}"></div>
+      <div class="collab-field"><div class="collab-field-label">Contact Email</div><input class="collab-field-input" id="cd-email" type="email" value="${(c.email||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:14px 0 12px"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Deliverables / Tasks</div>
-      <button onclick="window.addDealTask('${c.id}')" style="font-size:12px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent-light);border-radius:6px;padding:3px 10px;cursor:pointer">+ Add</button>
+      <button onclick="window.addDealTask('${c.id}')" style="font-size:12px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent-light);border-radius:6px;padding:3px 10px;cursor:pointer">+ Add deliverable</button>
     </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Income appears automatically 14 days after the last publish date</div>
     <div id="deal-tasks-list">
-      ${dealTasksHtml||'<div style="font-size:13px;color:var(--text3);padding:8px 0">No deliverables yet. Click + Add to create one.</div>'}
+      ${dealTasksHtml||'<div style="font-size:13px;color:var(--text3);padding:8px 0">No deliverables yet. Click + Add deliverable to create one.</div>'}
     </div>
+    <div style="border-top:1px solid var(--border);margin:14px 0 12px"></div>
+    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="cd-notes" rows="3" placeholder="Internal notes, context, reminders...">${c.notes||''}</textarea></div>
+    <div style="border-top:1px solid var(--border);margin:14px 0 12px"></div>
+    <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Invoice</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="collab-field"><div class="collab-field-label">Invoice Email</div><input class="collab-field-input" id="cd-invoice-email" type="email" placeholder="billing@brand.com" value="${(c.invoiceEmail||'').replace(/"/g,'&quot;')}"></div>
+      <div class="collab-field"><div class="collab-field-label">Link to Folder</div><input class="collab-field-input" id="cd-folder-link" type="url" placeholder="https://drive.google.com/..." value="${(c.folderLink||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="collab-field"><div class="collab-field-label">Invoice Info / EAN / CVR</div><textarea class="collab-field-input" id="cd-invoice-info" rows="2" placeholder="EAN number, CVR, payment terms, bank details...">${c.invoiceInfo||''}</textarea></div>
+    ${c.folderLink?`<a href="${c.folderLink}" target="_blank" style="display:inline-block;margin-top:4px;font-size:13px;color:var(--accent);text-decoration:none">📁 Open folder</a>`:''}
   `;
   document.getElementById('collab-bigmodal-overlay').classList.add('open');
 };
@@ -6185,17 +6192,18 @@ window.saveCollabDrawer = function(){
   c.company     = document.getElementById('cd-company')?.value.trim()||c.company;
   c.status      = document.getElementById('cd-status')?.value||c.status;
   c.stage       = document.getElementById('cd-stage')?.value||'';
-  c.description = document.getElementById('cd-desc')?.value.trim();
   c.price       = document.getElementById('cd-price')?.value;
   c.priceCurrency = document.getElementById('cd-currency')?.value||'DKK';
   c.priceDKK    = parseFloat(document.getElementById('cd-pricedkk')?.value)||toDKK(c.price,c.priceCurrency);
   c.dateContacted = document.getElementById('cd-date')?.value;
-  c.deliverables = document.getElementById('cd-deliverables')?.value.trim();
   c.contact     = document.getElementById('cd-contact')?.value.trim();
   c.email       = document.getElementById('cd-email')?.value.trim();
-  c.notes       = document.getElementById('cd-notes')?.value.trim();
   c.instagram   = document.getElementById('cd-instagram')?.value.trim();
   c.website     = document.getElementById('cd-website')?.value.trim().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+  c.notes       = document.getElementById('cd-notes')?.value.trim();
+  c.invoiceEmail = document.getElementById('cd-invoice-email')?.value.trim();
+  c.invoiceInfo  = document.getElementById('cd-invoice-info')?.value.trim();
+  c.folderLink   = document.getElementById('cd-folder-link')?.value.trim();
   c._ts         = Date.now();
   _collabStatus = c.status;
   saveCollabs();
@@ -6329,8 +6337,19 @@ function renderIncome(){
   // Selected month entries
   const selYYYYMM = `${_incomeYear}-${String(_incomeMonth+1).padStart(2,'0')}`;
   const selMonthEntries = INCOME.filter(x=>x.date&&x.date.startsWith(selYYYYMM));
-  // Auto-entries from ongoing collabs with lastContentDate in this month
-  const ongoingCollabs = (getCollabs()||[]).filter(c=>c.status==='ongoing'&&c.lastContentDate&&c.lastContentDate.startsWith(selYYYYMM));
+  // Auto-entries from deals: value appears 14 days after the LAST deliverable publish date
+  const allCollabs=getCollabs()||[];
+  const ongoingCollabs=allCollabs.filter(c=>{
+    if(!c.priceDKK&&!c.price) return false;
+    const dts=(c.dealTasks||[]).filter(dt=>dt.dueDate);
+    if(!dts.length) return false;
+    const lastDue=dts.map(dt=>dt.dueDate).sort().slice(-1)[0];
+    const incomeDate=new Date(lastDue+'T00:00:00');
+    incomeDate.setDate(incomeDate.getDate()+14);
+    const iY=incomeDate.getFullYear(),iM=incomeDate.getMonth();
+    c._autoIncomeDate=incomeDate.toISOString().slice(0,10);
+    return iY===_incomeYear&&iM===_incomeMonth;
+  });
   const selMonthLabel = new Date(_incomeYear, _incomeMonth, 1).toLocaleString('en',{month:'long',year:'numeric'});
   const manualSubtotal = selMonthEntries.reduce((s,x)=>s+(Number(x.amountDKK||x.amount)||0),0);
   const autoSubtotal = ongoingCollabs.reduce((s,c)=>s+(Number(c.priceDKK||c.price)||0),0);
@@ -6403,7 +6422,7 @@ function renderIncome(){
             <span class="income-type-badge" style="background:#d1fae5;color:#10b981">Auto (Deal)</span>
             <div class="income-row-name">🤝 ${c.company||'Unknown Deal'}</div>
             <div class="income-row-amount">DKK ${dkkVal.toLocaleString('da-DK')}</div>
-            <div class="income-row-date">${c.lastContentDate||''}</div>
+            <div class="income-row-date">${c._autoIncomeDate||''}</div>
             <div style="width:24px"></div>
           </div>`;
         }).join('')}
