@@ -802,11 +802,30 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 .stask-filters{display:flex;gap:6px;flex-wrap:wrap}
 .stask-filter-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);transition:all .15s}
 .stask-filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.stask-table{width:100%;border-collapse:collapse}
-.stask-table th{text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:0 12px 10px;border-bottom:2px solid var(--border)}
-.stask-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
-.stask-row:hover{background:var(--accent-light)}
-.stask-row td{padding:13px 12px;font-size:14px;color:var(--text);vertical-align:middle}
+.stask-table{width:100%;border-collapse:collapse;table-layout:auto}
+.stask-table th{text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:0 10px 10px;border-bottom:none}
+.stask-row{border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;transition:background .12s}
+.stask-row:last-child{border-bottom:none}
+.stask-row:hover{background:rgba(0,0,0,.02)}
+.stask-row td{padding:11px 10px;font-size:13px;color:var(--text);vertical-align:middle}
+/* Circle checkbox */
+.task-circle{width:20px;height:20px;border-radius:50%;border:1.5px solid #c5b8ae;background:none;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;padding:0;outline:none}
+.task-circle:hover{border-color:var(--accent)}
+.task-circle.done{background:var(--accent);border-color:var(--accent)}
+.task-circle.done::after{content:'';width:5px;height:9px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block}
+.task-title-done{text-decoration:line-through;color:var(--text3)!important}
+/* Month nav */
+.task-month-nav{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.task-month-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--text3);padding:4px 10px;transition:color .15s;line-height:1}
+.task-month-btn:hover{color:var(--accent)}
+.task-month-label{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.3px;min-width:160px;text-align:center}
+/* Section toggle – pill style */
+.task-section-toggle{display:flex;gap:0;background:rgba(0,0,0,.05);border-radius:10px;padding:3px}
+.task-section-btn{padding:7px 20px;font-size:13px;font-weight:600;border:none;border-radius:8px;cursor:pointer;background:none;color:var(--text2);transition:all .15s}
+.task-section-btn.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+/* Ideas drop zone */
+.ideas-drop-zone{padding:28px 20px;text-align:center;font-size:13px;color:var(--text3);border:1.5px dashed var(--border);border-radius:10px;transition:background .15s}
+.ideas-drop-zone.drag-over{background:var(--accent-light);border-color:var(--accent)}
 .stask-name{font-weight:600}
 .stask-status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
 .stask-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
@@ -5664,10 +5683,10 @@ function renderTasks(){
   if(!wrap) return;
   const section=_staskSection;
 
-  const sectionToggle=`<div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden">
-    <button onclick="window.setStaskSection('work')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='work'?'var(--accent)':'var(--card)'};color:${section==='work'?'#fff':'var(--text2)'};transition:all .15s">Work</button>
-    <button onclick="window.setStaskSection('home')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='home'?'var(--accent)':'var(--card)'};color:${section==='home'?'#fff':'var(--text2)'};border-left:1.5px solid var(--border);transition:all .15s">Home</button>
-    <button onclick="window.setStaskSection('content')" style="padding:8px 22px;font-size:14px;font-weight:700;border:none;cursor:pointer;background:${section==='content'?'var(--accent)':'var(--card)'};color:${section==='content'?'#fff':'var(--text2)'};border-left:1.5px solid var(--border);transition:all .15s">Content</button>
+  const sectionToggle=`<div class="task-section-toggle">
+    <button class="task-section-btn${section==='work'?' active':''}" onclick="window.setStaskSection('work')">Work</button>
+    <button class="task-section-btn${section==='home'?' active':''}" onclick="window.setStaskSection('home')">Home</button>
+    <button class="task-section-btn${section==='content'?' active':''}" onclick="window.setStaskSection('content')">Content</button>
   </div>`;
 
   if(section==='content'){
@@ -5683,54 +5702,69 @@ function renderTasks(){
 
     function ctBadge(items,val){
       const it=items.find(x=>x.id===val)||items[0];
-      return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${it.bg};color:${it.color}">${it.label}</span>`;
+      return `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${it.bg};color:${it.color}">${it.label}</span>`;
     }
 
-    function ctRow(t){
-      const st=CT_STATUSES.find(s=>s.id===t.status)||CT_STATUSES[0];
+    function ctRow(t, isIdea){
+      const done=t.status==='done';
+      const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
+      const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
       const fmt=CT_FORMATS.find(f=>f.id===t.format);
       const typ=CT_TYPES.find(tp=>tp.id===t.type);
-      const day=t.dueDate?new Date(t.dueDate+'T00:00:00').getDate():'—';
-      return `<tr class="stask-row" onclick="window.openCTDrawer('${t.id}')">
-        <td style="padding:10px 12px;font-size:13px;font-weight:600;color:var(--text)">${t.title||'Untitled'}</td>
-        <td style="padding:10px 8px">${ctBadge(CT_STATUSES,t.status||'todo')}</td>
-        <td style="padding:10px 8px">${fmt?ctBadge(CT_FORMATS,t.format):''}</td>
-        <td style="padding:10px 8px">${typ?ctBadge(CT_TYPES,t.type):''}</td>
-        <td style="padding:10px 8px;font-size:12px;color:var(--text2)">${t.dueDate?'<span style="font-weight:700;color:var(--text)">'+day+'</span> '+MONTH_NAMES[_ctMonth].slice(0,3):'—'}</td>
-        <td style="padding:10px 8px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none">🔗 Link</a>`:''}
+      return `<tr class="stask-row" draggable="true" data-id="${t.id}"
+        ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
+        onclick="window.openCTDrawer('${t.id}')">
+        <td style="width:44px;padding:12px 4px 12px 16px">
+          <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleCT('${t.id}')"></button>
         </td>
+        <td style="padding:12px 8px">
+          <div class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text)">${t.title||'Untitled'}</div>
+          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+            ${fmt?ctBadge(CT_FORMATS,t.format):''}${typ?ctBadge(CT_TYPES,t.type):''}
+          </div>
+        </td>
+        <td style="padding:12px 10px">${ctBadge(CT_STATUSES,t.status||'todo')}</td>
+        <td style="padding:12px 10px;font-size:12px;color:var(--text3);white-space:nowrap">${isIdea?'<span style="font-size:11px">drag → month</span>':dateStr}</td>
+        <td style="padding:12px 10px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.7">↗</a>`:''}</td>
       </tr>`;
     }
 
-    function ctTable(tasks, emptyMsg){
-      if(!tasks.length) return `<div style="padding:20px 0;font-size:13px;color:var(--text3)">${emptyMsg}</div>`;
-      return `<table class="stask-table" style="margin-bottom:0"><thead><tr>
-        <th style="padding:0 12px 10px">Title</th><th>Status</th><th>Format</th><th>Type</th><th>Date</th><th>Link</th>
-      </tr></thead><tbody>${tasks.map(ctRow).join('')}</tbody></table>`;
+    function ctMonthTable(tasks){
+      if(!tasks.length) return `<div class="ideas-drop-zone" id="ct-month-drop"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="this.classList.remove('drag-over');window.ctDropToMonth(event)">
+        Drop an idea here to schedule it, or <span style="color:var(--accent);font-weight:600">+ Add Content</span>
+      </div>`;
+      return `<table class="stask-table" style="margin-bottom:0">
+      <thead><tr><th style="width:44px"></th><th>Content</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody id="ct-month-drop" ondragover="event.preventDefault()" ondrop="window.ctDropToMonth(event)">
+        ${tasks.map(t=>ctRow(t,false)).join('')}
+      </tbody></table>`;
     }
 
     wrap.innerHTML=`
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
   ${sectionToggle}
-  <button class="btn btn-primary" onclick="window.openAddCTModal()">+ Add Content</button>
+  <button class="btn btn-primary" onclick="window.openAddCTModal()" style="border-radius:20px;padding:8px 20px;font-size:13px">+ Add Content</button>
 </div>
-<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-  <button onclick="window.ctPrevMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">‹</button>
-  <div style="font-size:18px;font-weight:800;color:var(--text);min-width:180px;text-align:center">${monthLabel}</div>
-  <button onclick="window.ctNextMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">›</button>
-  <span style="font-size:12px;color:var(--text3);margin-left:4px">${monthTasks.length} piece${monthTasks.length!==1?'s':''}</span>
+<div class="task-month-nav">
+  <button class="task-month-btn" onclick="window.ctPrevMonth()">‹</button>
+  <span class="task-month-label">${monthLabel}</span>
+  <button class="task-month-btn" onclick="window.ctNextMonth()">›</button>
+  <span style="font-size:12px;color:var(--text3);margin-left:12px">${monthTasks.length} piece${monthTasks.length!==1?'s':''}</span>
 </div>
-<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
-  ${monthTasks.length?ctTable(monthTasks,''): `<div id="ct-month-drop" ondragover="event.preventDefault()" ondrop="window.ctDropToMonth(event)"
-    ondragenter="this.style.background='var(--accent-light)'" ondragleave="this.style.background=''"
-    style="padding:32px 20px;text-align:center;font-size:13px;color:var(--text3);border:2px dashed var(--border);border-radius:10px;transition:background .15s">
-    Drop ideas here to schedule them this month, or click + Add Content
-  </div>`}
-  ${monthTasks.length?`<tbody id="ct-month-drop" ondragover="event.preventDefault()" ondrop="window.ctDropToMonth(event)"></tbody>`:''}
+<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px">
+  ${ctMonthTable(monthTasks)}
 </div>
-<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
-  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">💡 Ideas</div>
-  ${noDateTasks.length?ctTable(noDateTasks,''):'<div style="font-size:13px;color:var(--text3);padding:8px 0">No ideas yet. Add content without a date.</div>'}
+<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden">
+  <div style="padding:16px 20px 10px;display:flex;align-items:center;gap:8px">
+    <span style="font-size:13px;font-weight:700;color:var(--text)">Ideas</span>
+    <span style="font-size:11px;color:var(--text3);background:rgba(0,0,0,.06);padding:1px 7px;border-radius:10px">${noDateTasks.length}</span>
+  </div>
+  ${noDateTasks.length
+    ? `<table class="stask-table"><tbody>${noDateTasks.map(t=>ctRow(t,true)).join('')}</tbody></table>`
+    : `<div style="padding:16px 20px 24px;font-size:13px;color:var(--text3)">No ideas yet — add content without a date to collect it here.</div>`}
 </div>
 <div class="bigmodal-overlay" id="ct-bigmodal-overlay" onclick="if(event.target===this)window.closeCTDrawer()">
   <div class="bigmodal" id="ct-bigmodal">
@@ -5781,70 +5815,93 @@ function renderTasks(){
   });
   const ideaTasksST = allInSection.filter(t=>!t.dueDate);
 
+  function stBadge(st){
+    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>`;
+  }
+
   function stTaskRow(t){
     const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
-    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
-    const day=t.dueDate?new Date(t.dueDate+'T00:00:00').getDate():'';
+    const done=t.status==='done';
+    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
+    const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
+    const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
     return `<tr class="stask-row" draggable="true" data-id="${t.id}"
-      ondragstart="event.dataTransfer.setData('taskId','${t.id}');event.dataTransfer.setData('src','ideas')"
+      ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
       onclick="window.openStaskDrawer('${t.id}')">
-      <td style="padding:10px 12px;font-size:13px;font-weight:600;color:var(--text);cursor:grab">⠿ ${t.title||'Untitled'}</td>
-      <td style="padding:10px 8px"><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color}">${st.label}</span></td>
-      ${section==='work'?`<td style="padding:10px 8px">${tagHtml}</td>`:''}
-      <td style="padding:10px 8px;font-size:12px;color:var(--text2)">${day?'<span style="font-weight:700;color:var(--text)">'+day+'</span> '+MONTH_NAMES_T[_taskMonth].slice(0,3):'—'}</td>
-      <td style="padding:10px 8px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none">🔗</a>`:''}</td>
+      <td style="width:44px;padding:12px 4px 12px 16px">
+        <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${t.id}')"></button>
+      </td>
+      <td style="padding:12px 8px">
+        <div class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text)">${t.title||'Untitled'}</div>
+        ${tagHtml?`<div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tagHtml}</div>`:''}
+      </td>
+      <td style="padding:12px 10px;white-space:nowrap">${stBadge(st)}</td>
+      <td style="padding:12px 10px;font-size:12px;color:var(--text3);white-space:nowrap">${dateStr}</td>
+      <td style="padding:12px 10px;font-size:12px">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.7">↗</a>`:''}</td>
     </tr>`;
   }
 
   function stMonthTable(tasks){
-    if(!tasks.length) return `<div id="st-month-drop" ondragover="event.preventDefault()" ondrop="window.stDropToMonth(event)"
-      style="padding:32px 20px;text-align:center;font-size:13px;color:var(--text3);border:2px dashed var(--border);border-radius:10px;transition:background .15s"
-      ondragenter="this.style.background='var(--accent-light)'" ondragleave="this.style.background=''">
-      Drop ideas here to schedule them this month, or click + Add Task
+    if(!tasks.length) return `<div class="ideas-drop-zone" id="st-month-drop"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="this.classList.remove('drag-over');window.stDropToMonth(event)">
+      Drop an idea here to schedule it, or <span style="color:var(--accent);font-weight:600">+ Add Task</span>
     </div>`;
-    return `<table class="stask-table" style="margin-bottom:0"><thead><tr>
-      <th style="padding:0 12px 10px">Task</th><th>Status</th>${section==='work'?'<th>Tags</th>':''}
-      <th>Date</th><th>Link</th>
+    return `<table class="stask-table" style="margin-bottom:0">
+    <thead><tr>
+      <th style="width:44px"></th>
+      <th>Task</th><th>Status</th><th>Date</th><th></th>
     </tr></thead>
-    <tbody id="st-month-drop" ondragover="event.preventDefault()" ondrop="window.stDropToMonth(event)">
+    <tbody id="st-month-drop"
+      ondragover="event.preventDefault()"
+      ondrop="window.stDropToMonth(event)">
       ${tasks.map(stTaskRow).join('')}
-      <tr style="height:8px"></tr>
     </tbody></table>`;
   }
 
   function stIdeaRow(t){
     const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
+    const done=t.status==='done';
     return `<tr class="stask-row" draggable="true" data-id="${t.id}"
-      ondragstart="event.dataTransfer.setData('taskId','${t.id}');event.dataTransfer.setData('src','ideas')"
+      ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
       onclick="window.openStaskDrawer('${t.id}')">
-      <td style="padding:10px 12px;font-size:13px;font-weight:600;color:var(--text);cursor:grab">⠿ ${t.title||'Untitled'}</td>
-      <td style="padding:10px 8px"><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color}">${st.label}</span></td>
-      <td colspan="3" style="padding:10px 8px;font-size:12px;color:var(--text3)">No date — drag up to schedule</td>
+      <td style="width:44px;padding:12px 4px 12px 16px">
+        <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${t.id}')"></button>
+      </td>
+      <td style="padding:12px 8px">
+        <div class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text)">${t.title||'Untitled'}</div>
+      </td>
+      <td style="padding:12px 10px">${stBadge(st)}</td>
+      <td colspan="2" style="padding:12px 10px;font-size:12px;color:var(--text3)">drag → month to schedule</td>
     </tr>`;
   }
 
   wrap.innerHTML=`
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
   ${sectionToggle}
-  <button class="btn btn-primary" onclick="window.openAddStaskModal()">+ Add Task</button>
+  <button class="btn btn-primary" onclick="window.openAddStaskModal()" style="border-radius:20px;padding:8px 20px;font-size:13px">+ Add Task</button>
 </div>
-<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-  <button onclick="window.taskPrevMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">‹</button>
-  <div style="font-size:18px;font-weight:800;color:var(--text);min-width:180px;text-align:center">${MONTH_NAMES_T[_taskMonth]} ${_taskYear}</div>
-  <button onclick="window.taskNextMonth()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:16px;color:var(--text2)">›</button>
-  <span style="font-size:12px;color:var(--text3);margin-left:4px">${monthTasksST.length} task${monthTasksST.length!==1?'s':''}</span>
+<div class="task-month-nav">
+  <button class="task-month-btn" onclick="window.taskPrevMonth()">‹</button>
+  <span class="task-month-label">${MONTH_NAMES_T[_taskMonth]} ${_taskYear}</span>
+  <button class="task-month-btn" onclick="window.taskNextMonth()">›</button>
+  <span style="font-size:12px;color:var(--text3);margin-left:12px">${monthTasksST.length} task${monthTasksST.length!==1?'s':''}</span>
 </div>
-<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px">
   ${stMonthTable(monthTasksST)}
 </div>
-${ideaTasksST.length||true?`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
-  <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">💡 Ideas</div>
-  ${ideaTasksST.length?`<table class="stask-table" style="margin-bottom:0"><thead><tr>
-    <th style="padding:0 12px 10px">Task</th><th>Status</th>${section==='work'?'<th>Tags</th>':''}
-    <th colspan="2"></th>
-  </tr></thead><tbody>${ideaTasksST.map(stIdeaRow).join('')}</tbody></table>`
-  :`<div style="font-size:13px;color:var(--text3);padding:8px 0">No ideas yet. Add a task without a date.</div>`}
-</div>`:''}
+<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden">
+  <div style="padding:16px 20px 10px;display:flex;align-items:center;gap:8px">
+    <span style="font-size:13px;font-weight:700;color:var(--text)">Ideas</span>
+    <span style="font-size:11px;color:var(--text3);background:rgba(0,0,0,.06);padding:1px 7px;border-radius:10px">${ideaTasksST.length}</span>
+  </div>
+  ${ideaTasksST.length
+    ? `<table class="stask-table" style="margin-bottom:0">
+        <tbody>${ideaTasksST.map(stIdeaRow).join('')}</tbody>
+       </table>`
+    : `<div style="padding:20px 20px 24px;font-size:13px;color:var(--text3)">No ideas yet — add a task without a date to collect it here.</div>`}
+</div>
 <div class="stask-drawer-overlay" id="stask-drawer-overlay" style="display:none"></div>
 <div class="stask-drawer" id="stask-drawer" style="display:none"></div>
 <div class="bigmodal-overlay" id="stask-bigmodal-overlay" onclick="if(event.target===this)window.closeStaskDrawer()">
@@ -5904,6 +5961,18 @@ window.setStaskTag=function(t){_staskTagFilter=t;renderTasks();};
 window.setStaskStatus=function(s){_staskStatusFilter=s;renderTasks();};
 window.taskPrevMonth=function(){_taskMonth--;if(_taskMonth<0){_taskMonth=11;_taskYear--;}renderTasks();};
 window.taskNextMonth=function(){_taskMonth++;if(_taskMonth>11){_taskMonth=0;_taskYear++;}renderTasks();};
+window.quickToggleTask=function(id){
+  STASKS=getSTasks();
+  const t=STASKS.find(x=>x.id===id);if(!t)return;
+  t.status=t.status==='done'?'todo':'done';t._ts=Date.now();
+  saveSTasks();renderTasks();
+};
+window.quickToggleCT=function(id){
+  CONTENT_TASKS=getCTasks();
+  const t=CONTENT_TASKS.find(x=>x.id===id);if(!t)return;
+  t.status=t.status==='done'?'todo':'done';t._ts=Date.now();
+  saveCTasks();renderTasks();
+};
 window.stDropToMonth=function(e){
   e.preventDefault();
   const id=e.dataTransfer.getData('taskId');if(!id)return;
