@@ -5826,50 +5826,66 @@ function renderTasks(){
   });
   const ideaTasksST = allInSection.filter(t=>!t.dueDate);
 
-  function stBadge(st){
-    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>`;
+  // ── Inline-edit helpers for tasks ──────────────────────────
+  function stPill(st){
+    return `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color};cursor:pointer">${st.label}</span>`;
   }
 
-  function stTaskRow(t){
+  function stTaskRow(t, isIdea){
     const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
     const done=t.status==='done';
-    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
+    const tagHtml=section==='work'?(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join(''):'';
     const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
     const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
     const subs=(t.subtasks||[]);
+
     const subRows=subs.map(sub=>{
       const sd=sub.dueDate?new Date(sub.dueDate+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
-      return `<tr onclick="event.stopPropagation();window.openStaskDrawer('${t.id}')">
-        <td style="width:44px;padding:4px 4px 4px 16px;vertical-align:middle">
-          <button class="task-circle${sub.done?' done':''}" style="width:15px;height:15px;border-width:1.5px" onclick="event.stopPropagation();window.toggleSubtask('${t.id}','${sub.id}')"></button>
+      return `<tr>
+        <td style="width:44px;padding:3px 4px 3px 16px;vertical-align:middle">
+          <button class="task-circle${sub.done?' done':''}" style="width:14px;height:14px;border-width:1.5px" onclick="event.stopPropagation();window.toggleSubtask('${t.id}','${sub.id}')"></button>
         </td>
-        <td style="padding:4px 8px">
-          <div style="display:flex;align-items:center;gap:8px;padding-left:14px;border-left:2px solid var(--border)">
-            <span style="${sub.done?'text-decoration:line-through;color:var(--text3)':'color:var(--text2)'};font-size:12px">${sub.title}</span>
-            ${sub.responsible?`<span style="font-size:11px;color:var(--text3)">${sub.responsible}</span>`:''}
+        <td style="padding:3px 8px" colspan="3">
+          <div style="display:flex;align-items:center;gap:10px;padding-left:16px;border-left:2px solid #eee">
+            <span style="${sub.done?'text-decoration:line-through;color:var(--text3)':'color:var(--text2)'};font-size:12px"
+              onclick="event.stopPropagation();window.inlineEditTask('${t.id}','subtask-title','${sub.id}',this)">${sub.title||'—'}</span>
+            <span style="font-size:11px;color:var(--text3);cursor:pointer;min-width:50px"
+              onclick="event.stopPropagation();window.inlineEditTask('${t.id}','subtask-responsible','${sub.id}',this)">${sub.responsible||'<span style="opacity:.4">who?</span>'}</span>
+            <span style="font-size:11px;color:var(--text3);cursor:pointer"
+              onclick="event.stopPropagation();window.inlineEditTask('${t.id}','subtask-date','${sub.id}',this)">${sd||'<span style="opacity:.4">date</span>'}</span>
           </div>
         </td>
-        <td style="padding:4px 10px;font-size:11px;color:var(--text3);text-align:right">${sd}</td>
-        <td></td>
+        <td style="padding:3px 12px;text-align:right"></td>
       </tr>`;
     }).join('');
-    return `<tr class="stask-row" draggable="true" data-id="${t.id}"
-      ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
-      onclick="window.openStaskDrawer('${t.id}')">
+
+    return `<tr class="stask-row" draggable="true" data-id="${t.id}" ondragstart="event.dataTransfer.setData('taskId','${t.id}')">
       <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
         <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${t.id}')"></button>
       </td>
-      <td style="padding:11px 8px">
+      <td style="padding:11px 8px;min-width:160px">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
-          <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap">${t.title||'Untitled'}</span>
+          <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);cursor:text"
+            onclick="event.stopPropagation();window.inlineEditTask('${t.id}','title',null,this)">${t.title||'Untitled'}</span>
           ${tagHtml}
-          <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
-          ${t.responsible?`<span style="font-size:11px;color:var(--text3);white-space:nowrap">${t.responsible}</span>`:''}
-          ${subs.length?`<span style="font-size:10px;color:var(--text3);opacity:.6">${subs.filter(s=>s.done).length}/${subs.length}</span>`:''}
+          ${subs.length?`<span style="font-size:10px;color:var(--text3);opacity:.5;cursor:pointer" onclick="event.stopPropagation();window.openStaskDrawer('${t.id}')">${subs.filter(s=>s.done).length}/${subs.length}</span>`:''}
         </div>
       </td>
-      <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;text-align:right">${dateStr}</td>
-      <td style="padding:11px 12px;font-size:12px;text-align:right">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:''}</td>
+      <td style="padding:11px 6px;white-space:nowrap"
+          onclick="event.stopPropagation();window.inlineEditTaskStatus('${t.id}',this)">
+        ${stPill(st)}
+      </td>
+      <td style="padding:11px 8px;font-size:12px;color:var(--text2);cursor:text;min-width:70px"
+          onclick="event.stopPropagation();window.inlineEditTask('${t.id}','responsible',null,this)">
+        ${t.responsible||`<span style="color:var(--text3);opacity:.4">who?</span>`}
+      </td>
+      <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;cursor:pointer"
+          onclick="event.stopPropagation();window.inlineEditTask('${t.id}','dueDate',null,this)">
+        ${isIdea?`<span style="opacity:.4">no date</span>`:dateStr||`<span style="opacity:.4">date</span>`}
+      </td>
+      <td style="padding:11px 12px;font-size:12px;text-align:right">
+        ${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:`<span style="opacity:.3;cursor:pointer;font-size:16px" onclick="event.stopPropagation();window.openStaskDrawer('${t.id}')">…</span>`}
+      </td>
     </tr>${subRows}`;
   }
 
@@ -5878,50 +5894,22 @@ function renderTasks(){
       ondragover="event.preventDefault();this.classList.add('drag-over')"
       ondragleave="this.classList.remove('drag-over')"
       ondrop="this.classList.remove('drag-over');window.stDropToMonth(event)">
-      Drop an idea here to schedule it, or <span style="color:var(--accent);font-weight:600">+ Add Task</span>
+      Drop an idea here, or click <strong>+ Add Task</strong>
     </div>`;
-    const sec2=section;
     return `<table class="stask-table" style="margin-bottom:0">
     <thead><tr>
       <th style="width:44px"></th>
-      <th>Task · Status · Tags</th>
-      <th style="text-align:right">Date</th>
-      <th style="width:32px"></th>
+      <th>Task</th><th>Status</th><th>Responsible</th><th>Date</th><th style="width:36px"></th>
     </tr></thead>
-    <tbody id="st-month-drop"
-      ondragover="event.preventDefault()"
-      ondrop="window.stDropToMonth(event)">
-      ${tasks.map(stTaskRow).join('')}
+    <tbody id="st-month-drop" ondragover="event.preventDefault()" ondrop="window.stDropToMonth(event)">
+      ${tasks.map(t=>stTaskRow(t,false)).join('')}
       <tr class="stask-row-add" onclick="window.openAddStaskModal()">
-        <td style="width:44px;padding:10px 4px 10px 16px;vertical-align:middle">
-          <div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae;line-height:1">+</div>
+        <td style="padding:10px 4px 10px 16px;vertical-align:middle">
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae">+</div>
         </td>
-        <td colspan="3" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add task…</td>
+        <td colspan="5" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add task…</td>
       </tr>
     </tbody></table>`;
-  }
-
-  function stIdeaRow(t){
-    const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
-    const done=t.status==='done';
-    const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
-    return `<tr class="stask-row" draggable="true" data-id="${t.id}"
-      ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
-      onclick="window.openStaskDrawer('${t.id}')">
-      <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
-        <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${t.id}')"></button>
-      </td>
-      <td style="padding:11px 8px">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
-          <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap">${t.title||'Untitled'}</span>
-          ${tagHtml}
-          <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
-          ${t.responsible?`<span style="font-size:11px;color:var(--text3);white-space:nowrap">${t.responsible}</span>`:''}
-        </div>
-      </td>
-      <td style="padding:11px 10px;font-size:11px;color:var(--text3);text-align:right;white-space:nowrap;opacity:.6">no date</td>
-      <td style="width:32px"></td>
-    </tr>`;
   }
 
   wrap.innerHTML=`
@@ -5945,9 +5933,14 @@ function renderTasks(){
   </div>
   ${ideaTasksST.length
     ? `<table class="stask-table" style="margin-bottom:0">
-        <tbody>${ideaTasksST.map(stIdeaRow).join('')}</tbody>
+        <thead><tr><th style="width:44px"></th><th>Task</th><th>Status</th><th>Responsible</th><th>Date</th><th style="width:36px"></th></tr></thead>
+        <tbody>${ideaTasksST.map(t=>stTaskRow(t,true)).join('')}
+        <tr class="stask-row-add" onclick="window.openAddStaskModal()">
+          <td style="padding:10px 4px 10px 16px;vertical-align:middle"><div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae">+</div></td>
+          <td colspan="5" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add idea…</td>
+        </tr></tbody>
        </table>`
-    : `<div style="padding:20px 20px 24px;font-size:13px;color:var(--text3)">No ideas yet — add a task without a date to collect it here.</div>`}
+    : `<div style="padding:16px 20px 20px;font-size:13px;color:var(--text3)">No ideas yet — add a task without a date to collect it here.</div>`}
 </div>
 <div class="stask-drawer-overlay" id="stask-drawer-overlay" style="display:none"></div>
 <div class="stask-drawer" id="stask-drawer" style="display:none"></div>
@@ -6008,6 +6001,55 @@ window.setStaskTag=function(t){_staskTagFilter=t;renderTasks();};
 window.setStaskStatus=function(s){_staskStatusFilter=s;renderTasks();};
 window.taskPrevMonth=function(){_taskMonth--;if(_taskMonth<0){_taskMonth=11;_taskYear--;}renderTasks();};
 window.taskNextMonth=function(){_taskMonth++;if(_taskMonth>11){_taskMonth=0;_taskYear++;}renderTasks();};
+// ── Task inline editing ──────────────────────────────────────
+window.inlineEditTask=function(taskId, field, subId, el){
+  event.stopPropagation();
+  const isDate = field==='dueDate'||field==='subtask-date';
+  const isSubtask = subId && field.startsWith('subtask-');
+  const realField = isSubtask ? field.replace('subtask-','') : field;
+
+  STASKS=getSTasks();
+  const t=STASKS.find(x=>x.id===taskId); if(!t) return;
+  const sub=isSubtask?(t.subtasks||[]).find(s=>s.id===subId):null;
+  const curVal=isSubtask?(sub?sub[realField]||'':''):(t[field]||'');
+
+  const inp=document.createElement('input');
+  inp.type=isDate?'date':'text';
+  inp.value=curVal;
+  inp.style.cssText='width:100%;min-width:80px;border:none;border-bottom:1.5px solid var(--accent);background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none;padding:1px 0';
+  el.innerHTML=''; el.appendChild(inp);
+  inp.focus(); if(!isDate) inp.select();
+
+  const save=()=>{
+    STASKS=getSTasks();
+    const t2=STASKS.find(x=>x.id===taskId); if(!t2) return;
+    if(isSubtask){
+      const s=(t2.subtasks||[]).find(s=>s.id===subId);
+      if(s){s[realField]=inp.value.trim();t2._ts=Date.now();}
+    } else {
+      if(field==='dueDate') t2.dueDate=inp.value;
+      else t2[field]=inp.value.trim();
+      t2._ts=Date.now();
+    }
+    saveSTasks(); renderTasks();
+  };
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){inp.blur();}if(e.key==='Escape'){renderTasks();}});
+  if(isDate) inp.addEventListener('change',save);
+};
+
+window.inlineEditTaskStatus=function(taskId, el){
+  event.stopPropagation();
+  STASKS=getSTasks();
+  const t=STASKS.find(x=>x.id===taskId); if(!t) return;
+  openCDD(el.querySelector('span')||el, STASK_STATUSES, t.status||'todo', (val)=>{
+    STASKS=getSTasks();
+    const t2=STASKS.find(x=>x.id===taskId); if(!t2) return;
+    t2.status=val; t2._ts=Date.now();
+    saveSTasks(); renderTasks();
+  });
+};
+
 window.addSubtaskRow=function(){
   const container=document.getElementById('dt-subtasks');
   if(!container)return;
