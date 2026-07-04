@@ -826,6 +826,14 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 /* Ideas drop zone */
 .ideas-drop-zone{padding:28px 20px;text-align:center;font-size:13px;color:var(--text3);border:1.5px dashed var(--border);border-radius:10px;transition:background .15s}
 .ideas-drop-zone.drag-over{background:var(--accent-light);border-color:var(--accent)}
+.stask-row-add{cursor:pointer;opacity:.5;transition:opacity .15s}
+.stask-row-add:hover{opacity:1;background:rgba(0,0,0,.02)}
+/* Subtask rows in drawer */
+.sub-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.sub-row:last-child{border-bottom:none}
+.sub-input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none;padding:2px 0}
+.sub-input::placeholder{color:var(--text3)}
+.sub-input:focus{border-bottom:1px solid var(--accent)}
 .stask-name{font-weight:600}
 .stask-status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
 .stask-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
@@ -5828,6 +5836,23 @@ function renderTasks(){
     const tagHtml=(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join('');
     const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
     const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+    const subs=(t.subtasks||[]);
+    const subRows=subs.map(sub=>{
+      const sd=sub.dueDate?new Date(sub.dueDate+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+      return `<tr onclick="event.stopPropagation();window.openStaskDrawer('${t.id}')">
+        <td style="width:44px;padding:4px 4px 4px 16px;vertical-align:middle">
+          <button class="task-circle${sub.done?' done':''}" style="width:15px;height:15px;border-width:1.5px" onclick="event.stopPropagation();window.toggleSubtask('${t.id}','${sub.id}')"></button>
+        </td>
+        <td style="padding:4px 8px">
+          <div style="display:flex;align-items:center;gap:8px;padding-left:14px;border-left:2px solid var(--border)">
+            <span style="${sub.done?'text-decoration:line-through;color:var(--text3)':'color:var(--text2)'};font-size:12px">${sub.title}</span>
+            ${sub.responsible?`<span style="font-size:11px;color:var(--text3)">${sub.responsible}</span>`:''}
+          </div>
+        </td>
+        <td style="padding:4px 10px;font-size:11px;color:var(--text3);text-align:right">${sd}</td>
+        <td></td>
+      </tr>`;
+    }).join('');
     return `<tr class="stask-row" draggable="true" data-id="${t.id}"
       ondragstart="event.dataTransfer.setData('taskId','${t.id}')"
       onclick="window.openStaskDrawer('${t.id}')">
@@ -5840,11 +5865,12 @@ function renderTasks(){
           ${tagHtml}
           <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
           ${t.responsible?`<span style="font-size:11px;color:var(--text3);white-space:nowrap">${t.responsible}</span>`:''}
+          ${subs.length?`<span style="font-size:10px;color:var(--text3);opacity:.6">${subs.filter(s=>s.done).length}/${subs.length}</span>`:''}
         </div>
       </td>
       <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;text-align:right">${dateStr}</td>
       <td style="padding:11px 12px;font-size:12px;text-align:right">${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:''}</td>
-    </tr>`;
+    </tr>${subRows}`;
   }
 
   function stMonthTable(tasks){
@@ -5854,6 +5880,7 @@ function renderTasks(){
       ondrop="this.classList.remove('drag-over');window.stDropToMonth(event)">
       Drop an idea here to schedule it, or <span style="color:var(--accent);font-weight:600">+ Add Task</span>
     </div>`;
+    const sec2=section;
     return `<table class="stask-table" style="margin-bottom:0">
     <thead><tr>
       <th style="width:44px"></th>
@@ -5865,6 +5892,12 @@ function renderTasks(){
       ondragover="event.preventDefault()"
       ondrop="window.stDropToMonth(event)">
       ${tasks.map(stTaskRow).join('')}
+      <tr class="stask-row-add" onclick="window.openAddStaskModal()">
+        <td style="width:44px;padding:10px 4px 10px 16px;vertical-align:middle">
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae;line-height:1">+</div>
+        </td>
+        <td colspan="3" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add task…</td>
+      </tr>
     </tbody></table>`;
   }
 
@@ -5975,6 +6008,27 @@ window.setStaskTag=function(t){_staskTagFilter=t;renderTasks();};
 window.setStaskStatus=function(s){_staskStatusFilter=s;renderTasks();};
 window.taskPrevMonth=function(){_taskMonth--;if(_taskMonth<0){_taskMonth=11;_taskYear--;}renderTasks();};
 window.taskNextMonth=function(){_taskMonth++;if(_taskMonth>11){_taskMonth=0;_taskYear++;}renderTasks();};
+window.addSubtaskRow=function(){
+  const container=document.getElementById('dt-subtasks');
+  if(!container)return;
+  const newId=uid();
+  const row=document.createElement('div');
+  row.className='sub-row';row.dataset.subId=newId;
+  row.innerHTML=`<button class="task-circle" style="flex-shrink:0;width:16px;height:16px;border-width:1.5px" onclick="this.classList.toggle('done')"></button>
+    <input class="sub-input" placeholder="Subtask name" data-field="title">
+    <input class="sub-input" placeholder="Who" style="max-width:90px;font-size:12px;color:var(--text2)" data-field="responsible">
+    <input class="sub-input" type="date" style="max-width:120px;font-size:12px;color:var(--text2)" data-field="dueDate">
+    <button onclick="this.closest('.sub-row').remove()" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 2px;line-height:1;flex-shrink:0">×</button>`;
+  container.appendChild(row);
+  row.querySelector('.sub-input').focus();
+};
+window.toggleSubtask=function(taskId,subId){
+  STASKS=getSTasks();
+  const t=STASKS.find(x=>x.id===taskId);if(!t)return;
+  const sub=(t.subtasks||[]).find(s=>s.id===subId);if(!sub)return;
+  sub.done=!sub.done;t._ts=Date.now();
+  saveSTasks();renderTasks();
+};
 window.quickToggleTask=function(id){
   STASKS=getSTasks();
   const t=STASKS.find(x=>x.id===id);if(!t)return;
@@ -6056,6 +6110,21 @@ window.openStaskDrawer=function(id){
     </div>
     <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="dt-link" type="url" value="${t.link||''}"></div>
     ${t.link?`<a href="${t.link}" target="_blank" style="font-size:13px;color:var(--accent);text-decoration:none;display:inline-block;margin-top:-8px;margin-bottom:14px">↗ Open link</a>`:''}
+    <div style="border-top:1px solid var(--border);margin:16px 0 14px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px">Subtasks</div>
+      <button onclick="window.addSubtaskRow()" style="font-size:12px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent-light);border-radius:6px;padding:3px 10px;cursor:pointer">+ Add</button>
+    </div>
+    <div id="dt-subtasks">
+      ${(t.subtasks||[]).map(sub=>`
+      <div class="sub-row" data-sub-id="${sub.id}">
+        <button class="task-circle${sub.done?' done':''}" style="flex-shrink:0;width:16px;height:16px;border-width:1.5px" onclick="window.toggleSubtask('${t.id}','${sub.id}')"></button>
+        <input class="sub-input" placeholder="Subtask name" value="${(sub.title||'').replace(/"/g,'&quot;')}" data-field="title">
+        <input class="sub-input" placeholder="Who" style="max-width:90px;font-size:12px;color:var(--text2)" value="${(sub.responsible||'').replace(/"/g,'&quot;')}" data-field="responsible">
+        <input class="sub-input" type="date" style="max-width:120px;font-size:12px;color:var(--text2)" value="${sub.dueDate||''}" data-field="dueDate">
+        <button onclick="this.closest('.sub-row').remove()" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 2px;line-height:1;flex-shrink:0">×</button>
+      </div>`).join('')}
+    </div>
   `;
   document.querySelectorAll('input[name="dt-section"]').forEach(r=>{
     r.addEventListener('change',()=>{const tw=document.getElementById('dt-tags-wrap');if(tw)tw.style.display=r.value==='work'?'block':'none';});
@@ -6076,6 +6145,14 @@ window.saveStaskDrawer=function(){
   t.tags=t.section==='work'?[...document.querySelectorAll('input[name="dt-tag"]:checked')].map(x=>x.value):[];
   t.responsible=document.getElementById('dt-responsible')?.value.trim();
   t.link=document.getElementById('dt-link')?.value.trim();
+  // collect subtasks
+  t.subtasks=[...(document.getElementById('dt-subtasks')?.querySelectorAll('.sub-row')||[])].map(row=>({
+    id:row.dataset.subId||uid(),
+    title:row.querySelector('[data-field="title"]')?.value.trim()||'',
+    responsible:row.querySelector('[data-field="responsible"]')?.value.trim()||'',
+    dueDate:row.querySelector('[data-field="dueDate"]')?.value||'',
+    done:row.querySelector('.task-circle')?.classList.contains('done')||false,
+  })).filter(s=>s.title);
   t._ts=Date.now();
   _staskSection=t.section;
   saveSTasks();closeStaskDrawer();renderTasks();toast('Task saved','success');
