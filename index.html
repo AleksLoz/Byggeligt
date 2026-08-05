@@ -10,8 +10,8 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f2ede6;--card:#faf7f3;--accent:#3a1a0e;--accent-light:#ecddd5;--accent-mid:#5c2b18;
-  --border:#ddd5c8;--border2:#c9bfb3;--text:#2a1208;--text2:#7a6558;--text3:#a8968a;
+  --bg:#f7f7f7;--card:#ffffff;--accent:#111111;--accent-light:#eeeeee;--accent-mid:#333333;
+  --border:#e4e4e4;--border2:#c7c7c7;--text:#111111;--text2:#5c5c5c;--text3:#9a9a9a;
   --radius:8px;--radius-lg:12px;--shadow:0 2px 8px rgba(0,0,0,0.08);
   --status-idea:#8b5cf6;--status-in_process:#f59e0b;--status-ready:#10b981;--status-done:#6b7280;
   --font:Inter,sans-serif;
@@ -809,7 +809,7 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 .stask-row:hover{background:rgba(0,0,0,.02)}
 .stask-row td{padding:11px 10px;font-size:13px;color:var(--text);vertical-align:middle}
 /* Circle checkbox */
-.task-circle{width:20px;height:20px;border-radius:50%;border:1.5px solid #c5b8ae;background:none;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;padding:0;outline:none}
+.task-circle{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);background:none;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;padding:0;outline:none}
 .task-circle:hover{border-color:var(--accent)}
 .task-circle.done{background:var(--accent);border-color:var(--accent)}
 .task-circle.done::after{content:'';width:5px;height:9px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block}
@@ -864,6 +864,38 @@ input[type=date]{padding:3px 6px;border:1px solid var(--border);border-radius:va
 .cdd-opt{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--text);transition:background .1s;border:none;width:100%;background:transparent;font-family:inherit;text-align:left}
 .cdd-opt:hover{background:var(--accent-light)}
 .cdd-opt.cdd-sel{background:var(--accent-light);font-weight:600}
+/* Floating panel (assignee picker / stage manager / field editor) */
+#float-panel{position:fixed;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.18);padding:10px;display:none;max-height:70vh;overflow-y:auto;animation:cddIn .1s ease}
+#float-panel.open{display:block}
+.fp-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:2px 4px 8px}
+.fp-list-item{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text);border:none;width:100%;background:transparent;font-family:inherit;text-align:left}
+.fp-list-item:hover{background:var(--accent-light)}
+.fp-list-item.fp-sel{background:var(--accent-light);font-weight:600}
+.fp-empty{padding:8px;font-size:12px;color:var(--text3)}
+.fp-divider{height:1px;background:var(--border);margin:8px 2px}
+.fp-input{width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg);color:var(--text);box-sizing:border-box;font-family:inherit;margin-bottom:6px}
+.fp-input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.fp-btn{width:100%;padding:7px 10px;border-radius:7px;font-size:12px;font-weight:600;border:1.5px solid var(--border2);background:none;color:var(--text2);cursor:pointer;transition:all .12s}
+.fp-btn:hover{border-color:var(--accent);color:var(--accent)}
+.fp-btn-danger{color:#ef4444;border-color:#fca5a5}
+.fp-btn-danger:hover{background:#fee2e2;border-color:#ef4444;color:#ef4444}
+.fp-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.fp-type-opt{padding:7px 6px;border-radius:7px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;text-align:center;transition:all .12s}
+.fp-type-opt:hover{border-color:var(--border2)}
+.fp-type-opt.fp-sel{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+/* Column header controls (Asana-style table) */
+.col-th{display:flex;align-items:center;gap:5px;user-select:none}
+.col-th-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-th-menu{opacity:0;flex-shrink:0;width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);cursor:pointer;transition:opacity .12s,background .12s}
+th:hover .col-th-menu{opacity:1}
+.col-th-menu:hover{background:var(--accent-light);color:var(--text)}
+.col-add-btn{width:26px;height:26px;border-radius:7px;border:1.5px dashed var(--border2);background:none;color:var(--text3);cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.col-add-btn:hover{border-color:var(--accent);color:var(--accent)}
+.col-th[draggable="true"]{cursor:grab}
+.col-th-dragging{opacity:.4}
+.asana-th{cursor:pointer}
+.asana-th:hover{color:var(--text)}
+.tag-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer}
 /* Big center modal */
 .bigmodal-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px}
 .bigmodal-overlay.open{display:flex}
@@ -1601,6 +1633,34 @@ let activeInfId = null;
 // ---- PERSISTENCE ----
 const DEFAULT_INFLUENCERS = [{"id":"inf1","handle":"@sofie.dalgaard","name":"Sofie Dalgaard","platform":"instagram","followers":28000,"otherPlatforms":["tiktok"],"status":"inquired","priority":"medium","notes":"Interested in summer collection","email":"","driveLink":"","tags":["micro","lifestyle"],"reach":28000,"engagement":3.2,"lastContact":"2026-06-10","postUrl":"","productSent":false,"contentReceived":false,"posted":false},{"id":"inf2","handle":"@carolinemalling","name":"Caroline Malling","platform":"instagram","followers":155000,"otherPlatforms":[],"status":"in_comm","priority":"high","notes":"Negotiating rate card","email":"","tags":["mid","fashion"],"reach":155000,"engagement":2.8,"lastContact":"2026-06-12","postUrl":"","productSent":false,"contentReceived":false,"posted":false},{"id":"inf3","handle":"@idamarie.b","name":"Ida Marie Brandt","platform":"instagram","followers":89000,"otherPlatforms":["youtube"],"status":"sent_products","priority":"high","notes":"Products shipped June 8","tags":["mid","lifestyle"],"reach":89000,"engagement":4.1,"lastContact":"2026-06-08","productSent":true,"contentReceived":false,"posted":false},{"id":"inf4","handle":"@majathornberg","name":"Maja Thornberg","platform":"instagram","followers":67000,"otherPlatforms":["tiktok"],"status":"in_comm","priority":"medium","tags":["mid","fashion"],"reach":67000,"engagement":3.7,"lastContact":"2026-06-11","productSent":false,"contentReceived":false,"posted":false},{"id":"inf5","handle":"@camille.orsted","name":"Camille Orsted","platform":"instagram","followers":73000,"otherPlatforms":[],"status":"inquired","priority":"low","tags":["mid","lifestyle"],"reach":73000,"engagement":2.5,"productSent":false,"contentReceived":false,"posted":false},{"id":"y1sr1xbj","handle":"@byggeligt.home","name":"Byggeligt Home","platform":"instagram","followers":24085,"otherPlatforms":[],"status":"inquired","priority":"medium","notes":"","email":"","driveLink":"","tags":[],"reach":24085,"engagement":4.9,"lastContact":"2026-06-08","postUrl":"","productSent":false,"contentReceived":false,"posted":false},{"id":"btt72i44","handle":"@ugc_magns_meisler","name":"Ugc Magns Meisler","platform":"instagram","followers":16091,"otherPlatforms":[],"status":"inquired","priority":"medium","notes":"","email":"","driveLink":"","tags":[],"reach":16091,"engagement":2.2,"lastContact":"2026-06-08","postUrl":"","productSent":false,"contentReceived":false,"posted":false}];
 
+// Seeds the editable-stage / custom-field config for the Tasks page (Work/Home/Content boards).
+// References STASK_STATUSES/WORK_TAGS/CT_STATUSES/CT_FORMATS/CT_TYPES, which are declared further
+// down the file — safe because this only ever runs at loadData() call time (after boot()'s first
+// await), by which point the whole script has finished its synchronous top-to-bottom pass.
+function seedTaskBoardConfig(){
+  if (!CONFIG.taskStages) {
+    CONFIG.taskStages = {
+      work: STASK_STATUSES.map(s=>({...s})),
+      home: STASK_STATUSES.map(s=>({...s})),
+      content: CT_STATUSES.map(s=>({...s})),
+    };
+  }
+  if (!CONFIG.taskFields) {
+    CONFIG.taskFields = {
+      work: [],
+      home: [],
+      content: [
+        {id:'format', label:'Format', type:'select', options: CT_FORMATS.map(o=>({...o}))},
+        {id:'type',   label:'Type',   type:'select', options: CT_TYPES.map(o=>({...o}))},
+      ],
+    };
+  }
+  if (!CONFIG.taskTags) CONFIG.taskTags = WORK_TAGS.map(t=>({...t}));
+  ['work','home','content'].forEach(k=>{
+    if(!CONFIG.taskStages[k]) CONFIG.taskStages[k]=[];
+    if(!CONFIG.taskFields[k]) CONFIG.taskFields[k]=[];
+  });
+}
 function loadData() {
   try { CONFIG = JSON.parse(localStorage.getItem(CONFIG_KEY)) || JSON.parse(JSON.stringify(DEFAULT_CONFIG)); }
   catch(e) { CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG)); }
@@ -1608,6 +1668,7 @@ function loadData() {
     CONFIG.taskBoards = [];
   }
   if (!CONFIG.products) CONFIG.products = JSON.parse(JSON.stringify(DEFAULT_CONFIG.products));
+  seedTaskBoardConfig();
   syncAssigneeBoards();
   try { CONTENT = JSON.parse(localStorage.getItem(DATA_KEY)) || JSON.parse(JSON.stringify(DEFAULT_DATA)); }
   catch(e) { CONTENT = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
@@ -5530,12 +5591,10 @@ const WORK_TAGS=[
   {id:'some',     label:'SoMe',     color:'#5b21b6', bg:'#ede9ff'},
   {id:'byggeligt',label:'Byggeligt',color:'#3a1a0e', bg:'#ecddd5'},
 ];
-let _staskSection='work'; // 'work' | 'home' | 'content'
-let _staskTagFilter='all';
-let _staskStatusFilter='all';
+let _staskSection='work'; // 'work' | 'home' | 'content' — also doubles as the active board key
 let _activeStaskId=null;
-let _taskMonth=new Date().getMonth();
-let _taskYear=new Date().getFullYear();
+let _activeStaskBoard=null;
+let _taskResponsibleMigrated=false;
 
 // ── Custom Dropdown ──────────────────────────────────────────
 const _cddReg={};
@@ -5580,6 +5639,198 @@ function cddBtn(id,items,curVal){
 function cddVal(id){return document.getElementById(id)?.dataset?.cddVal||'';}
 // ─────────────────────────────────────────────────────────────
 
+// ── Shared floating panel (assignee picker / stage & field managers) ──
+function escHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function _initFloatPanel(){
+  if(document.getElementById('float-panel'))return;
+  const p=document.createElement('div');p.id='float-panel';document.body.appendChild(p);
+  document.addEventListener('click',e=>{ if(!e.target.closest('#float-panel')) closeFloatPanel(); });
+}
+function openFloatPanel(el, html, width){
+  _initFloatPanel();
+  const p=document.getElementById('float-panel');
+  p.innerHTML=html;
+  p.style.minWidth=(width||230)+'px';
+  const r=el.getBoundingClientRect();
+  p.style.left=Math.max(6,Math.min(r.left, window.innerWidth-(width||230)-16))+'px';
+  p.style.top=(r.bottom+6)+'px';
+  p.classList.add('open');
+  requestAnimationFrame(()=>{
+    const ph=p.offsetHeight, wh=window.innerHeight;
+    if(r.bottom+6+ph>wh) p.style.top=Math.max(6,r.top-ph-6)+'px';
+  });
+  return p;
+}
+function closeFloatPanel(){document.getElementById('float-panel')?.classList.remove('open');}
+
+// ── Assignee (responsible person) ──────────────────────────────
+function renderAssigneeAvatar(assigneeId, size){
+  size = size || 22;
+  const fs = Math.round(size*0.42);
+  const as = (CONFIG.assignees||[]).find(a=>a.id===assigneeId);
+  if(!as) return `<span class="assignee-empty" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.55)}px">+</span>`;
+  const label = escHtml(as.label||'?');
+  const ini = initials(as.label||'?');
+  if(as.avatar){
+    const fallback = `<span class=\\'assignee-dot\\' style=\\'width:${size}px;height:${size}px;background:${as.color||'#888'};font-size:${fs}px\\' title=\\'${label}\\'>${ini}</span>`;
+    return `<img class="assignee-dot assignee-avatar-img" style="width:${size}px;height:${size}px" src="${as.avatar}" title="${label}" alt="${ini}" onerror="this.outerHTML='${fallback}'">`;
+  }
+  return `<span class="assignee-dot" style="width:${size}px;height:${size}px;background:${as.color||'#888'};font-size:${fs}px" title="${label}">${ini}</span>`;
+}
+function findOrCreateAssignee(name){
+  name = (name||'').trim();
+  if(!name) return null;
+  CONFIG.assignees = CONFIG.assignees||[];
+  const existing = CONFIG.assignees.find(a=>(a.label||'').toLowerCase()===name.toLowerCase());
+  if(existing) return existing.id;
+  const colors = ['#8b5cf6','#3b82f6','#f59e0b','#10b981','#ef4444','#ec4899','#06b6d4'];
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  const na = {id:uid(), label:name, color, avatar:null};
+  CONFIG.assignees.push(na);
+  if (typeof syncAssigneeBoards === 'function') syncAssigneeBoards();
+  saveData();
+  return na.id;
+}
+window.openAssigneePicker=function(el, currentId, onPick){
+  const list=CONFIG.assignees||[];
+  const html=`
+    <div class="fp-title">Responsible</div>
+    ${list.map(a=>`<button class="fp-list-item${a.id===currentId?' fp-sel':''}" onclick="window._apPick('${a.id}')">${renderAssigneeAvatar(a.id,20)}<span>${escHtml(a.label)}</span></button>`).join('') || '<div class="fp-empty">No people yet — add one below</div>'}
+    ${currentId?`<button class="fp-list-item" onclick="window._apPick(null)"><span class="assignee-empty" style="width:20px;height:20px;font-size:11px">&times;</span><span>Unassign</span></button>`:''}
+    <div class="fp-divider"></div>
+    <input class="fp-input" id="ap-new-name" placeholder="New person's name…">
+    <input class="fp-input" id="ap-new-avatar" placeholder="Photo URL (optional)">
+    <button class="fp-btn" onclick="event.stopPropagation();window._apAddPerson()">+ Add person</button>`;
+  window._apCb=onPick;
+  openFloatPanel(el, html, 230);
+};
+window._apPick=function(id){ const cb=window._apCb; closeFloatPanel(); if(cb) cb(id); };
+window._apAddPerson=function(){
+  const nameEl=document.getElementById('ap-new-name');
+  const avEl=document.getElementById('ap-new-avatar');
+  const name=(nameEl?.value||'').trim();
+  if(!name){ nameEl?.focus(); return; }
+  const avatar=(avEl?.value||'').trim();
+  const id=findOrCreateAssignee(name);
+  if(avatar && id){ const a=(CONFIG.assignees||[]).find(x=>x.id===id); if(a){a.avatar=avatar; saveData();} }
+  const cb=window._apCb; closeFloatPanel(); if(cb) cb(id);
+};
+
+// ── Generic color+label option-list editor (stages, tags, select-field options) ──
+function renderOptionEditorList(container, list, onChange){
+  container.innerHTML='';
+  list.forEach((opt,i)=>{
+    const row=document.createElement('div');
+    row.className='settings-option-row';
+    row.innerHTML=`<input type="color" class="settings-color-input" value="${opt.color||'#888888'}">
+      <input type="text" class="settings-label-input" value="${escHtml(opt.label||'')}" style="flex:1">
+      <button class="settings-del-btn">&#x2715;</button>`;
+    row.querySelector('.settings-color-input').addEventListener('input',e=>{opt.color=e.target.value;saveData();onChange();});
+    row.querySelector('.settings-label-input').addEventListener('change',e=>{opt.label=e.target.value.trim()||opt.label;saveData();onChange();});
+    row.querySelector('.settings-del-btn').addEventListener('click',()=>{
+      list.splice(i,1); saveData(); renderOptionEditorList(container,list,onChange); onChange();
+    });
+    container.appendChild(row);
+  });
+  const addBtn=document.createElement('button');
+  addBtn.className='settings-add-btn';
+  addBtn.textContent='+ Add option';
+  addBtn.addEventListener('click',()=>{
+    list.push({id:uid(),label:'New',color:'#888888'});
+    saveData();
+    renderOptionEditorList(container,list,onChange);
+    onChange();
+  });
+  container.appendChild(addBtn);
+}
+
+// ── Editable stages (per-board status pipeline) ──────────────────
+window.openStageManager=function(el, boardKey, onChange){
+  const html=`<div class="fp-title">Edit stages</div><div id="fp-stage-list"></div>`;
+  const panel=openFloatPanel(el, html, 240);
+  renderOptionEditorList(panel.querySelector('#fp-stage-list'), CONFIG.taskStages[boardKey], ()=>{ if(onChange) onChange(); });
+};
+window.openTagManager=function(el, onChange){
+  const html=`<div class="fp-title">Edit tags</div><div id="fp-tag-list"></div>`;
+  const panel=openFloatPanel(el, html, 240);
+  renderOptionEditorList(panel.querySelector('#fp-tag-list'), CONFIG.taskTags, ()=>{ if(onChange) onChange(); });
+};
+
+// ── Custom fields (Asana-style "add columns I want") ─────────────
+const TASK_FIELD_TYPES=[
+  {id:'text',   label:'Text'},
+  {id:'number', label:'Number'},
+  {id:'date',   label:'Date'},
+  {id:'select', label:'Dropdown'},
+  {id:'person', label:'Person'},
+];
+window.openAddFieldForm=function(el, boardKey, onChange){
+  const html=`
+    <div class="fp-title">New column</div>
+    <input class="fp-input" id="nf-label" placeholder="Column name…">
+    <div class="fp-type-grid" id="nf-type-grid">
+      ${TASK_FIELD_TYPES.map((t,i)=>`<button type="button" class="fp-type-opt${i===0?' fp-sel':''}" data-type="${t.id}">${t.label}</button>`).join('')}
+    </div>
+    <button class="fp-btn" onclick="event.stopPropagation();window._addFieldSubmit('${boardKey}')">+ Add column</button>`;
+  const panel=openFloatPanel(el, html, 220);
+  panel.querySelectorAll('.fp-type-opt').forEach(b=>b.addEventListener('click',()=>{
+    panel.querySelectorAll('.fp-type-opt').forEach(x=>x.classList.remove('fp-sel'));
+    b.classList.add('fp-sel');
+  }));
+  window._addFieldOnChange=onChange;
+  setTimeout(()=>document.getElementById('nf-label')?.focus(),30);
+};
+window._addFieldSubmit=function(boardKey){
+  const label=(document.getElementById('nf-label')?.value||'').trim();
+  if(!label) return;
+  const type=document.querySelector('#nf-type-grid .fp-type-opt.fp-sel')?.dataset.type||'text';
+  const field={id:uid(), label, type};
+  if(type==='select') field.options=[{id:uid(),label:'Option 1',color:'#888888'}];
+  CONFIG.taskFields[boardKey].push(field);
+  saveData();
+  closeFloatPanel();
+  const cb=window._addFieldOnChange; if(cb) cb();
+};
+window.openFieldColumnMenu=function(el, boardKey, fieldId, onChange){
+  const field=(CONFIG.taskFields[boardKey]||[]).find(f=>f.id===fieldId);
+  if(!field) return;
+  const html=`
+    <div class="fp-title">Column</div>
+    <input class="fp-input" id="ef-label" value="${escHtml(field.label)}">
+    ${field.type==='select'?`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:6px 4px 4px">Options</div><div id="fp-field-opts"></div>`:''}
+    <button class="fp-btn" style="margin-top:8px" onclick="event.stopPropagation();window._renameFieldSubmit('${boardKey}','${fieldId}')">Save name</button>
+    <button class="fp-btn fp-btn-danger" style="margin-top:6px" onclick="event.stopPropagation();window._deleteField('${boardKey}','${fieldId}')">Delete column</button>`;
+  const panel=openFloatPanel(el, html, 230);
+  if(field.type==='select'){
+    field.options=field.options||[];
+    renderOptionEditorList(panel.querySelector('#fp-field-opts'), field.options, ()=>{ if(onChange) onChange(); });
+  }
+  window._fieldMenuOnChange=onChange;
+};
+window._renameFieldSubmit=function(boardKey, fieldId){
+  const field=(CONFIG.taskFields[boardKey]||[]).find(f=>f.id===fieldId); if(!field) return;
+  const val=(document.getElementById('ef-label')?.value||'').trim();
+  if(val) field.label=val;
+  saveData(); closeFloatPanel();
+  const cb=window._fieldMenuOnChange; if(cb) cb();
+};
+window._deleteField=function(boardKey, fieldId){
+  CONFIG.taskFields[boardKey]=(CONFIG.taskFields[boardKey]||[]).filter(f=>f.id!==fieldId);
+  saveData(); closeFloatPanel();
+  const cb=window._fieldMenuOnChange; if(cb) cb();
+};
+window.reorderTaskField=function(boardKey, fromId, toId){
+  const arr=CONFIG.taskFields[boardKey]; if(!arr) return;
+  const fromIdx=arr.findIndex(f=>f.id===fromId), toIdx=arr.findIndex(f=>f.id===toId);
+  if(fromIdx<0||toIdx<0||fromIdx===toIdx) return;
+  const [moved]=arr.splice(fromIdx,1);
+  arr.splice(toIdx,0,moved);
+  saveData();
+};
+// ─────────────────────────────────────────────────────────────
+
 // ── Content Planner ──────────────────────────────────────────
 const CONTENT_TASKS_KEY='byggeligt_content_tasks_v1';
 let CONTENT_TASKS=[];
@@ -5602,9 +5853,6 @@ const CT_FORMATS=[
   {id:'post',  label:'Post',  color:'#3a1a0e',bg:'#ecddd5'},
   {id:'collab',label:'Collab',color:'#10b981',bg:'#d1fae5'},
 ];
-let _ctMonth=new Date().getMonth(); // 0-indexed
-let _ctYear=new Date().getFullYear();
-
 // ── Content Collabs (legacy, kept for data compat) ───────────
 const CONTENT_COLLABS_KEY='byggeligt_content_collabs_v1';
 let CONTENT_COLLABS=[];
@@ -5684,292 +5932,238 @@ function _staskTable(tasks){
   </tbody></table>`;
 }
 
-function renderTasks(){
+// ── Board abstraction: 'work'/'home' live in STASKS, 'content' in CONTENT_TASKS ──
+function boardStore(boardKey){
+  if(boardKey==='content') return { getAll:()=>{CONTENT_TASKS=getCTasks();return CONTENT_TASKS;}, save:()=>saveCTasks() };
+  return { getAll:()=>{STASKS=getSTasks();return STASKS;}, save:()=>saveSTasks() };
+}
+function getBoardTasks(boardKey){
+  const all=boardStore(boardKey).getAll();
+  if(boardKey==='content') return all;
+  return boardKey==='work' ? all.filter(t=>t.section!=='home'&&t.section!=='content') : all.filter(t=>t.section==='home');
+}
+function getStages(boardKey){ return (CONFIG.taskStages && CONFIG.taskStages[boardKey]) || []; }
+function stageOf(boardKey, id){
+  return getStages(boardKey).find(s=>s.id===id) || {id:id||'', label: id||'No stage', color:'#9a9a9a'};
+}
+function stagePill(stage){
+  const c=stage.color||'#888888';
+  return `<span class="tag-pill" style="background:${c}20;color:${c};border:1px solid ${c}40">${escHtml(stage.label)}</span>`;
+}
+function getDoneStageId(boardKey){
+  const stages=getStages(boardKey);
+  const d=stages.find(s=>s.id==='done');
+  if(d) return d.id;
+  return stages.length ? stages[stages.length-1].id : null;
+}
+function getFieldValue(t, field){
+  if(t.customFields && Object.prototype.hasOwnProperty.call(t.customFields, field.id)) return t.customFields[field.id];
+  return t[field.id];
+}
+function assigneeBtn(id, curId, compact){
+  const size=compact?16:20;
+  const label=curId ? escHtml((CONFIG.assignees||[]).find(a=>a.id===curId)?.label||'') : 'Unassigned';
+  return `<button type="button" class="stask-field-input" id="${id}" data-assignee-id="${curId||''}" style="display:flex;align-items:center;gap:6px;cursor:pointer;${compact?'max-width:150px;padding:4px 8px;font-size:12px':''}" onclick="event.stopPropagation();window.openAssigneePicker(this, this.dataset.assigneeId||null, function(pid){document.getElementById('${id}').dataset.assigneeId=pid||'';window._refreshAssigneeBtn('${id}',${size});})">
+    <span id="${id}-avatar">${renderAssigneeAvatar(curId,size)}</span>
+    <span id="${id}-label" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${label}</span>
+  </button>`;
+}
+window._refreshAssigneeBtn=function(id, size){
+  const btn=document.getElementById(id); if(!btn) return;
+  const pid=btn.dataset.assigneeId||null;
+  const av=document.getElementById(id+'-avatar'); if(av) av.innerHTML=renderAssigneeAvatar(pid, size||20);
+  const lb=document.getElementById(id+'-label'); if(lb) lb.textContent = pid ? ((CONFIG.assignees||[]).find(a=>a.id===pid)?.label||'') : 'Unassigned';
+};
+function assigneeBtnVal(id){ return document.getElementById(id)?.dataset?.assigneeId || null; }
+
+// ── Sorting ─────────────────────────────────────────────────
+let _boardSort={work:{key:'dueDate',dir:1}, home:{key:'dueDate',dir:1}, content:{key:'dueDate',dir:1}};
+function sortBoardTasks(boardKey, tasks){
+  const {key,dir}=_boardSort[boardKey];
+  const field=(CONFIG.taskFields[boardKey]||[]).find(f=>f.id===key);
+  const val=(t)=>{
+    if(key==='dueDate') return t.dueDate||'';
+    if(key==='title') return (t.title||'').toLowerCase();
+    if(key==='status') return stageOf(boardKey,t.status).label.toLowerCase();
+    if(key==='assignee') return ((CONFIG.assignees||[]).find(a=>a.id===t.assigneeId)||{}).label?.toLowerCase()||'';
+    if(field){ const v=getFieldValue(t,field); return field.type==='person' ? (((CONFIG.assignees||[]).find(a=>a.id===v)||{}).label?.toLowerCase()||'') : (v||''); }
+    return '';
+  };
+  return [...tasks].sort((a,b)=>{
+    const va=val(a), vb=val(b);
+    const aEmpty=va===''||va==null, bEmpty=vb===''||vb==null;
+    if(aEmpty&&bEmpty) return 0;
+    if(aEmpty) return 1;
+    if(bEmpty) return -1;
+    if(va<vb) return -1*dir;
+    if(va>vb) return 1*dir;
+    return 0;
+  });
+}
+window.setBoardSort=function(boardKey, key){
+  const cur=_boardSort[boardKey];
+  if(cur.key===key) cur.dir*=-1; else { cur.key=key; cur.dir=1; }
+  renderTasks();
+};
+
+// ── Row / table rendering ──────────────────────────────────
+function boardRow(boardKey, t){
+  const st=stageOf(boardKey, t.status);
+  const doneId=getDoneStageId(boardKey);
+  const done = t.status===doneId;
+  const tagHtml = boardKey==='work' ? (t.tags||[]).map(tg=>{const wt=(CONFIG.taskTags||[]).find(x=>x.id===tg);return wt?`<span class="tag-pill" style="background:${wt.color}20;color:${wt.color};border:1px solid ${wt.color}40;cursor:default">${escHtml(wt.label)}</span>`:'';}).join('') : '';
+  const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
+  const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+  const subs=t.subtasks||[];
+  const fields=CONFIG.taskFields[boardKey]||[];
+
+  const fieldCells = fields.map(f=>{
+    const val=getFieldValue(t,f);
+    let cell;
+    if(f.type==='select'){
+      const opt=(f.options||[]).find(o=>o.id===val);
+      cell = opt ? `<span class="tag-pill" style="background:${opt.color}20;color:${opt.color};border:1px solid ${opt.color}40">${escHtml(opt.label)}</span>` : `<span style="opacity:.4;font-size:11px">—</span>`;
+    } else if(f.type==='person'){
+      cell = renderAssigneeAvatar(val, 20);
+    } else if(f.type==='date'){
+      const dd=val?new Date(val+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+      cell = dd || `<span style="opacity:.4">—</span>`;
+    } else {
+      cell = val ? escHtml(String(val)) : `<span style="opacity:.4">—</span>`;
+    }
+    return `<td style="padding:11px 8px;font-size:12px;color:var(--text2);white-space:nowrap;cursor:pointer" onclick="window.inlineEditField('${boardKey}','${t.id}','${f.id}',this)">${cell}</td>`;
+  }).join('');
+
+  const subRows = subs.map(sub=>{
+    const sd=sub.dueDate?new Date(sub.dueDate+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+    return `<tr class="stask-subrow">
+      <td style="width:44px;padding:3px 4px 3px 16px;vertical-align:middle">
+        <button class="task-circle${sub.done?' done':''}" style="width:14px;height:14px;border-width:1.5px" onclick="event.stopPropagation();window.toggleSubtask('${boardKey}','${t.id}','${sub.id}')"></button>
+      </td>
+      <td style="padding:3px 8px" colspan="${2+fields.length}">
+        <div style="display:flex;align-items:center;gap:10px;padding-left:16px;border-left:2px solid var(--border)">
+          <span style="${sub.done?'text-decoration:line-through;color:var(--text3)':'color:var(--text2)'};font-size:12px;cursor:text" onclick="event.stopPropagation();window.inlineEditSubtask('${boardKey}','${t.id}','${sub.id}','title',this)">${escHtml(sub.title)||'—'}</span>
+          <span style="cursor:pointer" onclick="event.stopPropagation();window.openAssigneePicker(this, ${sub.assigneeId?`'${sub.assigneeId}'`:'null'}, function(pid){window.setSubtaskAssignee('${boardKey}','${t.id}','${sub.id}',pid);})">${renderAssigneeAvatar(sub.assigneeId,16)}</span>
+          <span style="font-size:11px;color:var(--text3);cursor:pointer" onclick="event.stopPropagation();window.inlineEditSubtask('${boardKey}','${t.id}','${sub.id}','dueDate',this)">${sd||'<span style="opacity:.4">date</span>'}</span>
+        </div>
+      </td>
+      <td style="padding:3px 12px;text-align:right"></td>
+    </tr>`;
+  }).join('');
+
+  return `<tr class="stask-row" data-id="${t.id}">
+    <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
+      <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${boardKey}','${t.id}')"></button>
+    </td>
+    <td style="padding:11px 8px;min-width:160px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
+        <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);cursor:text"
+          onclick="event.stopPropagation();window.inlineEditTask('${boardKey}','${t.id}','title',this)">${escHtml(t.title)||'Untitled'}</span>
+        ${tagHtml}
+        ${subs.length?`<span style="font-size:10px;color:var(--text3);opacity:.5;cursor:pointer" onclick="event.stopPropagation();window.openStaskDrawer('${boardKey}','${t.id}')">${subs.filter(s=>s.done).length}/${subs.length}</span>`:''}
+      </div>
+    </td>
+    <td style="padding:11px 6px;white-space:nowrap" onclick="event.stopPropagation();window.inlineEditTaskStage('${boardKey}','${t.id}',this)">
+      ${stagePill(st)}
+    </td>
+    <td style="padding:11px 8px;white-space:nowrap;cursor:pointer" onclick="event.stopPropagation();window.openAssigneePicker(this, ${t.assigneeId?`'${t.assigneeId}'`:'null'}, function(pid){window.setTaskAssignee('${boardKey}','${t.id}',pid);})">
+      ${renderAssigneeAvatar(t.assigneeId, 22)}
+    </td>
+    <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;cursor:pointer" onclick="event.stopPropagation();window.inlineEditTask('${boardKey}','${t.id}','dueDate',this)">
+      ${dateStr||`<span style="opacity:.4">—</span>`}
+    </td>
+    ${fieldCells}
+    <td style="padding:11px 12px;font-size:12px;text-align:right">
+      ${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:`<span style="opacity:.3;cursor:pointer;font-size:16px" onclick="event.stopPropagation();window.openStaskDrawer('${boardKey}','${t.id}')">…</span>`}
+    </td>
+  </tr>${subRows}`;
+}
+
+function boardTable(boardKey, tasks){
+  const fields=CONFIG.taskFields[boardKey]||[];
+  const sorted=sortBoardTasks(boardKey, tasks);
+  const sort=_boardSort[boardKey];
+  const sortArrow=(key)=> sort.key===key ? (sort.dir===1?' ▲':' ▼') : '';
+  const thBase='padding:10px 8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;text-align:left';
+  const fieldHeaders = fields.map(f=>`<th style="${thBase};white-space:nowrap" draggable="true" ondragstart="window._fcDragStart(event,'${f.id}')" ondragover="event.preventDefault()" ondrop="window._fcDrop(event,'${boardKey}','${f.id}')">
+    <div class="col-th">
+      <span class="col-th-label asana-th" onclick="window.setBoardSort('${boardKey}','${f.id}')">${escHtml(f.label)}${sortArrow(f.id)}</span>
+      <span class="col-th-menu" onclick="event.stopPropagation();window.openFieldColumnMenu(this,'${boardKey}','${f.id}',renderTasks)">⚙</span>
+    </div>
+  </th>`).join('');
+
+  const head = `<thead><tr>
+    <th style="width:44px"></th>
+    <th style="${thBase}"><span class="asana-th" onclick="window.setBoardSort('${boardKey}','title')">Task${sortArrow('title')}</span></th>
+    <th style="${thBase}"><div class="col-th"><span class="col-th-label asana-th" onclick="window.setBoardSort('${boardKey}','status')">Stage${sortArrow('status')}</span><span class="col-th-menu" style="opacity:.6" onclick="event.stopPropagation();window.openStageManager(this,'${boardKey}',renderTasks)">⚙</span></div></th>
+    <th style="${thBase}"><span class="asana-th" onclick="window.setBoardSort('${boardKey}','assignee')">Responsible${sortArrow('assignee')}</span></th>
+    <th style="${thBase}"><span class="asana-th" onclick="window.setBoardSort('${boardKey}','dueDate')">Date${sortArrow('dueDate')}</span></th>
+    ${fieldHeaders}
+    <th style="width:36px"><button class="col-add-btn" title="Add column" onclick="event.stopPropagation();window.openAddFieldForm(this,'${boardKey}',renderTasks)">+</button></th>
+  </tr></thead>`;
+
+  if(!tasks.length) return `<div class="ideas-drop-zone">No tasks yet — click <strong>+ Add Task</strong> above to create one.</div>`;
+
+  return `<table class="stask-table" style="margin-bottom:0">${head}
+  <tbody>${sorted.map(t=>boardRow(boardKey,t)).join('')}</tbody></table>`;
+}
+window._fcDragStart=function(e, fieldId){ e.dataTransfer.setData('fieldId', fieldId); };
+window._fcDrop=function(e, boardKey, toFieldId){
+  e.preventDefault();
+  const fromId=e.dataTransfer.getData('fieldId'); if(!fromId||fromId===toFieldId) return;
+  reorderTaskField(boardKey, fromId, toFieldId);
+  renderTasks();
+};
+
+// One-time backfill: older tasks stored a free-text "responsible" name instead of an assigneeId.
+// Resolves each to a real CONFIG.assignees entry (creating one if needed) so the avatar picker works.
+function migrateLegacyResponsible(){
+  if(_taskResponsibleMigrated) return;
+  _taskResponsibleMigrated=true;
+  let changed=false;
   STASKS=getSTasks();
+  STASKS.forEach(t=>{
+    if(!t.assigneeId && t.responsible){ t.assigneeId=findOrCreateAssignee(t.responsible); changed=true; }
+    (t.subtasks||[]).forEach(sub=>{
+      if(!sub.assigneeId && sub.responsible){ sub.assigneeId=findOrCreateAssignee(sub.responsible); changed=true; }
+    });
+  });
+  if(changed){ saveSTasks(); changed=false; }
+  CONTENT_TASKS=getCTasks();
+  CONTENT_TASKS.forEach(t=>{
+    if(!t.assigneeId && t.responsible){ t.assigneeId=findOrCreateAssignee(t.responsible); changed=true; }
+  });
+  if(changed) saveCTasks();
+}
+
+function renderTasks(){
+  migrateLegacyResponsible();
   CONTENT_COLLABS=getCCollabs();
   const wrap=document.getElementById('view-tasks');
   if(!wrap) return;
-  const section=_staskSection;
+  const boardKey=_staskSection;
+  const isContent=boardKey==='content';
 
   const sectionToggle=`<div class="task-section-toggle">
-    <button class="task-section-btn${section==='work'?' active':''}" onclick="window.setStaskSection('work')">Work</button>
-    <button class="task-section-btn${section==='home'?' active':''}" onclick="window.setStaskSection('home')">Home</button>
-    <button class="task-section-btn${section==='content'?' active':''}" onclick="window.setStaskSection('content')">Content</button>
+    <button class="task-section-btn${boardKey==='work'?' active':''}" onclick="window.setStaskSection('work')">Work</button>
+    <button class="task-section-btn${boardKey==='home'?' active':''}" onclick="window.setStaskSection('home')">Home</button>
+    <button class="task-section-btn${boardKey==='content'?' active':''}" onclick="window.setStaskSection('content')">Content</button>
   </div>`;
 
-  if(section==='content'){
-    CONTENT_TASKS=getCTasks();
-    const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const monthLabel=MONTH_NAMES[_ctMonth]+' '+_ctYear;
-    const monthTasks=CONTENT_TASKS.filter(t=>{
-      if(!t.dueDate) return false;
-      const d=new Date(t.dueDate+'T00:00:00');
-      return d.getFullYear()===_ctYear&&d.getMonth()===_ctMonth;
-    });
-    const noDateTasks=CONTENT_TASKS.filter(t=>!t.dueDate);
-
-    function ctPill(items,val,clickFn){
-      const it=items.find(x=>x.id===val)||items[0];
-      return `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${it.bg};color:${it.color};cursor:pointer" onclick="event.stopPropagation();${clickFn}">${it.label}</span>`;
-    }
-
-    function ctRow(t, isIdea){
-      const done=t.status==='done';
-      const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
-      const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
-      return `<tr class="stask-row" draggable="true" data-id="${t.id}" ondragstart="event.dataTransfer.setData('taskId','${t.id}')">
-        <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
-          <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleCT('${t.id}')"></button>
-        </td>
-        <td style="padding:11px 8px;min-width:140px">
-          <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);cursor:text"
-            onclick="event.stopPropagation();window.inlineEditCT('${t.id}','title',this)">${t.title||'Untitled'}</span>
-        </td>
-        <td style="padding:11px 6px;white-space:nowrap"
-            onclick="event.stopPropagation();window.inlineEditCTStatus('${t.id}','format',this)">
-          ${ctPill(CT_FORMATS,t.format||'reel','')}
-        </td>
-        <td style="padding:11px 6px;white-space:nowrap"
-            onclick="event.stopPropagation();window.inlineEditCTStatus('${t.id}','type',this)">
-          ${ctPill(CT_TYPES,t.type||'organic','')}
-        </td>
-        <td style="padding:11px 6px;white-space:nowrap"
-            onclick="event.stopPropagation();window.inlineEditCTStatus('${t.id}','status',this)">
-          ${ctPill(CT_STATUSES,t.status||'todo','')}
-        </td>
-        <td style="padding:11px 8px;font-size:12px;color:var(--text2);cursor:text;min-width:60px"
-            onclick="event.stopPropagation();window.inlineEditCT('${t.id}','responsible',this)">
-          ${t.responsible||`<span style="color:var(--text3);opacity:.4">who?</span>`}
-        </td>
-        <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;cursor:pointer"
-            onclick="event.stopPropagation();window.inlineEditCT('${t.id}','dueDate',this)">
-          ${isIdea?`<span style="opacity:.4">no date</span>`:dateStr||`<span style="opacity:.4">date</span>`}
-        </td>
-        <td style="padding:11px 12px;font-size:12px;text-align:right">
-          ${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:`<span style="opacity:.3;cursor:pointer;font-size:16px" onclick="event.stopPropagation();window.openCTDrawer('${t.id}')">…</span>`}
-        </td>
-      </tr>`;
-    }
-
-    const CT_HEADERS=`<thead><tr>
-      <th style="width:44px"></th><th>Content</th>
-      <th>Format</th><th>Type</th><th>Status</th>
-      <th>Responsible</th><th>Date</th><th style="width:36px"></th>
-    </tr></thead>`;
-
-    function ctMonthTable(tasks){
-      if(!tasks.length) return `<div class="ideas-drop-zone" id="ct-month-drop"
-        ondragover="event.preventDefault();this.classList.add('drag-over')"
-        ondragleave="this.classList.remove('drag-over')"
-        ondrop="this.classList.remove('drag-over');window.ctDropToMonth(event)">
-        Drop an idea here, or click <strong>+ Add Content</strong>
-      </div>`;
-      return `<table class="stask-table" style="margin-bottom:0">${CT_HEADERS}
-      <tbody id="ct-month-drop" ondragover="event.preventDefault()" ondrop="window.ctDropToMonth(event)">
-        ${tasks.map(t=>ctRow(t,false)).join('')}
-        <tr class="stask-row-add" onclick="window.openAddCTModal()">
-          <td style="padding:10px 4px 10px 16px;vertical-align:middle"><div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae">+</div></td>
-          <td colspan="7" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add content…</td>
-        </tr>
-      </tbody></table>`;
-    }
-
-    wrap.innerHTML=`
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-  ${sectionToggle}
-  <button class="btn btn-primary" onclick="window.openAddCTModal()" style="border-radius:20px;padding:8px 20px;font-size:13px">+ Add Content</button>
-</div>
-<div class="task-month-nav">
-  <button class="task-month-btn" onclick="window.ctPrevMonth()">‹</button>
-  <span class="task-month-label">${monthLabel}</span>
-  <button class="task-month-btn" onclick="window.ctNextMonth()">›</button>
-  <span style="font-size:12px;color:var(--text3);margin-left:12px">${monthTasks.length} piece${monthTasks.length!==1?'s':''}</span>
-</div>
-<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px">
-  ${ctMonthTable(monthTasks)}
-</div>
-<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden">
-  <div style="padding:16px 20px 10px;display:flex;align-items:center;gap:8px">
-    <span style="font-size:13px;font-weight:700;color:var(--text)">Ideas</span>
-    <span style="font-size:11px;color:var(--text3);background:rgba(0,0,0,.06);padding:1px 7px;border-radius:10px">${noDateTasks.length}</span>
-  </div>
-  ${noDateTasks.length
-    ? `<table class="stask-table">${CT_HEADERS}<tbody>
-        ${noDateTasks.map(t=>ctRow(t,true)).join('')}
-        <tr class="stask-row-add" onclick="window.openAddCTModal()">
-          <td style="padding:10px 4px 10px 16px;vertical-align:middle"><div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae">+</div></td>
-          <td colspan="7" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add idea…</td>
-        </tr>
-       </tbody></table>`
-    : `<div style="padding:16px 20px 24px;font-size:13px;color:var(--text3)">No ideas yet — add content without a date to collect it here.</div>`}
-</div>
-<div class="bigmodal-overlay" id="ct-bigmodal-overlay" onclick="if(event.target===this)window.closeCTDrawer()">
-  <div class="bigmodal" id="ct-bigmodal">
-    <div class="bigmodal-header">
-      <div style="font-size:16px;font-weight:800;color:var(--text)">Content Details</div>
-      <button onclick="window.closeCTDrawer()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1">×</button>
-    </div>
-    <div class="bigmodal-body" id="ct-bigmodal-body"></div>
-    <div class="bigmodal-footer">
-      <button class="btn btn-primary" onclick="window.saveCTDrawer()" style="flex:1">Save</button>
-      <button class="btn" onclick="window.deleteCT()" style="color:#ef4444;border-color:#fca5a5">Delete</button>
-    </div>
-  </div>
-</div>
-<div class="stask-modal-overlay" id="add-ct-overlay">
-  <div class="stask-modal" style="max-width:460px">
-    <div style="font-size:16px;font-weight:800;margin-bottom:18px;color:var(--text)">Add Content</div>
-    <div class="stask-field"><div class="stask-field-label">Title *</div><input class="stask-field-input" id="nct-title" placeholder="e.g. Bedroom reveal reel"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('nct-status',CT_STATUSES,'todo')}</div>
-      <div class="stask-field"><div class="stask-field-label">Format</div>${cddBtn('nct-format',CT_FORMATS,'reel')}</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Type</div>${cddBtn('nct-type',CT_TYPES,'organic')}</div>
-      <div class="stask-field"><div class="stask-field-label">Publish Date</div><input class="stask-field-input" id="nct-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
-    </div>
-    <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="nct-link" type="url" placeholder="https://..."></div>
-    <div id="nct-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-      <button class="btn" onclick="window.closeAddCTModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="window.saveNewCT()">Add</button>
-    </div>
-  </div>
-</div>`;
-    return;
-  }
-
-  // Work / Home — month-based view
-  const MONTH_NAMES_T=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const allInSection = section==='work'
-    ? STASKS.filter(t=>t.section!=='home'&&t.section!=='content')
-    : STASKS.filter(t=>t.section==='home');
-
-  const monthTasksST = allInSection.filter(t=>{
-    if(!t.dueDate) return false;
-    const d=new Date(t.dueDate+'T00:00:00');
-    return d.getFullYear()===_taskYear && d.getMonth()===_taskMonth;
-  });
-  const ideaTasksST = allInSection.filter(t=>!t.dueDate);
-
-  // ── Inline-edit helpers for tasks ──────────────────────────
-  function stPill(st){
-    return `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${st.bg};color:${st.color};cursor:pointer">${st.label}</span>`;
-  }
-
-  function stTaskRow(t, isIdea){
-    const st=STASK_STATUSES.find(s=>s.id===t.status)||STASK_STATUSES[0];
-    const done=t.status==='done';
-    const tagHtml=section==='work'?(t.tags||[]).map(tg=>{const wt=WORK_TAGS.find(x=>x.id===tg);return wt?`<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:${wt.bg};color:${wt.color}">${wt.label}</span>`:''}).join(''):'';
-    const d=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;
-    const dateStr=d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
-    const subs=(t.subtasks||[]);
-
-    const subRows=subs.map(sub=>{
-      const sd=sub.dueDate?new Date(sub.dueDate+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
-      return `<tr>
-        <td style="width:44px;padding:3px 4px 3px 16px;vertical-align:middle">
-          <button class="task-circle${sub.done?' done':''}" style="width:14px;height:14px;border-width:1.5px" onclick="event.stopPropagation();window.toggleSubtask('${t.id}','${sub.id}')"></button>
-        </td>
-        <td style="padding:3px 8px" colspan="3">
-          <div style="display:flex;align-items:center;gap:10px;padding-left:16px;border-left:2px solid #eee">
-            <span style="${sub.done?'text-decoration:line-through;color:var(--text3)':'color:var(--text2)'};font-size:12px"
-              onclick="event.stopPropagation();window.inlineEditTask('${t.id}','subtask-title','${sub.id}',this)">${sub.title||'—'}</span>
-            <span style="font-size:11px;color:var(--text3);cursor:pointer;min-width:50px"
-              onclick="event.stopPropagation();window.inlineEditTask('${t.id}','subtask-responsible','${sub.id}',this)">${sub.responsible||'<span style="opacity:.4">who?</span>'}</span>
-            <span style="font-size:11px;color:var(--text3);cursor:pointer"
-              onclick="event.stopPropagation();window.inlineEditTask('${t.id}','subtask-date','${sub.id}',this)">${sd||'<span style="opacity:.4">date</span>'}</span>
-          </div>
-        </td>
-        <td style="padding:3px 12px;text-align:right"></td>
-      </tr>`;
-    }).join('');
-
-    return `<tr class="stask-row" draggable="true" data-id="${t.id}" ondragstart="event.dataTransfer.setData('taskId','${t.id}')">
-      <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
-        <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${t.id}')"></button>
-      </td>
-      <td style="padding:11px 8px;min-width:160px">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
-          <span class="${done?'task-title-done':''}" style="font-size:13px;font-weight:500;color:var(--text);cursor:text"
-            onclick="event.stopPropagation();window.inlineEditTask('${t.id}','title',null,this)">${t.title||'Untitled'}</span>
-          ${tagHtml}
-          ${subs.length?`<span style="font-size:10px;color:var(--text3);opacity:.5;cursor:pointer" onclick="event.stopPropagation();window.openStaskDrawer('${t.id}')">${subs.filter(s=>s.done).length}/${subs.length}</span>`:''}
-        </div>
-      </td>
-      <td style="padding:11px 6px;white-space:nowrap"
-          onclick="event.stopPropagation();window.inlineEditTaskStatus('${t.id}',this)">
-        ${stPill(st)}
-      </td>
-      <td style="padding:11px 8px;font-size:12px;color:var(--text2);cursor:text;min-width:70px"
-          onclick="event.stopPropagation();window.inlineEditTask('${t.id}','responsible',null,this)">
-        ${t.responsible||`<span style="color:var(--text3);opacity:.4">who?</span>`}
-      </td>
-      <td style="padding:11px 10px;font-size:12px;color:var(--text3);white-space:nowrap;cursor:pointer"
-          onclick="event.stopPropagation();window.inlineEditTask('${t.id}','dueDate',null,this)">
-        ${isIdea?`<span style="opacity:.4">no date</span>`:dateStr||`<span style="opacity:.4">date</span>`}
-      </td>
-      <td style="padding:11px 12px;font-size:12px;text-align:right">
-        ${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:`<span style="opacity:.3;cursor:pointer;font-size:16px" onclick="event.stopPropagation();window.openStaskDrawer('${t.id}')">…</span>`}
-      </td>
-    </tr>${subRows}`;
-  }
-
-  function stMonthTable(tasks){
-    if(!tasks.length) return `<div class="ideas-drop-zone" id="st-month-drop"
-      ondragover="event.preventDefault();this.classList.add('drag-over')"
-      ondragleave="this.classList.remove('drag-over')"
-      ondrop="this.classList.remove('drag-over');window.stDropToMonth(event)">
-      Drop an idea here, or click <strong>+ Add Task</strong>
-    </div>`;
-    return `<table class="stask-table" style="margin-bottom:0">
-    <thead><tr>
-      <th style="width:44px"></th>
-      <th>Task</th><th>Status</th><th>Responsible</th><th>Date</th><th style="width:36px"></th>
-    </tr></thead>
-    <tbody id="st-month-drop" ondragover="event.preventDefault()" ondrop="window.stDropToMonth(event)">
-      ${tasks.map(t=>stTaskRow(t,false)).join('')}
-      <tr class="stask-row-add" onclick="window.openAddStaskModal()">
-        <td style="padding:10px 4px 10px 16px;vertical-align:middle">
-          <div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae">+</div>
-        </td>
-        <td colspan="5" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add task…</td>
-      </tr>
-    </tbody></table>`;
-  }
+  const tasks=getBoardTasks(boardKey);
+  const addLabel = isContent ? '+ Add Content' : '+ Add Task';
 
   wrap.innerHTML=`
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
   ${sectionToggle}
-  <button class="btn btn-primary" onclick="window.openAddStaskModal()" style="border-radius:20px;padding:8px 20px;font-size:13px">+ Add Task</button>
-</div>
-<div class="task-month-nav">
-  <button class="task-month-btn" onclick="window.taskPrevMonth()">‹</button>
-  <span class="task-month-label">${MONTH_NAMES_T[_taskMonth]} ${_taskYear}</span>
-  <button class="task-month-btn" onclick="window.taskNextMonth()">›</button>
-  <span style="font-size:12px;color:var(--text3);margin-left:12px">${monthTasksST.length} task${monthTasksST.length!==1?'s':''}</span>
-</div>
-<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px">
-  ${stMonthTable(monthTasksST)}
-</div>
-<div style="background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden">
-  <div style="padding:16px 20px 10px;display:flex;align-items:center;gap:8px">
-    <span style="font-size:13px;font-weight:700;color:var(--text)">Ideas</span>
-    <span style="font-size:11px;color:var(--text3);background:rgba(0,0,0,.06);padding:1px 7px;border-radius:10px">${ideaTasksST.length}</span>
+  <div style="display:flex;align-items:center;gap:14px">
+    <span style="font-size:12px;color:var(--text3)">${tasks.length} task${tasks.length!==1?'s':''}</span>
+    <button class="btn btn-primary" onclick="window.openAddStaskModal('${boardKey}')" style="border-radius:20px;padding:8px 20px;font-size:13px">${addLabel}</button>
   </div>
-  ${ideaTasksST.length
-    ? `<table class="stask-table" style="margin-bottom:0">
-        <thead><tr><th style="width:44px"></th><th>Task</th><th>Status</th><th>Responsible</th><th>Date</th><th style="width:36px"></th></tr></thead>
-        <tbody>${ideaTasksST.map(t=>stTaskRow(t,true)).join('')}
-        <tr class="stask-row-add" onclick="window.openAddStaskModal()">
-          <td style="padding:10px 4px 10px 16px;vertical-align:middle"><div style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #c5b8ae;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c5b8ae">+</div></td>
-          <td colspan="5" style="padding:10px 8px;font-size:13px;color:var(--text3)">Add idea…</td>
-        </tr></tbody>
-       </table>`
-    : `<div style="padding:16px 20px 20px;font-size:13px;color:var(--text3)">No ideas yet — add a task without a date to collect it here.</div>`}
 </div>
-<div class="stask-drawer-overlay" id="stask-drawer-overlay" style="display:none"></div>
-<div class="stask-drawer" id="stask-drawer" style="display:none"></div>
+<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:auto">
+  ${boardTable(boardKey, tasks)}
+</div>
 <div class="bigmodal-overlay" id="stask-bigmodal-overlay" onclick="if(event.target===this)window.closeStaskDrawer()">
   <div class="bigmodal" id="stask-bigmodal">
     <div class="bigmodal-header">
@@ -5984,98 +6178,111 @@ function renderTasks(){
   </div>
 </div>
 <div class="stask-modal-overlay" id="add-stask-overlay">
-  <div class="stask-modal">
-    <div style="font-size:16px;font-weight:800;margin-bottom:20px;color:var(--text)">Add Task</div>
-    <div class="stask-field"><div class="stask-field-label">Task Name *</div><input class="stask-field-input" id="nt-title" placeholder="What needs to be done?"></div>
-    <div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="nt-desc" rows="3" placeholder="Details, context, notes..."></textarea></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Due Date</div><input class="stask-field-input" id="nt-date" type="date"></div>
-      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('nt-status',STASK_STATUSES,'todo')}</div>
-    </div>
-    <div class="stask-field"><div class="stask-field-label">Section</div>
-      <div style="display:flex;gap:8px">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="work" ${section==='work'?'checked':''}> Work</label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="home" ${section==='home'?'checked':''}> Home</label>
-      </div>
-    </div>
-    <div class="stask-field" id="nt-tags-wrap" style="${section!=='work'?'display:none':''}"><div class="stask-field-label">Tags</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        ${WORK_TAGS.map(tg=>`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px"><input type="checkbox" name="nt-tag" value="${tg.id}"> <span style="padding:2px 8px;border-radius:8px;background:${tg.bg};color:${tg.color};font-weight:600;font-size:12px">${tg.label}</span></label>`).join('')}
-      </div>
-    </div>
-    <div class="stask-field"><div class="stask-field-label">Responsible</div><input class="stask-field-input" id="nt-responsible" placeholder="Who owns this?"></div>
-    <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="nt-link" type="url" placeholder="https://..."></div>
-    <div id="nt-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-      <button class="btn" onclick="window.closeAddStaskModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="window.saveNewStask()">Add Task</button>
-    </div>
-  </div>
+  <div class="stask-modal" id="add-stask-modal-inner"></div>
 </div>`;
-
-  document.querySelectorAll('input[name="nt-section"]').forEach(r=>{
-    r.addEventListener('change',()=>{
-      const tw=document.getElementById('nt-tags-wrap');
-      if(tw) tw.style.display=r.value==='work'?'':'none';
-    });
-  });
 }
 
-window._ccAutoFx=_ccAutoFx;
-window.setStaskSection=function(s){_staskSection=s;_staskTagFilter='all';_staskStatusFilter='all';renderTasks();};
-window.setStaskTag=function(t){_staskTagFilter=t;renderTasks();};
-window.setStaskStatus=function(s){_staskStatusFilter=s;renderTasks();};
-window.taskPrevMonth=function(){_taskMonth--;if(_taskMonth<0){_taskMonth=11;_taskYear--;}renderTasks();};
-window.taskNextMonth=function(){_taskMonth++;if(_taskMonth>11){_taskMonth=0;_taskYear++;}renderTasks();};
-// ── Task inline editing ──────────────────────────────────────
-window.inlineEditTask=function(taskId, field, subId, el){
+window.setStaskSection=function(s){_staskSection=s;renderTasks();};
+
+// ── Field (custom column) inline editing ────────────────────
+window.inlineEditField=function(boardKey, taskId, fieldId, el){
   event.stopPropagation();
-  const isDate = field==='dueDate'||field==='subtask-date';
-  const isSubtask = subId && field.startsWith('subtask-');
-  const realField = isSubtask ? field.replace('subtask-','') : field;
-
-  STASKS=getSTasks();
-  const t=STASKS.find(x=>x.id===taskId); if(!t) return;
-  const sub=isSubtask?(t.subtasks||[]).find(s=>s.id===subId):null;
-  const curVal=isSubtask?(sub?sub[realField]||'':''):(t[field]||'');
-
+  const field=(CONFIG.taskFields[boardKey]||[]).find(f=>f.id===fieldId); if(!field) return;
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  const curVal=getFieldValue(t,field);
+  if(field.type==='select'){
+    openCDD(el, field.options||[], curVal||'', (val)=>{
+      const t2=store.getAll().find(x=>x.id===taskId); if(!t2) return;
+      t2.customFields=t2.customFields||{}; t2.customFields[fieldId]=val; t2._ts=Date.now();
+      store.save(); renderTasks();
+    });
+    return;
+  }
+  if(field.type==='person'){
+    window.openAssigneePicker(el, curVal||null, (pid)=>{
+      const t2=store.getAll().find(x=>x.id===taskId); if(!t2) return;
+      t2.customFields=t2.customFields||{}; t2.customFields[fieldId]=pid; t2._ts=Date.now();
+      store.save(); renderTasks();
+    });
+    return;
+  }
+  const isDate=field.type==='date';
   const inp=document.createElement('input');
-  inp.type=isDate?'date':'text';
-  inp.value=curVal;
-  inp.style.cssText='width:100%;min-width:80px;border:none;border-bottom:1.5px solid var(--accent);background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none;padding:1px 0';
-  el.innerHTML=''; el.appendChild(inp);
-  inp.focus(); if(!isDate) inp.select();
-
+  inp.type= field.type==='number' ? 'number' : (isDate?'date':'text');
+  inp.value= curVal||'';
+  inp.style.cssText='width:100%;min-width:60px;border:none;border-bottom:1.5px solid var(--accent);background:transparent;font-size:12px;color:var(--text);font-family:inherit;outline:none;padding:1px 0';
+  el.innerHTML=''; el.appendChild(inp); inp.focus(); if(!isDate) inp.select();
   const save=()=>{
-    STASKS=getSTasks();
-    const t2=STASKS.find(x=>x.id===taskId); if(!t2) return;
-    if(isSubtask){
-      const s=(t2.subtasks||[]).find(s=>s.id===subId);
-      if(s){s[realField]=inp.value.trim();t2._ts=Date.now();}
-    } else {
-      if(field==='dueDate') t2.dueDate=inp.value;
-      else t2[field]=inp.value.trim();
-      t2._ts=Date.now();
-    }
-    saveSTasks(); renderTasks();
+    const t2=store.getAll().find(x=>x.id===taskId); if(!t2) return;
+    t2.customFields=t2.customFields||{}; t2.customFields[fieldId]= inp.value.trim();
+    t2._ts=Date.now(); store.save(); renderTasks();
   };
   inp.addEventListener('blur',save);
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){inp.blur();}if(e.key==='Escape'){renderTasks();}});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur(); if(e.key==='Escape')renderTasks();});
   if(isDate) inp.addEventListener('change',save);
 };
 
-window.inlineEditTaskStatus=function(taskId, el){
+// ── Task inline editing ──────────────────────────────────────
+window.inlineEditTask=function(boardKey, taskId, field, el){
   event.stopPropagation();
-  STASKS=getSTasks();
-  const t=STASKS.find(x=>x.id===taskId); if(!t) return;
-  openCDD(el.querySelector('span')||el, STASK_STATUSES, t.status||'todo', (val)=>{
-    STASKS=getSTasks();
-    const t2=STASKS.find(x=>x.id===taskId); if(!t2) return;
-    t2.status=val; t2._ts=Date.now();
-    saveSTasks(); renderTasks();
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  const isDate=field==='dueDate';
+  const inp=document.createElement('input');
+  inp.type=isDate?'date':'text';
+  inp.value=t[field]||'';
+  inp.style.cssText='width:100%;min-width:80px;border:none;border-bottom:1.5px solid var(--accent);background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none;padding:1px 0';
+  el.innerHTML=''; el.appendChild(inp); inp.focus(); if(!isDate) inp.select();
+  const save=()=>{
+    const t2=store.getAll().find(x=>x.id===taskId); if(!t2) return;
+    t2[field]= isDate ? inp.value : inp.value.trim();
+    t2._ts=Date.now(); store.save(); renderTasks();
+  };
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur(); if(e.key==='Escape')renderTasks();});
+  if(isDate) inp.addEventListener('change',save);
+};
+window.inlineEditTaskStage=function(boardKey, taskId, el){
+  event.stopPropagation();
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  openCDD(el, getStages(boardKey), t.status||'', (val)=>{
+    const t2=store.getAll().find(x=>x.id===taskId); if(!t2) return;
+    t2.status=val; t2._ts=Date.now(); store.save(); renderTasks();
   });
 };
-
+window.setTaskAssignee=function(boardKey, taskId, assigneeId){
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  t.assigneeId=assigneeId||null; t._ts=Date.now(); store.save(); renderTasks();
+};
+window.setSubtaskAssignee=function(boardKey, taskId, subId, assigneeId){
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  const sub=(t.subtasks||[]).find(s=>s.id===subId); if(!sub) return;
+  sub.assigneeId=assigneeId||null; t._ts=Date.now(); store.save(); renderTasks();
+};
+window.inlineEditSubtask=function(boardKey, taskId, subId, field, el){
+  event.stopPropagation();
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  const sub=(t.subtasks||[]).find(s=>s.id===subId); if(!sub) return;
+  const isDate=field==='dueDate';
+  const inp=document.createElement('input');
+  inp.type=isDate?'date':'text';
+  inp.value=sub[field]||'';
+  inp.style.cssText='min-width:60px;border:none;border-bottom:1.5px solid var(--accent);background:transparent;font-size:12px;color:var(--text);font-family:inherit;outline:none;padding:1px 0';
+  el.innerHTML=''; el.appendChild(inp); inp.focus(); if(!isDate) inp.select();
+  const save=()=>{
+    const t2=store.getAll().find(x=>x.id===taskId); if(!t2) return;
+    const s2=(t2.subtasks||[]).find(s=>s.id===subId); if(!s2) return;
+    s2[field]=inp.value.trim(); t2._ts=Date.now(); store.save(); renderTasks();
+  };
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur(); if(e.key==='Escape')renderTasks();});
+  if(isDate) inp.addEventListener('change',save);
+};
 window.addSubtaskRow=function(){
   const container=document.getElementById('dt-subtasks');
   if(!container)return;
@@ -6084,126 +6291,153 @@ window.addSubtaskRow=function(){
   row.className='sub-row';row.dataset.subId=newId;
   row.innerHTML=`<button class="task-circle" style="flex-shrink:0;width:16px;height:16px;border-width:1.5px" onclick="this.classList.toggle('done')"></button>
     <input class="sub-input" placeholder="Subtask name" data-field="title">
-    <input class="sub-input" placeholder="Who" style="max-width:90px;font-size:12px;color:var(--text2)" data-field="responsible">
+    ${assigneeBtn('sub-ap-'+newId, null, true)}
     <input class="sub-input" type="date" style="max-width:120px;font-size:12px;color:var(--text2)" data-field="dueDate">
     <button onclick="this.closest('.sub-row').remove()" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 2px;line-height:1;flex-shrink:0">×</button>`;
   container.appendChild(row);
   row.querySelector('.sub-input').focus();
 };
-window.toggleSubtask=function(taskId,subId){
-  STASKS=getSTasks();
-  const t=STASKS.find(x=>x.id===taskId);if(!t)return;
-  const sub=(t.subtasks||[]).find(s=>s.id===subId);if(!sub)return;
-  sub.done=!sub.done;t._ts=Date.now();
-  saveSTasks();renderTasks();
+window.toggleSubtask=function(boardKey, taskId, subId){
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  const sub=(t.subtasks||[]).find(s=>s.id===subId); if(!sub) return;
+  sub.done=!sub.done; t._ts=Date.now(); store.save(); renderTasks();
 };
-window.quickToggleTask=function(id){
-  STASKS=getSTasks();
-  const t=STASKS.find(x=>x.id===id);if(!t)return;
-  t.status=t.status==='done'?'todo':'done';t._ts=Date.now();
-  saveSTasks();renderTasks();
+window.quickToggleTask=function(boardKey, id){
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===id); if(!t) return;
+  const doneId=getDoneStageId(boardKey);
+  const firstId=(getStages(boardKey)[0]||{}).id||'todo';
+  t.status = t.status===doneId ? firstId : doneId;
+  t._ts=Date.now(); store.save(); renderTasks();
 };
-window.inlineEditCT=function(id, field, el){
-  event.stopPropagation();
-  const isDate=field==='dueDate';
-  CONTENT_TASKS=getCTasks();
-  const t=CONTENT_TASKS.find(x=>x.id===id); if(!t) return;
-  const inp=document.createElement('input');
-  inp.type=isDate?'date':'text';
-  inp.value=t[field]||'';
-  inp.style.cssText='width:100%;min-width:80px;border:none;border-bottom:1.5px solid var(--accent);background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none;padding:1px 0';
-  el.innerHTML=''; el.appendChild(inp);
-  inp.focus(); if(!isDate) inp.select();
-  const save=()=>{ CONTENT_TASKS=getCTasks(); const t2=CONTENT_TASKS.find(x=>x.id===id); if(!t2)return; t2[field]=inp.value.trim()||inp.value; t2._ts=Date.now(); saveCTasks(); renderTasks(); };
-  inp.addEventListener('blur',save);
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape')renderTasks();});
-  if(isDate) inp.addEventListener('change',save);
-};
-window.inlineEditCTStatus=function(id, field, el){
-  event.stopPropagation();
-  CONTENT_TASKS=getCTasks();
-  const t=CONTENT_TASKS.find(x=>x.id===id); if(!t) return;
-  const items=field==='format'?CT_FORMATS:field==='type'?CT_TYPES:CT_STATUSES;
-  openCDD(el.querySelector('span')||el, items, t[field]||items[0].id, (val)=>{
-    CONTENT_TASKS=getCTasks(); const t2=CONTENT_TASKS.find(x=>x.id===id); if(!t2)return;
-    t2[field]=val; t2._ts=Date.now(); saveCTasks(); renderTasks();
+
+// ── Add Task / Add Content (unified, per-board) ──────────────
+window._addStaskBoard=null;
+window.openAddStaskModal=function(boardKey){
+  boardKey = boardKey || _staskSection;
+  window._addStaskBoard = boardKey;
+  const isContent = boardKey==='content';
+  const stages=getStages(boardKey);
+  const fields=CONFIG.taskFields[boardKey]||[];
+  const title = isContent ? 'Add Content' : 'Add Task';
+
+  const customFieldsHtml = fields.map(f=>{
+    let inputHtml;
+    if(f.type==='select') inputHtml=cddBtn('nf-'+f.id, f.options||[], (f.options&&f.options[0]&&f.options[0].id)||'');
+    else if(f.type==='person') inputHtml=assigneeBtn('nf-'+f.id, null);
+    else if(f.type==='date') inputHtml=`<input class="stask-field-input" type="date" id="nf-${f.id}">`;
+    else if(f.type==='number') inputHtml=`<input class="stask-field-input" type="number" id="nf-${f.id}">`;
+    else inputHtml=`<input class="stask-field-input" type="text" id="nf-${f.id}">`;
+    return `<div class="stask-field"><div class="stask-field-label">${escHtml(f.label)}</div>${inputHtml}</div>`;
+  }).join('');
+
+  const sectionHtml = isContent ? '' : `<div class="stask-field"><div class="stask-field-label">Section</div>
+      <div style="display:flex;gap:8px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="work" ${boardKey==='work'?'checked':''}> Work</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="nt-section" value="home" ${boardKey==='home'?'checked':''}> Home</label>
+      </div>
+    </div>`;
+  const tagsHtml = isContent ? '' : `<div class="stask-field" id="nt-tags-wrap" style="display:${boardKey==='work'?'block':'none'}"><div class="stask-field-label">Tags</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${(CONFIG.taskTags||[]).map(tg=>`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px"><input type="checkbox" name="nt-tag" value="${tg.id}"> <span class="tag-pill" style="background:${tg.color}20;color:${tg.color};border:1px solid ${tg.color}40">${escHtml(tg.label)}</span></label>`).join('')}
+      </div>
+    </div>`;
+
+  const modal=document.getElementById('add-stask-modal-inner');
+  if(!modal) return;
+  modal.innerHTML=`
+    <div style="font-size:16px;font-weight:800;margin-bottom:20px;color:var(--text)">${title}</div>
+    <div class="stask-field"><div class="stask-field-label">${isContent?'Title *':'Task Name *'}</div><input class="stask-field-input" id="nt-title" placeholder="${isContent?'e.g. Bedroom reveal reel':'What needs to be done?'}"></div>
+    ${isContent?'':'<div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="nt-desc" rows="3" placeholder="Details, context, notes..."></textarea></div>'}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">${isContent?'Publish Date':'Due Date'}</div><input class="stask-field-input" id="nt-date" type="date"></div>
+      <div class="stask-field"><div class="stask-field-label">Stage</div>${cddBtn('nt-stage', stages, (stages[0]&&stages[0].id)||'')}</div>
+    </div>
+    ${sectionHtml}
+    ${tagsHtml}
+    <div class="stask-field"><div class="stask-field-label">Responsible</div>${assigneeBtn('nt-assignee', null)}</div>
+    ${customFieldsHtml}
+    <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="nt-link" type="url" placeholder="https://..."></div>
+    <div id="nt-error" style="color:#ef4444;font-size:12px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn" onclick="window.closeAddStaskModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="window.saveNewStask()">${isContent?'Add':'Add Task'}</button>
+    </div>`;
+  document.querySelectorAll('input[name="nt-section"]').forEach(r=>{
+    r.addEventListener('change',()=>{ const tw=document.getElementById('nt-tags-wrap'); if(tw) tw.style.display=r.value==='work'?'block':'none'; });
   });
-};
-window.quickToggleCT=function(id){
-  CONTENT_TASKS=getCTasks();
-  const t=CONTENT_TASKS.find(x=>x.id===id);if(!t)return;
-  t.status=t.status==='done'?'todo':'done';t._ts=Date.now();
-  saveCTasks();renderTasks();
-};
-window.stDropToMonth=function(e){
-  e.preventDefault();
-  const id=e.dataTransfer.getData('taskId');if(!id)return;
-  STASKS=getSTasks();
-  const t=STASKS.find(x=>x.id===id);if(!t)return;
-  const d=new Date(_taskYear,_taskMonth,1);
-  t.dueDate=d.toISOString().slice(0,10);t._ts=Date.now();
-  saveSTasks();renderTasks();toast('Scheduled for '+d.toLocaleDateString('en-GB',{month:'long',year:'numeric'}),'success');
-};
-window.ctDropToMonth=function(e){
-  e.preventDefault();
-  const id=e.dataTransfer.getData('taskId');if(!id)return;
-  CONTENT_TASKS=getCTasks();
-  const t=CONTENT_TASKS.find(x=>x.id===id);if(!t)return;
-  const d=new Date(_ctYear,_ctMonth,1);
-  t.dueDate=d.toISOString().slice(0,10);t._ts=Date.now();
-  saveCTasks();renderTasks();toast('Scheduled for '+d.toLocaleDateString('en-GB',{month:'long',year:'numeric'}),'success');
-};
-window.openAddStaskModal=function(){
-  const ov=document.getElementById('add-stask-overlay');
-  if(ov){
-    ov.classList.add('open');
-    // pre-select current section
-    const radio=document.querySelector(`input[name="nt-section"][value="${_staskSection}"]`);
-    if(radio){radio.checked=true;const tw=document.getElementById('nt-tags-wrap');if(tw)tw.style.display=_staskSection==='work'?'':'none';}
-    setTimeout(()=>document.getElementById('nt-title')?.focus(),50);
-  }
+  document.getElementById('add-stask-overlay')?.classList.add('open');
+  setTimeout(()=>document.getElementById('nt-title')?.focus(),50);
 };
 window.closeAddStaskModal=function(){document.getElementById('add-stask-overlay')?.classList.remove('open');};
 window.saveNewStask=function(){
+  const boardKey=window._addStaskBoard||_staskSection;
+  const isContent=boardKey==='content';
   const title=document.getElementById('nt-title')?.value.trim();
-  if(!title){document.getElementById('nt-error').textContent='Task name is required';return;}
-  const section=document.querySelector('input[name="nt-section"]:checked')?.value||'work';
-  const tags=section==='work'?[...document.querySelectorAll('input[name="nt-tag"]:checked')].map(x=>x.value):[];
-  STASKS.unshift({id:uid(),title,description:document.getElementById('nt-desc')?.value.trim(),dueDate:document.getElementById('nt-date')?.value,status:cddVal('nt-status')||'todo',section,tags,responsible:document.getElementById('nt-responsible')?.value.trim(),link:document.getElementById('nt-link')?.value.trim(),_ts:Date.now()});
-  saveSTasks();closeAddStaskModal();renderTasks();toast('Task added!','success');
+  if(!title){const e=document.getElementById('nt-error'); if(e) e.textContent = isContent?'Title is required':'Task name is required'; return;}
+  const stages=getStages(boardKey);
+  const stageId = cddVal('nt-stage') || (stages[0]&&stages[0].id) || '';
+  const assigneeId = assigneeBtnVal('nt-assignee');
+  const link=document.getElementById('nt-link')?.value.trim();
+  const dueDate=document.getElementById('nt-date')?.value||'';
+  const customFields={};
+  (CONFIG.taskFields[boardKey]||[]).forEach(f=>{
+    if(f.type==='select') customFields[f.id]=cddVal('nf-'+f.id);
+    else if(f.type==='person') customFields[f.id]=assigneeBtnVal('nf-'+f.id);
+    else customFields[f.id]=document.getElementById('nf-'+f.id)?.value.trim()||'';
+  });
+
+  if(isContent){
+    CONTENT_TASKS=getCTasks();
+    CONTENT_TASKS.push({id:uid(),title,status:stageId,dueDate,link,assigneeId,customFields,_ts:Date.now()});
+    saveCTasks();
+  } else {
+    const section=document.querySelector('input[name="nt-section"]:checked')?.value||boardKey;
+    const tags=section==='work'?[...document.querySelectorAll('input[name="nt-tag"]:checked')].map(x=>x.value):[];
+    STASKS=getSTasks();
+    STASKS.unshift({id:uid(),title,description:document.getElementById('nt-desc')?.value.trim(),dueDate,status:stageId,section,tags,assigneeId,link,customFields,subtasks:[],_ts:Date.now()});
+    saveSTasks();
+  }
+  closeAddStaskModal(); renderTasks(); toast(isContent?'Content added!':'Task added!','success');
 };
-window.openStaskDrawer=function(id){
-  _activeStaskId=id;
-  const t=STASKS.find(x=>x.id===id);if(!t)return;
-  const el=document.getElementById('stask-bigmodal-title');
-  if(el)el.textContent=t.title||'Task';
+
+// ── Task / Content details drawer (unified) ──────────────────
+window.openStaskDrawer=function(boardKey, id){
+  _activeStaskBoard=boardKey; _activeStaskId=id;
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===id); if(!t) return;
+  const isContent=boardKey==='content';
+  const titleEl=document.getElementById('stask-bigmodal-title'); if(titleEl) titleEl.textContent=t.title||'Task';
   const body=document.getElementById('stask-bigmodal-body');
   const sec=t.section||'work';
-  const collabBadge=t.collabId?(function(){const col=COLLABS.find(x=>x.id===t.collabId);return col?`<div style="font-size:12px;color:var(--accent);margin-bottom:12px">🤝 Linked to deal: <b>${col.company||''}</b></div>`:''})():'';
-  if(body)body.innerHTML=`
-    ${collabBadge}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Task Name</div><input class="stask-field-input" id="dt-title" value="${(t.title||'').replace(/"/g,'&quot;')}"></div>
-      <div class="stask-field"><div class="stask-field-label">Due Date</div><input class="stask-field-input" id="dt-date" type="date" value="${t.dueDate||''}"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="stask-field"><div class="stask-field-label">Status</div>${cddBtn('dt-status',STASK_STATUSES,t.status||'todo')}</div>
-      <div class="stask-field"><div class="stask-field-label">Responsible Person</div><input class="stask-field-input" id="dt-responsible" value="${(t.responsible||'').replace(/"/g,'&quot;')}"></div>
-    </div>
-    <div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="dt-desc" rows="4">${t.description||''}</textarea></div>
-    <div class="stask-field"><div class="stask-field-label">Section</div>
+  const stages=getStages(boardKey);
+  const fields=CONFIG.taskFields[boardKey]||[];
+  const collabBadge=t.collabId?(function(){const col=COLLABS.find(x=>x.id===t.collabId);return col?`<div style="font-size:12px;color:var(--accent);margin-bottom:12px">🤝 Linked to deal: <b>${escHtml(col.company||'')}</b></div>`:''})():'';
+
+  const customFieldsHtml = fields.map(f=>{
+    const val=getFieldValue(t,f);
+    let inputHtml;
+    if(f.type==='select') inputHtml=cddBtn('dt-'+f.id, f.options||[], val||((f.options&&f.options[0])?f.options[0].id:''));
+    else if(f.type==='person') inputHtml=assigneeBtn('dt-'+f.id, val||null);
+    else if(f.type==='date') inputHtml=`<input class="stask-field-input" type="date" id="dt-${f.id}" value="${val||''}">`;
+    else if(f.type==='number') inputHtml=`<input class="stask-field-input" type="number" id="dt-${f.id}" value="${escHtml(val||'')}">`;
+    else inputHtml=`<input class="stask-field-input" type="text" id="dt-${f.id}" value="${escHtml(val||'')}">`;
+    return `<div class="stask-field"><div class="stask-field-label">${escHtml(f.label)}</div>${inputHtml}</div>`;
+  }).join('');
+
+  const sectionHtml = isContent ? '' : `<div class="stask-field"><div class="stask-field-label">Section</div>
       <div style="display:flex;gap:10px">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="dt-section" value="work"${sec==='work'?' checked':''}> Work</label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="dt-section" value="home"${sec==='home'?' checked':''}> Home</label>
       </div>
-    </div>
-    <div class="stask-field" id="dt-tags-wrap" style="display:${sec==='work'?'block':'none'}"><div class="stask-field-label">Tags</div>
+    </div>`;
+  const tagsHtml = isContent ? '' : `<div class="stask-field" id="dt-tags-wrap" style="display:${sec==='work'?'block':'none'}"><div class="stask-field-label">Tags</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        ${WORK_TAGS.map(tg=>`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px"><input type="checkbox" name="dt-tag" value="${tg.id}"${(t.tags||[]).includes(tg.id)?' checked':''}> <span style="padding:2px 8px;border-radius:8px;background:${tg.bg};color:${tg.color};font-weight:600;font-size:12px">${tg.label}</span></label>`).join('')}
+        ${(CONFIG.taskTags||[]).map(tg=>`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px"><input type="checkbox" name="dt-tag" value="${tg.id}"${(t.tags||[]).includes(tg.id)?' checked':''}> <span class="tag-pill" style="background:${tg.color}20;color:${tg.color};border:1px solid ${tg.color}40">${escHtml(tg.label)}</span></label>`).join('')}
       </div>
-    </div>
-    <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="dt-link" type="url" value="${t.link||''}"></div>
-    ${t.link?`<a href="${t.link}" target="_blank" style="font-size:13px;color:var(--accent);text-decoration:none;display:inline-block;margin-top:-8px;margin-bottom:14px">↗ Open link</a>`:''}
+    </div>`;
+  const subtasksHtml = isContent ? '' : `
     <div style="border-top:1px solid var(--border);margin:16px 0 14px"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px">Subtasks</div>
@@ -6212,112 +6446,82 @@ window.openStaskDrawer=function(id){
     <div id="dt-subtasks">
       ${(t.subtasks||[]).map(sub=>`
       <div class="sub-row" data-sub-id="${sub.id}">
-        <button class="task-circle${sub.done?' done':''}" style="flex-shrink:0;width:16px;height:16px;border-width:1.5px" onclick="window.toggleSubtask('${t.id}','${sub.id}')"></button>
-        <input class="sub-input" placeholder="Subtask name" value="${(sub.title||'').replace(/"/g,'&quot;')}" data-field="title">
-        <input class="sub-input" placeholder="Who" style="max-width:90px;font-size:12px;color:var(--text2)" value="${(sub.responsible||'').replace(/"/g,'&quot;')}" data-field="responsible">
+        <button class="task-circle${sub.done?' done':''}" style="flex-shrink:0;width:16px;height:16px;border-width:1.5px" onclick="window.toggleSubtask('${boardKey}','${t.id}','${sub.id}')"></button>
+        <input class="sub-input" placeholder="Subtask name" value="${escHtml(sub.title||'')}" data-field="title">
+        ${assigneeBtn('sub-ap-'+sub.id, sub.assigneeId||null, true)}
         <input class="sub-input" type="date" style="max-width:120px;font-size:12px;color:var(--text2)" value="${sub.dueDate||''}" data-field="dueDate">
         <button onclick="this.closest('.sub-row').remove()" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:0 2px;line-height:1;flex-shrink:0">×</button>
       </div>`).join('')}
+    </div>`;
+
+  if(body) body.innerHTML=`
+    ${collabBadge}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">${isContent?'Title':'Task Name'}</div><input class="stask-field-input" id="dt-title" value="${escHtml(t.title||'')}"></div>
+      <div class="stask-field"><div class="stask-field-label">${isContent?'Publish Date':'Due Date'}</div><input class="stask-field-input" id="dt-date" type="date" value="${t.dueDate||''}"></div>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="stask-field"><div class="stask-field-label">Stage</div>${cddBtn('dt-stage', stages, t.status||(stages[0]&&stages[0].id)||'')}</div>
+      <div class="stask-field"><div class="stask-field-label">Responsible Person</div>${assigneeBtn('dt-assignee', t.assigneeId||null)}</div>
+    </div>
+    ${isContent?'':`<div class="stask-field"><div class="stask-field-label">Description</div><textarea class="stask-field-input" id="dt-desc" rows="4">${escHtml(t.description||'')}</textarea></div>`}
+    ${sectionHtml}
+    ${tagsHtml}
+    ${customFieldsHtml}
+    <div class="stask-field"><div class="stask-field-label">Link</div><input class="stask-field-input" id="dt-link" type="url" value="${escHtml(t.link||'')}"></div>
+    ${t.link?`<a href="${t.link}" target="_blank" style="font-size:13px;color:var(--accent);text-decoration:none;display:inline-block;margin-top:-8px;margin-bottom:14px">↗ Open link</a>`:''}
+    ${subtasksHtml}
   `;
-  document.querySelectorAll('input[name="dt-section"]').forEach(r=>{
-    r.addEventListener('change',()=>{const tw=document.getElementById('dt-tags-wrap');if(tw)tw.style.display=r.value==='work'?'block':'none';});
-  });
+  if(!isContent){
+    document.querySelectorAll('input[name="dt-section"]').forEach(r=>{
+      r.addEventListener('change',()=>{const tw=document.getElementById('dt-tags-wrap');if(tw)tw.style.display=r.value==='work'?'block':'none';});
+    });
+  }
   document.getElementById('stask-bigmodal-overlay')?.classList.add('open');
 };
 window.closeStaskDrawer=function(){
   document.getElementById('stask-bigmodal-overlay')?.classList.remove('open');
-  _activeStaskId=null;
+  _activeStaskId=null; _activeStaskBoard=null;
 };
 window.saveStaskDrawer=function(){
-  const t=STASKS.find(x=>x.id===_activeStaskId);if(!t)return;
+  const boardKey=_activeStaskBoard; if(!boardKey) return;
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===_activeStaskId); if(!t) return;
+  const isContent=boardKey==='content';
   t.title=document.getElementById('dt-title')?.value.trim()||t.title;
-  t.description=document.getElementById('dt-desc')?.value.trim();
-  t.dueDate=document.getElementById('dt-date')?.value;
-  t.status=cddVal('dt-status')||t.status;
-  t.section=document.querySelector('input[name="dt-section"]:checked')?.value||t.section||'work';
-  t.tags=t.section==='work'?[...document.querySelectorAll('input[name="dt-tag"]:checked')].map(x=>x.value):[];
-  t.responsible=document.getElementById('dt-responsible')?.value.trim();
+  t.dueDate=document.getElementById('dt-date')?.value||'';
+  t.status=cddVal('dt-stage')||t.status;
+  t.assigneeId=assigneeBtnVal('dt-assignee');
   t.link=document.getElementById('dt-link')?.value.trim();
-  // collect subtasks
-  t.subtasks=[...(document.getElementById('dt-subtasks')?.querySelectorAll('.sub-row')||[])].map(row=>({
-    id:row.dataset.subId||uid(),
-    title:row.querySelector('[data-field="title"]')?.value.trim()||'',
-    responsible:row.querySelector('[data-field="responsible"]')?.value.trim()||'',
-    dueDate:row.querySelector('[data-field="dueDate"]')?.value||'',
-    done:row.querySelector('.task-circle')?.classList.contains('done')||false,
-  })).filter(s=>s.title);
+  if(!isContent){
+    t.description=document.getElementById('dt-desc')?.value.trim();
+    t.section=document.querySelector('input[name="dt-section"]:checked')?.value||t.section||'work';
+    t.tags=t.section==='work'?[...document.querySelectorAll('input[name="dt-tag"]:checked')].map(x=>x.value):[];
+    t.subtasks=[...(document.getElementById('dt-subtasks')?.querySelectorAll('.sub-row')||[])].map(row=>({
+      id:row.dataset.subId||uid(),
+      title:row.querySelector('[data-field="title"]')?.value.trim()||'',
+      assigneeId: assigneeBtnVal('sub-ap-'+(row.dataset.subId||'')) || null,
+      dueDate:row.querySelector('[data-field="dueDate"]')?.value||'',
+      done:row.querySelector('.task-circle')?.classList.contains('done')||false,
+    })).filter(s=>s.title);
+    _staskSection=t.section;
+  }
+  t.customFields=t.customFields||{};
+  (CONFIG.taskFields[boardKey]||[]).forEach(f=>{
+    if(f.type==='select') t.customFields[f.id]=cddVal('dt-'+f.id);
+    else if(f.type==='person') t.customFields[f.id]=assigneeBtnVal('dt-'+f.id);
+    else t.customFields[f.id]=document.getElementById('dt-'+f.id)?.value.trim()||'';
+  });
   t._ts=Date.now();
-  _staskSection=t.section;
-  saveSTasks();closeStaskDrawer();renderTasks();toast('Task saved','success');
+  store.save(); closeStaskDrawer(); renderTasks(); toast(isContent?'Content saved':'Task saved','success');
 };
 window.deleteStask=function(){
-  if(!_activeStaskId||!confirm('Delete this task?'))return;
-  STASKS=STASKS.filter(x=>x.id!==_activeStaskId);
-  saveSTasks();closeStaskDrawer();renderTasks();toast('Task deleted');
-};
-
-// ── Content Planner functions ────────────────────────────────
-let _activeCTId=null;
-window.ctPrevMonth=function(){_ctMonth--;if(_ctMonth<0){_ctMonth=11;_ctYear--;}renderTasks();};
-window.ctNextMonth=function(){_ctMonth++;if(_ctMonth>11){_ctMonth=0;_ctYear++;}renderTasks();};
-window.openAddCTModal=function(){
-  document.getElementById('add-ct-overlay')?.classList.add('open');
-  setTimeout(()=>document.getElementById('nct-title')?.focus(),50);
-};
-window.closeAddCTModal=function(){document.getElementById('add-ct-overlay')?.classList.remove('open');};
-window.saveNewCT=function(){
-  const title=document.getElementById('nct-title')?.value.trim();
-  if(!title){document.getElementById('nct-error').textContent='Title is required';return;}
-  CONTENT_TASKS=getCTasks();
-  CONTENT_TASKS.push({id:uid(),title,status:cddVal('nct-status')||'todo',format:cddVal('nct-format')||'reel',type:cddVal('nct-type')||'organic',dueDate:document.getElementById('nct-date')?.value||'',link:document.getElementById('nct-link')?.value.trim()||'',_ts:Date.now()});
-  saveCTasks();closeAddCTModal();renderTasks();toast('Content added!','success');
-};
-window.openCTDrawer=function(id){
-  CONTENT_TASKS=getCTasks();
-  const t=CONTENT_TASKS.find(x=>x.id===id);if(!t)return;
-  _activeCTId=id;
-  const ov=document.getElementById('ct-bigmodal-overlay');
-  const body=document.getElementById('ct-bigmodal-body');
-  if(ov)ov.style.display='flex';
-  if(body)body.innerHTML=`
-    <div class="collab-field"><div class="collab-field-label">Title</div><input class="collab-field-input" id="ctd-title" value="${(t.title||'').replace(/"/g,'&quot;')}"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="collab-field"><div class="collab-field-label">Status</div>${cddBtn('ctd-status',CT_STATUSES,t.status||'todo')}</div>
-      <div class="collab-field"><div class="collab-field-label">Format</div>${cddBtn('ctd-format',CT_FORMATS,t.format||'reel')}</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="collab-field"><div class="collab-field-label">Type</div>${cddBtn('ctd-type',CT_TYPES,t.type||'organic')}</div>
-      <div class="collab-field"><div class="collab-field-label">Publish Date</div><input class="collab-field-input" id="ctd-date" type="date" value="${t.dueDate||''}"></div>
-    </div>
-    <div class="collab-field"><div class="collab-field-label">Link</div><input class="collab-field-input" id="ctd-link" type="url" value="${(t.link||'').replace(/"/g,'&quot;')}" placeholder="https://..."></div>
-    <div class="collab-field"><div class="collab-field-label">Notes</div><textarea class="collab-field-input" id="ctd-notes" rows="3" placeholder="Caption ideas, brief, reminders...">${t.notes||''}</textarea></div>
-  `;
-};
-window.closeCTDrawer=function(){
-  const ov=document.getElementById('ct-bigmodal-overlay');
-  if(ov)ov.style.display='none';
-  _activeCTId=null;
-};
-window.saveCTDrawer=function(){
-  CONTENT_TASKS=getCTasks();
-  const t=CONTENT_TASKS.find(x=>x.id===_activeCTId);if(!t)return;
-  t.title  =document.getElementById('ctd-title')?.value.trim()||t.title;
-  t.status =cddVal('ctd-status')||t.status;
-  t.format =cddVal('ctd-format')||t.format;
-  t.type   =cddVal('ctd-type')||t.type;
-  t.dueDate=document.getElementById('ctd-date')?.value||'';
-  t.link   =document.getElementById('ctd-link')?.value.trim()||'';
-  t.notes  =document.getElementById('ctd-notes')?.value.trim()||'';
-  t._ts    =Date.now();
-  saveCTasks();closeCTDrawer();renderTasks();toast('Content saved','success');
-};
-window.deleteCT=function(){
-  if(!_activeCTId)return;
-  if(!confirm('Delete this content item?'))return;
-  CONTENT_TASKS=getCTasks();
-  CONTENT_TASKS=CONTENT_TASKS.filter(x=>x.id!==_activeCTId);
-  saveCTasks();closeCTDrawer();renderTasks();toast('Deleted');
+  const boardKey=_activeStaskBoard; if(!boardKey||!_activeStaskId) return;
+  if(!confirm('Delete this task?')) return;
+  const store=boardStore(boardKey);
+  const filtered=store.getAll().filter(x=>x.id!==_activeStaskId);
+  if(boardKey==='content'){ CONTENT_TASKS=filtered; } else { STASKS=filtered; }
+  store.save(); closeStaskDrawer(); renderTasks(); toast('Deleted');
 };
 
 // ── Content Collabs functions (legacy) ───────────────────────
@@ -7231,20 +7435,7 @@ document.getElementById('su-btn')?.addEventListener('click', async ()=>{
   const users = getAuthUsers();
   if (users.find(u=>u.email===email)){ errEl.textContent='An account with this email already exists'; return; }
   // Link to existing assignee by name (case-insensitive) or create new
-  let assigneeId = null;
-  const existingAssignee = (CONFIG.assignees||[]).find(a=>a.label.toLowerCase()===name.toLowerCase());
-  if (existingAssignee) {
-    assigneeId = existingAssignee.id;
-  } else {
-    const colors = ['#8b5cf6','#3b82f6','#f59e0b','#10b981','#ef4444','#ec4899','#06b6d4'];
-    const color  = colors[Math.floor(Math.random()*colors.length)];
-    const newAssignee = {id:uid(), label:name, color, avatar:null};
-    CONFIG.assignees = CONFIG.assignees||[];
-    CONFIG.assignees.push(newAssignee);
-    syncAssigneeBoards();
-    saveData();
-    assigneeId = newAssignee.id;
-  }
+  const assigneeId = findOrCreateAssignee(name);
   const hash = await hashPassword(password);
   const newUser = {id:assigneeId, email, name, passwordHash:hash, createdAt:Date.now()};
   // First user to register becomes admin automatically
