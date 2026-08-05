@@ -896,6 +896,13 @@ th:hover .col-th-menu{opacity:1}
 .asana-th{cursor:pointer}
 .asana-th:hover{color:var(--text)}
 .tag-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer}
+/* Inline quick-add (type-to-create) rows */
+.quickadd-dot{display:inline-block;width:20px;height:20px;border-radius:50%;border:1.5px dashed var(--border2)}
+.quickadd-input{width:100%;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none;padding:2px 0}
+.quickadd-input::placeholder{color:var(--text3)}
+.quickadd-sub-input{width:100%;max-width:320px;border:none;background:transparent;font-size:12px;color:var(--text2);font-family:inherit;outline:none;padding:1px 0}
+.quickadd-sub-input::placeholder{color:var(--text3);opacity:.7}
+.stask-quickadd:hover{background:var(--bg)}
 /* Big center modal */
 .bigmodal-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px}
 .bigmodal-overlay.open{display:flex}
@@ -5495,6 +5502,14 @@ async function insRenderIg(){
 //  MIGRATIONS
 // ====================================================================
 
+// Auto-open the native calendar the moment any date field is focused, app-wide,
+// so picking a date always shows a calendar instead of requiring a click on the tiny icon.
+document.addEventListener('focusin', e=>{
+  if(e.target && e.target.tagName==='INPUT' && e.target.type==='date'){
+    try{ e.target.showPicker && e.target.showPicker(); }catch(err){}
+  }
+});
+
 // ====================================================================
 //  INIT  (async — waits for Supabase sync before rendering)
 // ====================================================================
@@ -6051,6 +6066,16 @@ function boardRow(boardKey, t){
     </tr>`;
   }).join('');
 
+  const subAddRow = boardKey==='content' ? '' : `<tr class="stask-subrow stask-subrow-add">
+    <td style="width:44px"></td>
+    <td style="padding:2px 8px 6px" colspan="${2+fields.length}">
+      <div style="padding-left:16px;border-left:2px solid transparent">
+        <input class="quickadd-sub-input" placeholder="+ Add subtask" onkeydown="if(event.key==='Enter'){window.quickAddSubtask('${boardKey}','${t.id}',this);}">
+      </div>
+    </td>
+    <td></td>
+  </tr>`;
+
   return `<tr class="stask-row" data-id="${t.id}">
     <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle">
       <button class="task-circle${done?' done':''}" onclick="event.stopPropagation();window.quickToggleTask('${boardKey}','${t.id}')"></button>
@@ -6076,8 +6101,18 @@ function boardRow(boardKey, t){
     <td style="padding:11px 12px;font-size:12px;text-align:right">
       ${t.link?`<a href="${t.link}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;opacity:.6">↗</a>`:`<span style="opacity:.3;cursor:pointer;font-size:16px" onclick="event.stopPropagation();window.openStaskDrawer('${boardKey}','${t.id}')">…</span>`}
     </td>
-  </tr>${subRows}`;
+  </tr>${subRows}${subAddRow}`;
 }
+window.quickAddSubtask=function(boardKey, taskId, inputEl){
+  const title=(inputEl.value||'').trim();
+  if(!title) return;
+  const store=boardStore(boardKey);
+  const t=store.getAll().find(x=>x.id===taskId); if(!t) return;
+  t.subtasks=t.subtasks||[];
+  t.subtasks.push({id:uid(),title,assigneeId:null,dueDate:'',done:false});
+  t._ts=Date.now();
+  store.save(); renderTasks();
+};
 
 function boardTable(boardKey, tasks){
   const fields=CONFIG.taskFields[boardKey]||[];
@@ -6102,10 +6137,15 @@ function boardTable(boardKey, tasks){
     <th style="width:36px"><button class="col-add-btn" title="Add column" onclick="event.stopPropagation();window.openAddFieldForm(this,'${boardKey}',renderTasks)">+</button></th>
   </tr></thead>`;
 
-  if(!tasks.length) return `<div class="ideas-drop-zone">No tasks yet — click <strong>+ Add Task</strong> above to create one.</div>`;
+  const quickAddRow = `<tr class="stask-row stask-quickadd">
+    <td style="width:44px;padding:12px 4px 12px 16px;vertical-align:middle"><span class="quickadd-dot"></span></td>
+    <td colspan="${3+fields.length}" style="padding:8px 8px 8px 0">
+      <input id="qa-${boardKey}" class="quickadd-input" placeholder="Write a task and press Enter…" onkeydown="if(event.key==='Enter'){window.quickAddTask('${boardKey}',this);}">
+    </td>
+  </tr>`;
 
   return `<table class="stask-table" style="margin-bottom:0">${head}
-  <tbody>${sorted.map(t=>boardRow(boardKey,t)).join('')}</tbody></table>`;
+  <tbody>${sorted.map(t=>boardRow(boardKey,t)).join('')}${quickAddRow}</tbody></table>`;
 }
 window._fcDragStart=function(e, fieldId){ e.dataTransfer.setData('fieldId', fieldId); };
 window._fcDrop=function(e, boardKey, toFieldId){
@@ -6113,6 +6153,24 @@ window._fcDrop=function(e, boardKey, toFieldId){
   const fromId=e.dataTransfer.getData('fieldId'); if(!fromId||fromId===toFieldId) return;
   reorderTaskField(boardKey, fromId, toFieldId);
   renderTasks();
+};
+window.quickAddTask=function(boardKey, inputEl){
+  const title=(inputEl.value||'').trim();
+  if(!title) return;
+  const stages=getStages(boardKey);
+  const stageId=(stages[0]&&stages[0].id)||'';
+  if(boardKey==='content'){
+    CONTENT_TASKS=getCTasks();
+    CONTENT_TASKS.push({id:uid(),title,status:stageId,dueDate:'',link:'',assigneeId:null,customFields:{},_ts:Date.now()});
+    saveCTasks();
+  } else {
+    STASKS=getSTasks();
+    STASKS.unshift({id:uid(),title,description:'',dueDate:'',status:stageId,section:boardKey,tags:[],assigneeId:null,link:'',customFields:{},subtasks:[],_ts:Date.now()});
+    saveSTasks();
+  }
+  renderTasks();
+  // keep the quick-add input focused so you can add several tasks back-to-back without re-clicking
+  requestAnimationFrame(()=>{ document.getElementById('qa-'+boardKey)?.focus(); });
 };
 
 // One-time backfill: older tasks stored a free-text "responsible" name instead of an assigneeId.
